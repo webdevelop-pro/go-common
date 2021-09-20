@@ -7,16 +7,19 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// Client ...
 type Client interface {
-	getCommit(repo, sha string) (GitCommit, error)
+	getCommit(repo, sha string) (Commit, error)
 }
 
-type GitCommit struct {
+// Commit ...
+type Commit struct {
 	Author  string
 	URL     string
 	Message string
 }
 
+// GithubClient ...
 type GithubClient struct {
 	AccessToken string `json:"access_token"`
 	RepoOwner   string `json:"repo_owner"`
@@ -40,7 +43,7 @@ func (g GithubClient) getCommit(repo, sha string) (GitCommit, error) {
 		sha,
 	)
 
-	return GitCommit{
+	return Commit{
 		Author:  *commit.Author.Name,
 		URL:     *commit.URL,
 		Message: *commit.Message,
