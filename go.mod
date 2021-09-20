@@ -1,4 +1,4 @@
-module webdevelop-pro/go-common
+module github.com/webdevelop-pro/go-common
 
 go 1.16
 
