@@ -1,21 +1,19 @@
 // Package p contains a Pub/Sub Cloud Function.
 
-package senders
+package cloudbuild
 
 import (
 	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/webdevelop-pro/go-common/notifications/subscriptions"
-	. "github.com/webdevelop-pro/go-common/notifications/subscriptions"
 )
 
 func TestProcessEvent(t *testing.T) {
 	t.Parallel()
 
-	worker := subscriptions.NewWorker(
-		subscriptions.Config{
+	worker := NewWorker(
+		Config{
 			SlackToken:        "xoxb-2523150300577-2495865134151-7yze2ClHQ1zLGILNvpGOYJOm",
 			GithubAccessToken: "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",
 			GitRepoOwner:      "replier-ai",

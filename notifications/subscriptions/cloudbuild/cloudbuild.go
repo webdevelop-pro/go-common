@@ -1,5 +1,5 @@
 // Package p contains a Pub/Sub Cloud Function.
-package subscriptions
+package cloudbuild
 
 import (
 	"context"
