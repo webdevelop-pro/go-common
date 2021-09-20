@@ -17,12 +17,12 @@ type GitCommit struct {
 	Message string
 }
 
-type Github struct {
+type GithubClient struct {
 	AccessToken string `json:"access_token"`
 	RepoOwner   string `json:"repo_owner"`
 }
 
-func (g Github) getCommit(repo, sha string) (GitCommit, error) {
+func (g GithubClient) getCommit(repo, sha string) (GitCommit, error) {
 	ctx := context.Background()
 
 	ts := oauth2.StaticTokenSource(
