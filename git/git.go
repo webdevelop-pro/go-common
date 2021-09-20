@@ -9,7 +9,7 @@ import (
 
 // Client ...
 type Client interface {
-	getCommit(repo, sha string) (Commit, error)
+	GetCommit(repo, sha string) (*Commit, error)
 }
 
 // Commit ...
@@ -25,7 +25,8 @@ type GithubClient struct {
 	RepoOwner   string `json:"repo_owner"`
 }
 
-func (g GithubClient) getCommit(repo, sha string) (GitCommit, error) {
+// GetCommit ...
+func (g GithubClient) GetCommit(repo, sha string) (*Commit, error) {
 	ctx := context.Background()
 
 	ts := oauth2.StaticTokenSource(
@@ -42,8 +43,11 @@ func (g GithubClient) getCommit(repo, sha string) (GitCommit, error) {
 		repo,
 		sha,
 	)
+	if err != nil {
+		return nil, err
+	}
 
-	return Commit{
+	return &Commit{
 		Author:  *commit.Author.Name,
 		URL:     *commit.URL,
 		Message: *commit.Message,
