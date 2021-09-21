@@ -3,6 +3,7 @@ module github.com/webdevelop-pro/go-common
 go 1.16
 
 require (
+	github.com/gomarkdown/markdown v0.0.0-20210918233619-6c1113f12c4a // indirect
 	github.com/google/go-github/v39 v39.0.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/rs/zerolog v1.25.0

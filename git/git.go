@@ -14,9 +14,11 @@ type Client interface {
 
 // Commit ...
 type Commit struct {
-	Author  string
-	URL     string
-	Message string
+	AuthorName  string
+	AuthorLogin string
+	URL         string
+	Message     string
+	SHA         string
 }
 
 // GithubClient ...
@@ -48,8 +50,10 @@ func (g GithubClient) GetCommit(repo, sha string) (*Commit, error) {
 	}
 
 	return &Commit{
-		Author:  *commit.Author.Name,
-		URL:     *commit.URL,
-		Message: *commit.Message,
+		AuthorName:  commit.GetAuthor().GetName(),
+		AuthorLogin: commit.GetAuthor().GetLogin(),
+		URL:         commit.GetHTMLURL(),
+		Message:     commit.GetMessage(),
+		SHA:         commit.GetSHA(),
 	}, err
 }

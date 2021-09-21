@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/webdevelop-pro/go-common/notifications/subscriptions"
 )
 
 func TestProcessEvent(t *testing.T) {
@@ -14,14 +15,14 @@ func TestProcessEvent(t *testing.T) {
 
 	worker := NewWorker(
 		Config{
-			SlackToken:        "xoxb-2523150300577-2495865134151-7yze2ClHQ1zLGILNvpGOYJOm",
+			SlackToken:        "xoxb-1582127800421-1664120099108-II2ur4kaypnKnoUSW5ZTSyhT",
 			GithubAccessToken: "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",
 			GitRepoOwner:      "replier-ai",
 			Channels: map[string][]Channel{
 				"all": {
 					{
 						Type: Slack,
-						To:   "tests",
+						To:   "test_notify",
 					},
 					{
 						Type: Matrix,
@@ -32,7 +33,7 @@ func TestProcessEvent(t *testing.T) {
 		},
 	)
 
-	err := worker.ProcessEvent(context.Background(), PubSubMessage{
+	err := worker.ProcessEvent(context.Background(), subscriptions.PubSubMessage{
 		Data: []byte(`
 			{
 				"id": "ee57301f-580f-4563-b2c2-ae6f137fb91a",
@@ -50,7 +51,7 @@ func TestProcessEvent(t *testing.T) {
 					"_SERVICE_NAME": "payment-api",
 					"REF_NAME": "cloudbuild",
 					"TRIGGER_NAME": "pament-api",
-					"TRIGGER_BUILD_CONFIG_PATH": "cloudbuild.yaml"
+					"TRIGGER_BUILD_CONFIG_PATH": "cloudbuild.yamsl"
 				}
 			}`,
 		),
