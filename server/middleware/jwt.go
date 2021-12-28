@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/rs/zerolog/log"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -39,6 +40,11 @@ func ParseJWTPayload(token string) (pld JWTPayload, err error) {
 func SetJWTPayload(c echo.Context, pld JWTPayload) {
 	ctx := c.Request().Context()
 	ctx = context.WithValue(ctx, jwtKey, pld)
+
+	// set user_id to logger
+	l := log.Ctx(ctx).With().Str("user_id", pld.UserID).Logger()
+	ctx = l.WithContext(ctx)
+
 	c.SetRequest(c.Request().WithContext(ctx))
 }
 
