@@ -55,32 +55,45 @@ type severityHook struct{}
 
 // New returns logger instance
 func New(params Params) Logger {
+	logger := newLogger(params)
+
+	var emptyVarsList []string
+	if params.AppVersion == "" {
+		emptyVarsList = append(emptyVarsList, "Version")
+	}
+
+	if params.Component == "" {
+		emptyVarsList = append(emptyVarsList, "Component")
+	}
+
+	if len(emptyVarsList) > 0 {
+		logger.Error().
+			Msg(fmt.Sprintf("this vars didn't set: %v", emptyVarsList))
+	}
+
+	return logger
+}
+
+// New returns logger instance
+func newLogger(params Params) Logger {
 	defaultLogger := getDefaultLogger(params.output)
 
 	level, err := zerolog.ParseLevel(params.LogLevel)
 	if err != nil {
 		level = zerolog.InfoLevel
-		defaultLogger.Error().Err(err).Str("level_from_params", params.LogLevel).Msg("failed to parse log level")
+		defaultLogger.Error().Err(err).
+			Str("level_from_params", params.LogLevel).
+			Msg("failed to parse log level")
 	}
 
 	ctxLogger := defaultLogger.Level(level).With()
 
-	var emptyVarsList []string
-	if params.AppVersion == "" {
-		emptyVarsList = append(emptyVarsList, "Version")
-	} else {
+	if params.AppVersion != "" {
 		ctxLogger = ctxLogger.Str("version", params.AppVersion)
 	}
 
-	if params.Component == "" {
-		emptyVarsList = append(emptyVarsList, "Component")
-	} else {
+	if params.Component != "" {
 		ctxLogger = ctxLogger.Str("component", params.Component)
-	}
-
-	if len(emptyVarsList) > 0 {
-		defaultLogger.Error().
-			Err(err).Msg(fmt.Sprintf("this vars didn't set: %v", emptyVarsList))
 	}
 
 	return Logger{ctxLogger.Logger()}
@@ -130,7 +143,7 @@ func (l Logger) Printf(s string, args ...interface{}) {
 
 // NewDefault returns default logger instance
 func NewDefault() Logger {
-	return New(GetDefaultParams())
+	return newLogger(GetDefaultParams())
 }
 
 // NewDefaultComponent returns default logger instance with custom component name
@@ -138,5 +151,5 @@ func NewDefaultComponent(component string) Logger {
 	params := GetDefaultParams()
 	params.Component = component
 
-	return New(params)
+	return newLogger(params)
 }
