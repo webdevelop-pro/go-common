@@ -5,10 +5,10 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/rs/zerolog/log"
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog/log"
 )
 
 type contextKey int
