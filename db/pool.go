@@ -30,7 +30,7 @@ func ParseConfig(connString string) *pgxpool.Config {
 func GetConfig() *Config {
 	cfg := &Config{}
 
-	if err := configurator.NewConfiguration(cfg); err != nil {
+	if err := configurator.NewConfiguration(cfg, "db"); err != nil {
 		logger.Fatal().Err(err).Msg("failed to get configuration of db")
 	}
 
