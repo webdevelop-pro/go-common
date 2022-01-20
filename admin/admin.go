@@ -58,7 +58,7 @@ func ConfigureAdmin(
 			Path:   "./uploads",
 			Prefix: "uploads",
 		},
-		Debug:    true,
+		Debug:    conf.Debug,
 		Language: language.CN,
 	}
 
