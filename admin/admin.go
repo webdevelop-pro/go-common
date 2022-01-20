@@ -62,8 +62,8 @@ func ConfigureAdmin(
 			User:       dbConf.User,
 			Pwd:        dbConf.Password,
 			Name:       dbConf.Database,
-			MaxIdleCon: int(dbConf.DbMaxConnections),
-			MaxOpenCon: int(dbConf.DbMaxConnections) * 2,
+			MaxIdleCon: int(dbConf.MaxConnections),
+			MaxOpenCon: int(dbConf.MaxConnections) * 2,
 			Driver:     config.DriverPostgresql,
 		}
 	}
