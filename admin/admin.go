@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/GoAdminGroup/go-admin/examples/datamodel"
 	_ "github.com/GoAdminGroup/go-admin/modules/db/drivers/postgres"
 	"github.com/GoAdminGroup/go-admin/plugins/admin/modules/table"
+	"github.com/GoAdminGroup/go-admin/template/types"
 	_ "github.com/GoAdminGroup/themes/adminlte"
 	"github.com/labstack/echo/v4"
 	"github.com/webdevelop-pro/go-common/db"
@@ -16,7 +18,6 @@ import (
 	"github.com/GoAdminGroup/go-admin/modules/config"
 	"github.com/GoAdminGroup/go-admin/modules/language"
 	"github.com/GoAdminGroup/go-admin/template"
-	"github.com/GoAdminGroup/go-admin/template/chartjs"
 )
 
 type Config struct {
@@ -67,12 +68,9 @@ func ConfigureAdmin(
 		cfg.Databases[dbConf.Database] = getDatabaseConfig(dbConf)
 	}
 
-	template.AddComp(chartjs.NewChart())
-
 	if err := eng.AddConfig(&cfg).
 		AddGenerators(listTables).
 		AddDisplayFilterXssJsFilter().
-		AddGenerator("user", datamodel.GetUserTable).
 		Use(e); err != nil {
 		return err
 	}
@@ -95,4 +93,12 @@ func getDatabaseConfig(dbConf db.Config) config.Database {
 		MaxOpenCon: int(dbConf.MaxConnections) * 2,
 		Driver:     config.DriverPostgresql,
 	}
+}
+
+// GetContent return the content of index page.
+func GetContent(ctx *context.Context) (types.Panel, error) {
+	return types.Panel{
+		Title:       "Dashboard",
+		Description: "coming soon",
+	}, nil
 }
