@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"fmt"
 	"strconv"
 
 	_ "github.com/GoAdminGroup/go-admin/adapter/echo"
@@ -35,6 +36,10 @@ func ConfigureAdmin(
 	conf Config,
 	dbConfigs ...db.Config,
 ) error {
+	if len(dbConfigs) == 0 {
+		return fmt.Errorf("db configs list is empty")
+	}
+
 	eng := engine.Default()
 
 	cfg := config.Config{
@@ -55,17 +60,10 @@ func ConfigureAdmin(
 		Language: language.CN,
 	}
 
+	cfg.Databases["default"] = getDatabaseConfig(dbConfigs[0])
+
 	for _, dbConf := range dbConfigs {
-		cfg.Databases[dbConf.Database] = config.Database{
-			Host:       dbConf.Host,
-			Port:       strconv.Itoa(int(dbConf.Port)),
-			User:       dbConf.User,
-			Pwd:        dbConf.Password,
-			Name:       dbConf.Database,
-			MaxIdleCon: int(dbConf.MaxConnections),
-			MaxOpenCon: int(dbConf.MaxConnections) * 2,
-			Driver:     config.DriverPostgresql,
-		}
+		cfg.Databases[dbConf.Database] = getDatabaseConfig(dbConf)
 	}
 
 	template.AddComp(chartjs.NewChart())
@@ -83,4 +81,17 @@ func ConfigureAdmin(
 	eng.HTML("GET", "/admin", datamodel.GetContent)
 
 	return nil
+}
+
+func getDatabaseConfig(dbConf db.Config) config.Database {
+	return config.Database{
+		Host:       dbConf.Host,
+		Port:       strconv.Itoa(int(dbConf.Port)),
+		User:       dbConf.User,
+		Pwd:        dbConf.Password,
+		Name:       dbConf.Database,
+		MaxIdleCon: int(dbConf.MaxConnections),
+		MaxOpenCon: int(dbConf.MaxConnections) * 2,
+		Driver:     config.DriverPostgresql,
+	}
 }
