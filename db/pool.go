@@ -40,12 +40,12 @@ func GetConfig() *Config {
 func GetConnString(cfg *Config) string {
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%d/%s?pool_max_conns=%d&application_name=%s",
-		cfg.DbUser,
-		cfg.DbPassword,
-		cfg.DbHost,
-		cfg.DbPort,
-		cfg.DbDatabase,
-		cfg.DbMaxConnections,
+		cfg.User,
+		cfg.Password,
+		cfg.Host,
+		cfg.Port,
+		cfg.Database,
+		cfg.MaxConnections,
 		cfg.HOSTNAME,
 	)
 }
@@ -53,7 +53,7 @@ func GetConnString(cfg *Config) string {
 func GetConnConfig(cfg *Config) *pgxpool.Config {
 	pgConfig := ParseConfig(GetConnString(cfg))
 
-	pgxLogLevel, err := pgx.LogLevelFromString(cfg.DbLogLevel)
+	pgxLogLevel, err := pgx.LogLevelFromString(cfg.LogLevel)
 	if err != nil {
 		pgxLogLevel = pgx.LogLevelNone
 	}
