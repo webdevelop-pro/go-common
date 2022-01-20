@@ -7,7 +7,7 @@ import (
 	_ "github.com/GoAdminGroup/go-admin/adapter/echo"
 	"github.com/GoAdminGroup/go-admin/examples/datamodel"
 	_ "github.com/GoAdminGroup/go-admin/modules/db/drivers/postgres"
-	"github.com/GoAdminGroup/go-admin/tests/tables"
+	"github.com/GoAdminGroup/go-admin/plugins/admin/modules/table"
 	_ "github.com/GoAdminGroup/themes/adminlte"
 	"github.com/labstack/echo/v4"
 	"github.com/webdevelop-pro/go-common/db"
@@ -34,6 +34,7 @@ type Config struct {
 func ConfigureAdmin(
 	e *echo.Echo,
 	conf Config,
+	listTables table.GeneratorList,
 	dbConfigs ...db.Config,
 ) error {
 	if len(dbConfigs) == 0 {
@@ -56,7 +57,7 @@ func ConfigureAdmin(
 			Path:   "./uploads",
 			Prefix: "uploads",
 		},
-		Debug:    conf.Debug,
+		Debug:    true,
 		Language: language.CN,
 	}
 
@@ -69,7 +70,7 @@ func ConfigureAdmin(
 	template.AddComp(chartjs.NewChart())
 
 	if err := eng.AddConfig(&cfg).
-		AddGenerators(tables.Generators).
+		AddGenerators(listTables).
 		AddDisplayFilterXssJsFilter().
 		AddGenerator("user", datamodel.GetUserTable).
 		Use(e); err != nil {
