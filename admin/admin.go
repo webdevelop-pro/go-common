@@ -1,12 +1,10 @@
 package admin
 
 import (
-	"context"
 	"fmt"
 	"strconv"
 
 	_ "github.com/GoAdminGroup/go-admin/adapter/echo"
-	"github.com/GoAdminGroup/go-admin/examples/datamodel"
 	_ "github.com/GoAdminGroup/go-admin/modules/db/drivers/postgres"
 	"github.com/GoAdminGroup/go-admin/plugins/admin/modules/table"
 	"github.com/GoAdminGroup/go-admin/template/types"
@@ -14,6 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/webdevelop-pro/go-common/db"
 
+	"github.com/GoAdminGroup/go-admin/context"
 	"github.com/GoAdminGroup/go-admin/engine"
 	"github.com/GoAdminGroup/go-admin/modules/config"
 	"github.com/GoAdminGroup/go-admin/modules/language"
@@ -77,7 +76,7 @@ func ConfigureAdmin(
 
 	e.Static("/uploads", "./uploads")
 
-	eng.HTML("GET", "/admin", datamodel.GetContent)
+	eng.HTML("GET", "/admin", getContent)
 
 	return nil
 }
@@ -96,7 +95,7 @@ func getDatabaseConfig(dbConf db.Config) config.Database {
 }
 
 // GetContent return the content of index page.
-func GetContent(ctx *context.Context) (types.Panel, error) {
+func getContent(ctx *context.Context) (types.Panel, error) {
 	return types.Panel{
 		Title:       "Dashboard",
 		Description: "coming soon",
