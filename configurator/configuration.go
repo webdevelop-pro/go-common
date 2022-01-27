@@ -9,11 +9,18 @@ type Configuration struct {
 }
 
 // NewConfiguration sets conf from env
-func NewConfiguration(conf interface{}) error {
-	err := envconfig.Process("", conf)
-	if err != nil {
-		_ = envconfig.Usage("", conf)
+func NewConfiguration(conf interface{}, prefixes ...string) error {
+	prefix := ""
+
+	if len(prefixes) > 0 {
+		prefix = prefixes[0]
+	}
+
+	if err := envconfig.Process(prefix, conf); err != nil {
+		_ = envconfig.Usage(prefix, conf)
+
 		return err
 	}
+
 	return nil
 }

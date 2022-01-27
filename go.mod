@@ -3,6 +3,10 @@ module github.com/webdevelop-pro/go-common
 go 1.16
 
 require (
+	github.com/GoAdminGroup/go-admin v1.2.23
+	github.com/GoAdminGroup/themes v0.0.43
+	github.com/gin-gonic/gin v1.7.7 // indirect
+	github.com/gobuffalo/packr/v2 v2.8.3 // indirect
 	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx/v4 v4.14.1
 	github.com/jackc/puddle v1.2.1 // indirect
@@ -21,4 +25,6 @@ require (
 	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11 // indirect
+	gorm.io/driver/postgres v1.2.3
+	gorm.io/gorm v1.22.5
 )
