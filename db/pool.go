@@ -1,6 +1,5 @@
 package db
 
-import "C"
 import (
 	"context"
 	"fmt"
@@ -17,24 +16,27 @@ var (
 	logger  = comLogger.NewDefaultComponent(pkgName)
 )
 
-func ParseConfig(connString string) *pgxpool.Config {
-	pgConfig, err := pgxpool.ParseConfig(connString)
+func ParseConfig(cfg *Config) *pgxpool.Config {
+	pgConfig, err := pgxpool.ParseConfig(GetConnString(cfg))
 
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed to parse config")
 	}
 
+	pgxLogLevel, err := pgx.LogLevelFromString(cfg.LogLevel)
+
+	if err != nil {
+		pgxLogLevel = pgx.LogLevelNone
+	}
+
+	pgConfig.ConnConfig.Logger = NewDBLogger(logger)
+	pgConfig.ConnConfig.LogLevel = pgxLogLevel
+
 	return pgConfig
 }
 
-func GetConfig() *Config {
-	cfg := &Config{}
-
-	if err := configurator.NewConfiguration(cfg, "db"); err != nil {
-		logger.Fatal().Err(err).Msg("failed to get configuration of db")
-	}
-
-	return cfg
+func GetConfig(c *configurator.Configurator) *Config {
+	return c.New(pkgName, &Config{}, pkgName).(*Config)
 }
 
 func GetConnString(cfg *Config) string {
@@ -50,23 +52,13 @@ func GetConnString(cfg *Config) string {
 	)
 }
 
-func GetConnConfig(cfg *Config) *pgxpool.Config {
-	pgConfig := ParseConfig(GetConnString(cfg))
-
-	pgxLogLevel, err := pgx.LogLevelFromString(cfg.LogLevel)
-	if err != nil {
-		pgxLogLevel = pgx.LogLevelNone
-	}
-
-	pgConfig.ConnConfig.Logger = NewDBLogger(logger)
-	pgConfig.ConnConfig.LogLevel = pgxLogLevel
-
-	return pgConfig
+func GetConnConfig(c *configurator.Configurator) *pgxpool.Config {
+	return ParseConfig(GetConfig(c))
 }
 
 // NewPool is constructor for pgxpool.Pool
-func NewPool(cfg *Config) *pgxpool.Pool {
-	return newPool(GetConnConfig(cfg))
+func NewPool(c *configurator.Configurator) *pgxpool.Pool {
+	return newPool(GetConnConfig(c))
 }
 
 // NewPoolFromConfig is constructor for pgxpool.Pool

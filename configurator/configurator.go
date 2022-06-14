@@ -14,8 +14,8 @@ type Configurator struct {
 	configMap map[string]interface{}
 }
 
-// NewConfigurator returns a new instance of Configurator
-func NewConfigurator(configs ...Configuration) *Configurator {
+// New returns a new instance of Configurator
+func New(configs ...Configuration) *Configurator {
 	c := &Configurator{
 		configMap: map[string]interface{}{},
 	}
@@ -35,7 +35,7 @@ func (c *Configurator) Set(key string, conf interface{}) {
 }
 
 // Get returns or creates a Configuration
-func (c *Configurator) Get(key string, conf interface{}) {
+func (c *Configurator) Get(key string, conf interface{}) interface{} {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -45,7 +45,7 @@ func (c *Configurator) Get(key string, conf interface{}) {
 			panic(err)
 		}
 
-		return
+		return conf
 	}
 
 	if err := NewConfiguration(conf); err != nil {
@@ -54,5 +54,19 @@ func (c *Configurator) Get(key string, conf interface{}) {
 
 	c.configMap[key] = conf
 
-	return
+	return conf
+}
+
+// New sets a new configuration
+func (c *Configurator) New(key string, conf interface{}, prefixes ...string) interface{} {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if err := NewConfiguration(conf, prefixes...); err != nil {
+		panic(err)
+	}
+
+	c.configMap[key] = conf
+
+	return conf
 }

@@ -104,7 +104,7 @@ func New() *HttpServer {
 	l := logger.NewDefaultComponent("http_server")
 
 	if err := configurator.NewConfiguration(cfg); err != nil {
-		l.Fatal().Err(err).Msg("failed to get configuration of db")
+		l.Fatal().Err(err).Msg("failed to get configuration of server")
 	}
 
 	return NewHttpServer(echo.New(), l, cfg, nil)

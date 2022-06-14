@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/webdevelop-pro/go-common/configurator"
 	comLogger "github.com/webdevelop-pro/go-common/logger"
 )
 
@@ -14,8 +15,8 @@ type DB struct {
 }
 
 // New returns new DB instance.
-func New() *DB {
-	return NewDB(NewPool(GetConfig()), comLogger.NewDefaultComponent("db"))
+func New(c *configurator.Configurator) *DB {
+	return NewDB(NewPool(c), logger)
 }
 
 // NewDB returns new DB instance.
