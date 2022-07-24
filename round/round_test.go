@@ -31,9 +31,9 @@ func TestRoundToLargestRemainder(t *testing.T) {
 		{
 			description: "real case",
 			input: []float64{
-				48.648648648648646,
-				40.54054054054054,
-				10.81081081081081,
+				(18.0 / 37) * 100, // 48.648648648648646 %
+				(15.0 / 37) * 100, // 40.54054054054054 %
+				(4.0 / 37) * 100,  // 10.81081081081081 %
 			},
 			expectedResult: []float64{49, 40, 11},
 			expectedError:  nil,
