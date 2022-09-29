@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	pkgName = "go-common/db"
+	pkgName = "db"
 	logger  = comLogger.NewDefaultComponent(pkgName)
 )
 
