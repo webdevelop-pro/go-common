@@ -8,13 +8,13 @@ on:
   push:
     branches:
     - master
-    - staging
-    - develop
+    - stage
+    - dev
   pull_request:
     branches:
     - master
-    - staging
-    - develop
+    - stage
+    - dev
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -39,6 +39,7 @@ jobs:
       run: |
         go version
         go get -u golang.org/x/lint/golint
+        go get ./...
 
     # Run build of the application
     - name: Run tests
@@ -48,7 +49,7 @@ jobs:
     - name: Run vet & lint
       run: |
         go vet ./...
-        golint ./...
+        # golint ./...
 
   coverage:
     runs-on: ubuntu-latest
