@@ -1,139 +1,42 @@
 package logger
 
 import (
-	"fmt"
 	"io"
 	"os"
-	"strings"
 
 	"github.com/rs/zerolog"
 	"github.com/webdevelop-pro/go-common/configurator"
+	"github.com/webdevelop-pro/go-common/verser"
 )
 
-var (
-	cfg           = Config{}
-	defaultParams Params
-	defaultOutput io.Writer
-)
-
-func init() {
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-
-	if err := configurator.NewConfiguration(&cfg); err != nil {
-		panic(err)
-	}
-
-	defaultOutput = os.Stdout
-
-	if cfg.LogConsole {
-		defaultOutput = zerolog.NewConsoleWriter()
-	}
-
-	defaultParams = Params{
-		LogLevel:   cfg.LogLevel,
-		AppVersion: "",
-		Component:  "",
-		output:     defaultOutput,
-	}
-}
-
-// Logger is wrapper struct around zerolog.Logger that adds some custom functionality
+// Logger is wrapper struct around logger.Logger that adds some custom functionality
 type Logger struct {
 	zerolog.Logger
 }
 
-// Params ...
-type Params struct {
-	LogLevel   string    `required:"true" split_words:"true"`
-	AppVersion string    `ignored:"true"`
-	Component  string    `ignored:"true"`
-	output     io.Writer `ignored:"true"`
+// ServiceContext contain info for all logs
+type ServiceContext struct {
+	Service         string             `json:"service"`
+	Version         string             `json:"version"`
+	User            string             `json:"user"`
+	HttpRequest     HttpRequestContext `json:"httpRequest"`
+	SourceReference SourceReference    `json:"sourceReference"`
 }
 
-// severityHook is a structure for adding the severity field in log
-type severityHook struct{}
-
-// New returns logger instance
-func New(params Params) Logger {
-	logger := newLogger(params)
-
-	var emptyVarsList []string
-	if params.AppVersion == "" {
-		emptyVarsList = append(emptyVarsList, "Version")
-	}
-
-	if params.Component == "" {
-		emptyVarsList = append(emptyVarsList, "Component")
-	}
-
-	if len(emptyVarsList) > 0 {
-		logger.Error().
-			Msg(fmt.Sprintf("this vars didn't set: %v", emptyVarsList))
-	}
-
-	return logger
+// SourceReference repositary name and revision id
+type SourceReference struct {
+	Repository string `json:"repository"`
+	RevisionID string `json:"revisionId"`
 }
 
-// New returns logger instance
-func newLogger(params Params) Logger {
-	defaultLogger := getDefaultLogger(params.output)
-
-	level, err := zerolog.ParseLevel(params.LogLevel)
-	if err != nil {
-		level = zerolog.InfoLevel
-		defaultLogger.Error().Err(err).
-			Str("level_from_params", params.LogLevel).
-			Msg("failed to parse log level")
-	}
-
-	ctxLogger := defaultLogger.Level(level).With()
-
-	if params.AppVersion != "" {
-		ctxLogger = ctxLogger.Str("version", params.AppVersion)
-	}
-
-	if params.Component != "" {
-		ctxLogger = ctxLogger.Str("component", params.Component)
-	}
-
-	return Logger{ctxLogger.Logger()}
-}
-
-// GetDefaultParams return default params
-func GetDefaultParams() Params {
-	return defaultParams
-}
-
-func getDefaultLogger(w io.Writer) zerolog.Logger {
-	output := w
-	if output == nil {
-		output = os.Stdout
-	}
-
-	return zerolog.
-		New(output).
-		Level(zerolog.InfoLevel).
-		Hook(severityHook{}).
-		With().Caller().
-		Timestamp().
-		Logger()
-}
-
-// GetDefaultLogger returns default logger
-func GetDefaultLogger(w io.Writer) Logger {
-	return Logger{
-		getDefaultLogger(w),
-	}
-}
-
-// Run convert info to severity
-func (h severityHook) Run(e *zerolog.Event, level zerolog.Level, msg string) {
-	if level != zerolog.NoLevel {
-		e.Str("severity", strings.ToUpper(level.String()))
-	} else {
-		e.Str("severity", strings.ToUpper(zerolog.ErrorLevel.String()))
-		e.Str("message", "Don't use logs with NoLevel")
-	}
+// HttpRequestContext http request context
+type HttpRequestContext struct {
+	Method             string `json:"method"`
+	URL                string `json:"url"`
+	UserAgent          string `json:"userAgent"`
+	Referrer           string `json:"referrer"`
+	ResponseStatusCode int    `json:"responseStatusCode"`
+	RemoteIp           string `json:"remoteIp"`
 }
 
 // Printf is implementation of fx.Printer
@@ -141,15 +44,77 @@ func (l Logger) Printf(s string, args ...interface{}) {
 	l.Info().Msgf(s, args...)
 }
 
-// NewDefault returns default logger instance
-func NewDefault() Logger {
-	return newLogger(GetDefaultParams())
+// NewLogger return logger instance
+func NewLogger(component string, output io.Writer, conf *configurator.Configurator) Logger {
+	cfg := conf.New("logger", &Config{}).(*Config)
+
+	level, err := zerolog.ParseLevel(cfg.LogLevel)
+	if err != nil {
+		level = zerolog.InfoLevel
+	}
+
+	// Beautiful output
+	if cfg.LogConsole {
+		output = zerolog.NewConsoleWriter()
+	} else if output == nil {
+		output = os.Stdout
+	}
+
+	l := zerolog.
+		New(output).
+		Level(level).
+		Hook(SeverityHook{}).
+		Hook(TypeHook{skip: cfg.LogConsole}).
+		With().Timestamp()
+
+	if level == zerolog.DebugLevel || level == zerolog.TraceLevel {
+		l = l.Caller()
+	}
+
+	if component != "" {
+		l = l.Str("component", component)
+	}
+
+	serviceCtx := ServiceContext{}
+
+	if service := verser.GetService(); service != "" {
+		serviceCtx.Service = service
+		l = l.Str("service", service)
+	}
+
+	if version := verser.GetVersion(); version != "" {
+		serviceCtx.Version = version
+		l = l.Str("version", version)
+	}
+
+	if repository := verser.GetRepository(); repository != "" {
+		serviceCtx.SourceReference.Repository = repository
+		l = l.Str("repository", repository)
+	}
+
+	if revisionID := verser.GetRevisionID(); revisionID != "" {
+		serviceCtx.SourceReference.RevisionID = revisionID
+		l = l.Str("revisionID", revisionID)
+	}
+
+	if serviceCtx.Service != "" || serviceCtx.Version != "" {
+		l = l.Interface("serviceContext", serviceCtx)
+	}
+
+	return Logger{l.Logger()}
 }
 
-// NewDefaultComponent returns default logger instance with custom component name
-func NewDefaultComponent(component string) Logger {
-	params := GetDefaultParams()
-	params.Component = component
+// NewDefaultLogger return default logger instance
+func NewDefaultLogger() Logger {
+	return NewLogger("", os.Stdout, configurator.NewConfigurator())
+}
 
-	return newLogger(params)
+// NewDefaultComponentLogger return default logger instance with custom component
+func NewDefaultComponentLogger(component string) Logger {
+	return NewLogger(component, os.Stdout, configurator.NewConfigurator())
+}
+
+// NewDefaultConsoleLogger return default logger instance
+func NewDefaultConsoleLogger() Logger {
+	return NewLogger("", zerolog.NewConsoleWriter(), configurator.NewConfigurator())
 }

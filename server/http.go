@@ -37,7 +37,7 @@ type Route struct {
 func (s *HttpServer) AddRoute(route Route) {
 	handle := route.Handle
 
-	if !route.NoCORS {
+	if !route.NoCORS && route.Method != http.MethodOptions {
 		route.Middlewares = append(route.Middlewares, middleware.CORS)
 		s.Echo.OPTIONS(route.Path, middleware.CORSHandler)
 	}
