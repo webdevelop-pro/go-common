@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/rs/zerolog"
-	"github.com/webdevelop-pro/go-common/configurator"
-	"github.com/webdevelop-pro/go-common/verser"
+	"github.com/webdevelop-pro/lib/configurator"
+	"github.com/webdevelop-pro/lib/verser"
 )
 
 // Logger is wrapper struct around logger.Logger that adds some custom functionality
@@ -16,11 +16,11 @@ type Logger struct {
 
 // ServiceContext contain info for all logs
 type ServiceContext struct {
-	Service         string             `json:"service"`
-	Version         string             `json:"version"`
-	User            string             `json:"user"`
-	HttpRequest     HttpRequestContext `json:"httpRequest"`
-	SourceReference SourceReference    `json:"sourceReference"`
+	Service         string              `json:"service"`
+	Version         string              `json:"version"`
+	User            string              `json:"user,omitempty"`
+	HttpRequest     *HttpRequestContext `json:"httpRequest,omitempty"`
+	SourceReference *SourceReference    `json:"sourceReference,omitempty"`
 }
 
 // SourceReference repositary name and revision id
@@ -75,7 +75,10 @@ func NewLogger(component string, output io.Writer, conf *configurator.Configurat
 		l = l.Str("component", component)
 	}
 
-	serviceCtx := ServiceContext{}
+	serviceCtx := ServiceContext{
+		SourceReference: &SourceReference{},
+		HttpRequest:     &HttpRequestContext{},
+	}
 
 	if service := verser.GetService(); service != "" {
 		serviceCtx.Service = service

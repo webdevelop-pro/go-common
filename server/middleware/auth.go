@@ -2,14 +2,15 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/webdevelop-pro/go-common/configurator"
+
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
-	"github.com/webdevelop-pro/go-common/logger"
-	"github.com/webdevelop-pro/go-common/server/errorcode"
-	"github.com/webdevelop-pro/go-common/server/response"
+	"github.com/webdevelop-pro/lib/configurator"
+	logger "github.com/webdevelop-pro/lib/logger"
+	"github.com/webdevelop-pro/lib/server/errorcode"
+	"github.com/webdevelop-pro/lib/server/response"
 )
 
 // AuthMiddleware is struct which store instance of auth middleware
@@ -27,14 +28,14 @@ type Config struct {
 func NewAuthMW(cfg *Config) *AuthMiddleware {
 	return &AuthMiddleware{
 		validateURI: cfg.AuthValidateURI,
-		log:         logger.NewDefaultComponent("auth_tool"),
+		log:         logger.NewDefaultComponentLogger("auth_tool"),
 	}
 }
 
 // NewAuthMiddleware returns a new instance of AuthMiddleware
 func NewAuthMiddleware() *AuthMiddleware {
 	cfg := &Config{}
-	l := logger.NewDefaultComponent("auth_tool")
+	l := logger.NewDefaultComponentLogger("auth_tool")
 
 	if err := configurator.NewConfiguration(cfg); err != nil {
 		l.Fatal().Err(err).Msg("failed to get configuration of db")

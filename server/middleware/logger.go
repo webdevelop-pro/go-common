@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/webdevelop-pro/go-common/logger"
+	"github.com/webdevelop-pro/lib/logger"
 )
 
 // SetLogger adds logger to context
@@ -11,7 +11,7 @@ func SetLogger(next echo.HandlerFunc) echo.HandlerFunc {
 		// get request's context
 		ctx := c.Request().Context()
 		// create sub logger
-		log := logger.NewDefault()
+		log := logger.NewDefaultLogger()
 		// add logger to context
 		ctx = log.WithContext(ctx)
 		// enrich context

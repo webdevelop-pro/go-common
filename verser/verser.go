@@ -7,7 +7,7 @@ var (
 	revisionID string
 )
 
-func SetVersionAndServer(ver, serv, repo, rev string) {
+func SetServiVersRepoRevis(serv, ver, repo, rev string) {
 	version = ver
 	service = serv
 	repository = repo

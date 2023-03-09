@@ -3,7 +3,7 @@ package fxzerolog
 import (
 	"strings"
 
-	"github.com/webdevelop-pro/go-common/logger"
+	"github.com/webdevelop-pro/lib/logger"
 	"go.uber.org/fx/fxevent"
 )
 

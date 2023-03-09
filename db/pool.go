@@ -7,13 +7,13 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/webdevelop-pro/go-common/configurator"
-	comLogger "github.com/webdevelop-pro/go-common/logger"
+	"github.com/webdevelop-pro/lib/configurator"
+	comLogger "github.com/webdevelop-pro/lib/logger"
 )
 
 var (
 	pkgName = "db"
-	logger  = comLogger.NewDefaultComponent(pkgName)
+	logger  = comLogger.NewDefaultComponentLogger(pkgName)
 )
 
 func ParseConfig(cfg *Config) *pgxpool.Config {

@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/webdevelop-pro/go-common/configurator"
-	comLogger "github.com/webdevelop-pro/go-common/logger"
+	"github.com/webdevelop-pro/lib/configurator"
+	comLogger "github.com/webdevelop-pro/lib/logger"
 )
 
 // DB is a layer to simplify interact with DB
