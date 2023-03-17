@@ -4,9 +4,11 @@ import (
 	"io"
 	"os"
 
+	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/pkgerrors"
+
 	"github.com/webdevelop-pro/lib/configurator"
-	"github.com/webdevelop-pro/lib/verser"
 )
 
 // Logger is wrapper struct around logger.Logger that adds some custom functionality
@@ -39,85 +41,62 @@ type HttpRequestContext struct {
 	RemoteIp           string `json:"remoteIp"`
 }
 
+func init() {
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+}
+
 // Printf is implementation of fx.Printer
 func (l Logger) Printf(s string, args ...interface{}) {
 	l.Info().Msgf(s, args...)
 }
 
 // NewLogger return logger instance
-func NewLogger(component string, output io.Writer, conf *configurator.Configurator) Logger {
-	cfg := conf.New("logger", &Config{}).(*Config)
-
-	level, err := zerolog.ParseLevel(cfg.LogLevel)
+func NewLogger(component string, logLevel string, output io.Writer, c echo.Context) Logger {
+	level, err := zerolog.ParseLevel(logLevel)
 	if err != nil {
 		level = zerolog.InfoLevel
-	}
-
-	// Beautiful output
-	if cfg.LogConsole {
-		output = zerolog.NewConsoleWriter()
-	} else if output == nil {
-		output = os.Stdout
 	}
 
 	l := zerolog.
 		New(output).
 		Level(level).
-		Hook(SeverityHook{}).
-		Hook(TypeHook{skip: cfg.LogConsole}).
-		With().Timestamp()
+		// Hook(SeverityHook{}).
+		// Hook(GoogleCloudHook{reqContext: c, skip: false}). // output == ConsoleWriter ?
+		With().Stack().Timestamp()
 
-	if level == zerolog.DebugLevel || level == zerolog.TraceLevel {
-		l = l.Caller()
-	}
+	// if level == zerolog.DebugLevel || level == zerolog.TraceLevel {
+	// l = l.Caller()
+	// }
 
 	if component != "" {
 		l = l.Str("component", component)
 	}
 
-	serviceCtx := ServiceContext{
-		SourceReference: &SourceReference{},
-		HttpRequest:     &HttpRequestContext{},
-	}
-
-	if service := verser.GetService(); service != "" {
-		serviceCtx.Service = service
-		l = l.Str("service", service)
-	}
-
-	if version := verser.GetVersion(); version != "" {
-		serviceCtx.Version = version
-		l = l.Str("version", version)
-	}
-
-	if repository := verser.GetRepository(); repository != "" {
-		serviceCtx.SourceReference.Repository = repository
-		l = l.Str("repository", repository)
-	}
-
-	if revisionID := verser.GetRevisionID(); revisionID != "" {
-		serviceCtx.SourceReference.RevisionID = revisionID
-		l = l.Str("revisionID", revisionID)
-	}
-
-	if serviceCtx.Service != "" || serviceCtx.Version != "" {
-		l = l.Interface("serviceContext", serviceCtx)
+	if err != nil {
+		ll := l.Logger()
+		ll.Error().Err(err).Interface("level", logLevel).Msg("cannot parse log level, using default info")
 	}
 
 	return Logger{l.Logger()}
 }
 
-// NewDefaultLogger return default logger instance
-func NewDefaultLogger() Logger {
-	return NewLogger("", os.Stdout, configurator.NewConfigurator())
+// DefaultStdoutLogger return default logger instance
+func DefaultStdoutLogger(logLevel string, c echo.Context) Logger {
+	return NewLogger("default", logLevel, os.Stdout, c)
 }
 
-// NewDefaultComponentLogger return default logger instance with custom component
-func NewDefaultComponentLogger(component string) Logger {
-	return NewLogger(component, os.Stdout, configurator.NewConfigurator())
-}
+// NewComponentLogger return default logger instance with custom component
+func NewComponentLogger(component string, c echo.Context) Logger {
+	conf := configurator.NewConfigurator()
+	cfg := conf.New("logger", &Config{}).(*Config)
 
-// NewDefaultConsoleLogger return default logger instance
-func NewDefaultConsoleLogger() Logger {
-	return NewLogger("", zerolog.NewConsoleWriter(), configurator.NewConfigurator())
+	var output io.Writer
+	// Beautiful output
+	if cfg.LogConsole {
+		output = zerolog.NewConsoleWriter()
+	} else {
+		output = os.Stdout
+	}
+
+	return NewLogger(component, cfg.LogLevel, output, c)
 }

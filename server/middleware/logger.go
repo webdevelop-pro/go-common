@@ -11,7 +11,7 @@ func SetLogger(next echo.HandlerFunc) echo.HandlerFunc {
 		// get request's context
 		ctx := c.Request().Context()
 		// create sub logger
-		log := logger.NewDefaultLogger()
+		log := logger.NewComponentLogger("echo", c)
 		// add logger to context
 		ctx = log.WithContext(ctx)
 		// enrich context

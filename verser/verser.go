@@ -11,7 +11,7 @@ func SetServiVersRepoRevis(serv, ver, repo, rev string) {
 	version = ver
 	service = serv
 	repository = repo
-	service = rev
+	revisionID = rev
 }
 
 func GetVersion() string {

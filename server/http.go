@@ -101,7 +101,7 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool *middlew
 
 func New() *HttpServer {
 	cfg := &Config{}
-	l := logger.NewDefaultComponentLogger("http_server")
+	l := logger.NewComponentLogger("http_server", nil)
 
 	if err := configurator.NewConfiguration(cfg); err != nil {
 		l.Fatal().Err(err).Msg("failed to get configuration of server")

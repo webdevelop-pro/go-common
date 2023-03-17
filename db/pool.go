@@ -13,7 +13,7 @@ import (
 
 var (
 	pkgName = "db"
-	logger  = comLogger.NewDefaultComponentLogger(pkgName)
+	logger  = comLogger.NewComponentLogger(pkgName, nil)
 )
 
 func ParseConfig(cfg *Config) *pgxpool.Config {
