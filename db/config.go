@@ -22,6 +22,6 @@ type Config struct {
 	Database       string `required:"true" split_words:"true"`
 	SSLMode        Active `required:"true" split_words:"true"`
 	MaxConnections int    `default:"16" split_words:"true"`
-	HOSTNAME       string `default:"go-application" split_words:"true"`
+	AppName        string `split_words:"true"`
 	LogLevel       string `default:"none" split_words:"true"`
 }

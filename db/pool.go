@@ -48,7 +48,7 @@ func GetConnString(cfg *Config) string {
 		cfg.Port,
 		cfg.Database,
 		cfg.MaxConnections,
-		cfg.HOSTNAME,
+		cfg.AppName,
 	)
 }
 
