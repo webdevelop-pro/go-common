@@ -19,7 +19,7 @@ var (
 func ParseConfig(cfg *Config) *pgxpool.Config {
 	pgConfig, err := pgxpool.ParseConfig(GetConnString(cfg))
 
-	pgConfig.MaxConnIdleTime = time.Second * time.Duration(cfg.MaxConnIdleTime)
+	pgConfig.MaxConnLifetime = time.Second * time.Duration(cfg.MaxConnLifetime)
 
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed to parse config")
