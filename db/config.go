@@ -14,14 +14,15 @@ var (
 
 // Config is a struct to configure postgresql
 type Config struct {
-	Type           Type   `required:"true" split_words:"true"`
-	Host           string `required:"false" default:"localhost" split_words:"true"`
-	Port           uint16 `default:"5432" split_words:"true"`
-	User           string `required:"true" split_words:"true"`
-	Password       string `required:"true" split_words:"true"`
-	Database       string `required:"true" split_words:"true"`
-	SSLMode        Active `required:"true" split_words:"true"`
-	MaxConnections int    `default:"16" split_words:"true"`
-	AppName        string `split_words:"true"`
-	LogLevel       string `default:"none" split_words:"true"`
+	Type            Type   `required:"true" split_words:"true"`
+	Host            string `required:"false" default:"localhost" split_words:"true"`
+	Port            uint16 `default:"5432" split_words:"true"`
+	User            string `required:"true" split_words:"true"`
+	Password        string `required:"true" split_words:"true"`
+	Database        string `required:"true" split_words:"true"`
+	SSLMode         Active `required:"true" split_words:"true"`
+	MaxConnections  int    `default:"16" split_words:"true"`
+	MaxConnIdleTime int    `default:"3600" split_words:"true"`
+	AppName         string `split_words:"true"`
+	LogLevel        string `default:"none" split_words:"true"`
 }
