@@ -7,10 +7,10 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
-	"github.com/webdevelop-pro/lib/configurator"
-	logger "github.com/webdevelop-pro/lib/logger"
-	"github.com/webdevelop-pro/lib/server/errorcode"
-	"github.com/webdevelop-pro/lib/server/response"
+	"github.com/webdevelop-pro/go-common/configurator"
+	logger "github.com/webdevelop-pro/go-common/logger"
+	"github.com/webdevelop-pro/go-common/server/errorcode"
+	"github.com/webdevelop-pro/go-common/server/response"
 )
 
 // AuthMiddleware is struct which store instance of auth middleware

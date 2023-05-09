@@ -3,9 +3,9 @@ package db
 import (
 	"context"
 
-	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/webdevelop-pro/lib/configurator"
-	comLogger "github.com/webdevelop-pro/lib/logger"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/webdevelop-pro/go-common/configurator"
+	comLogger "github.com/webdevelop-pro/go-common/logger"
 )
 
 // DB is a layer to simplify interact with DB

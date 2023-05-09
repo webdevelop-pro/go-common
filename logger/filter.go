@@ -3,7 +3,7 @@ package logger
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
-	"github.com/webdevelop-pro/lib/verser"
+	"github.com/webdevelop-pro/go-common/verser"
 )
 
 const (

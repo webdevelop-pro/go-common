@@ -8,10 +8,10 @@ import (
 	"github.com/labstack/echo/v4"
 	echoMW "github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
-	"github.com/webdevelop-pro/lib/configurator"
-	"github.com/webdevelop-pro/lib/logger"
-	"github.com/webdevelop-pro/lib/server/healthcheck"
-	"github.com/webdevelop-pro/lib/server/middleware"
+	"github.com/webdevelop-pro/go-common/configurator"
+	"github.com/webdevelop-pro/go-common/logger"
+	"github.com/webdevelop-pro/go-common/server/healthcheck"
+	"github.com/webdevelop-pro/go-common/server/middleware"
 	"go.uber.org/fx"
 )
 

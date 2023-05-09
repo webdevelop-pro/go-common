@@ -3,8 +3,8 @@ package db
 import (
 	"context"
 
-	"github.com/jackc/pgx/v4"
-	comLogger "github.com/webdevelop-pro/lib/logger"
+	"github.com/jackc/pgx/v5/tracelog"
+	comLogger "github.com/webdevelop-pro/go-common/logger"
 )
 
 // Logger is a struct that represent logger for DB
@@ -18,17 +18,17 @@ func NewDBLogger(log comLogger.Logger) *Logger {
 }
 
 // Log prints a message
-func (l *Logger) Log(ctx context.Context, level pgx.LogLevel, msg string, data map[string]interface{}) {
+func (l *Logger) Log(ctx context.Context, level tracelog.LogLevel, msg string, data map[string]interface{}) {
 	switch level {
-	case pgx.LogLevelTrace:
+	case tracelog.LogLevelTrace:
 		l.log.Trace().Interface("data", data).Msg(msg)
-	case pgx.LogLevelDebug:
+	case tracelog.LogLevelDebug:
 		l.log.Debug().Interface("data", data).Msg(msg)
-	case pgx.LogLevelInfo:
+	case tracelog.LogLevelInfo:
 		l.log.Info().Interface("data", data).Msg(msg)
-	case pgx.LogLevelWarn:
+	case tracelog.LogLevelWarn:
 		l.log.Warn().Interface("data", data).Msg(msg)
-	case pgx.LogLevelError:
+	case tracelog.LogLevelError:
 		l.log.Error().Interface("data", data).Msg(msg)
 	}
 }

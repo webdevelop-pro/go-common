@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/webdevelop-pro/lib/configurator"
-	comLogger "github.com/webdevelop-pro/lib/logger"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/tracelog"
+	"github.com/webdevelop-pro/go-common/configurator"
+	comLogger "github.com/webdevelop-pro/go-common/logger"
 )
 
 var (
@@ -23,14 +23,16 @@ func ParseConfig(cfg *Config) *pgxpool.Config {
 		logger.Fatal().Err(err).Msg("failed to parse config")
 	}
 
-	pgxLogLevel, err := pgx.LogLevelFromString(cfg.LogLevel)
+	pgxLogLevel, err := tracelog.LogLevelFromString(cfg.LogLevel)
 
 	if err != nil {
-		pgxLogLevel = pgx.LogLevelNone
+		pgxLogLevel = tracelog.LogLevelNone
 	}
 
-	pgConfig.ConnConfig.Logger = NewDBLogger(logger)
-	pgConfig.ConnConfig.LogLevel = pgxLogLevel
+	pgConfig.ConnConfig.Tracer = &tracelog.TraceLog{
+		Logger:   NewDBLogger(logger),
+		LogLevel: pgxLogLevel,
+	}
 
 	return pgConfig
 }
@@ -76,7 +78,7 @@ func newPool(pgConfig *pgxpool.Config) *pgxpool.Pool {
 
 	for ; ; <-ticker.C {
 		i++
-		pg, err = pgxpool.ConnectConfig(context.TODO(), pgConfig)
+		pg, err = pgxpool.NewWithConfig(context.TODO(), pgConfig)
 		if err == nil || i > 60 {
 			break
 		}

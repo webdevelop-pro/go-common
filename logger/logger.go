@@ -8,7 +8,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
 
-	"github.com/webdevelop-pro/lib/configurator"
+	"github.com/webdevelop-pro/go-common/configurator"
 )
 
 // Logger is wrapper struct around logger.Logger that adds some custom functionality

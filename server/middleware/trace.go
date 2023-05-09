@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
-	"github.com/webdevelop-pro/lib/constants"
+	"github.com/webdevelop-pro/go-common/constants"
 )
 
 // SetTraceID adds trace_id to context and X-TRACE-ID to headers
