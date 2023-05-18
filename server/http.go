@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/labstack/echo-contrib/prometheus"
 	"github.com/labstack/echo/v4"
 	echoMW "github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -85,6 +86,10 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool *middlew
 	e.Use(middleware.SetTraceID)
 	// Add the healthcheck endpoint
 	e.GET(`/healthcheck`, healthcheck.Healthcheck)
+
+	// Add prometheus metrics
+	p := prometheus.NewPrometheus("echo", nil)
+	p.Use(e)
 
 	// avoid any native logging of echo, because we use custom library for logging
 	e.HideBanner = true        // don't log the banner on startup
