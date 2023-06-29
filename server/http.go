@@ -34,12 +34,23 @@ type Route struct {
 	Middlewares  []echo.MiddlewareFunc
 }
 
+func defaultCORSHeadersMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		c.Response().Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Response().Header().Set("Access-Control-Allow-Headers", "Authorization, X-PINGOTHER, Content-Type, X-Requested-With")
+		c.Response().Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS, DELETE, PATCH")
+
+		return next(c)
+	}
+}
+
 // AddRoute adds route to the router.
 func (s *HttpServer) AddRoute(route Route) {
 	handle := route.Handle
 
 	if !route.NoCORS && route.Method != http.MethodOptions {
 		route.Middlewares = append(route.Middlewares, middleware.CORS)
+		route.Middlewares = append(route.Middlewares, defaultCORSHeadersMiddleware)
 		s.Echo.OPTIONS(route.Path, middleware.CORSHandler)
 	}
 
