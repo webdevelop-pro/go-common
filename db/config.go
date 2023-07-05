@@ -21,8 +21,8 @@ type Config struct {
 	Password        string `required:"true" split_words:"true"`
 	Database        string `required:"true" split_words:"true"`
 	SSLMode         Active `required:"true" split_words:"true"`
+	AppName         string `required:"true" split_words:"true"`
 	MaxConnections  int    `default:"16" split_words:"true"`
 	MaxConnLifetime int    `default:"3600" split_words:"true"`
-	AppName         string `split_words:"true"`
-	LogLevel        string `default:"none" split_words:"true"`
+	LogLevel        string `default:"error" split_words:"true"`
 }

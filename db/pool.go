@@ -16,13 +16,16 @@ var (
 	logger  = comLogger.NewComponentLogger(pkgName, nil)
 )
 
-func ParseConfig(cfg *Config) *pgxpool.Config {
+func GetConfigPool(c *configurator.Configurator) *pgxpool.Config {
+	cfg := c.New(pkgName, &Config{}, pkgName).(*Config)
 	pgConfig, err := pgxpool.ParseConfig(GetConnString(cfg))
-
-	pgConfig.MaxConnLifetime = time.Second * time.Duration(cfg.MaxConnLifetime)
-
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed to parse config")
+	}
+
+	pgConfig.MaxConnLifetime = time.Second * time.Duration(cfg.MaxConnLifetime)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("failed to set conn lifetime")
 	}
 
 	pgxLogLevel, err := tracelog.LogLevelFromString(cfg.LogLevel)
@@ -39,30 +42,22 @@ func ParseConfig(cfg *Config) *pgxpool.Config {
 	return pgConfig
 }
 
-func GetConfig(c *configurator.Configurator) *Config {
-	return c.New(pkgName, &Config{}, pkgName).(*Config)
-}
-
 func GetConnString(cfg *Config) string {
 	return fmt.Sprintf(
-		"postgres://%s:%s@%s:%d/%s?pool_max_conns=%d&application_name=%s",
+		"%s://%s:%s@%s:%d/%s?application_name=%s",
+		cfg.Type,
 		cfg.User,
 		cfg.Password,
 		cfg.Host,
 		cfg.Port,
 		cfg.Database,
-		cfg.MaxConnections,
 		cfg.AppName,
 	)
 }
 
-func GetConnConfig(c *configurator.Configurator) *pgxpool.Config {
-	return ParseConfig(GetConfig(c))
-}
-
 // NewPool is constructor for pgxpool.Pool
 func NewPool(c *configurator.Configurator) *pgxpool.Pool {
-	return newPool(GetConnConfig(c))
+	return newPool(GetConfigPool(c))
 }
 
 // NewPoolFromConfig is constructor for pgxpool.Pool
@@ -80,6 +75,9 @@ func newPool(pgConfig *pgxpool.Config) *pgxpool.Pool {
 
 	for ; ; <-ticker.C {
 		i++
+		// ToDo, show database type and host
+		// logger.Info().Msgf("Connecting to %s, attempt %d", cfg.Type, i)
+		logger.Info().Msgf("Connecting to db attempt %d", i)
 		pg, err = pgxpool.NewWithConfig(context.TODO(), pgConfig)
 		if err == nil || i > 60 {
 			break
