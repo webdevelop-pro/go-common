@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/labstack/echo-contrib/prometheus"
 	"github.com/labstack/echo/v4"
@@ -48,12 +47,6 @@ func defaultCORSHeadersMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 func (s *HttpServer) AddRoute(route Route) {
 	handle := route.Handle
 
-	if !route.NoCORS && route.Method != http.MethodOptions {
-		route.Middlewares = append(route.Middlewares, middleware.CORS)
-		route.Middlewares = append(route.Middlewares, defaultCORSHeadersMiddleware)
-		s.Echo.OPTIONS(route.Path, middleware.CORSHandler)
-	}
-
 	if s.authTool != nil && !route.NoAuth {
 		route.Middlewares = append(route.Middlewares, s.authTool.Validate)
 	}
@@ -72,29 +65,26 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool *middlew
 	e.Use(
 		echoMW.CORSWithConfig(echoMW.CORSConfig{
 			Skipper: func(c echo.Context) bool {
-				return true
+				return false
 			},
-			//AllowOrigins: cfg.CORSOrigins,
 			AllowOriginFunc: func(origin string) (bool, error) {
-				if origin != "" {
-					return true, nil
-				}
-
-				return false, nil
+				return true, nil
 			},
-			AllowMethods: []string{
-				http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete,
-			},
-			AllowHeaders: []string{
-				echo.HeaderAuthorization, echo.HeaderContentType,
-			},
+			AllowCredentials: true,
+			AllowMethods:     []string{"GET, POST, PUT, OPTIONS, DELETE, PATCH"},
+			AllowHeaders:     []string{"Authorization, X-PINGOTHER, Content-Type, X-Requested-With, X-Request-ID, Vary"},
 		}),
 	)
 
 	// Set context logger
 	e.Use(middleware.SetLogger)
+	e.Use(middleware.SetRequestTime)
 	// Trace ID middleware generates a unique id for a request.
-	e.Use(middleware.SetTraceID)
+	e.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
+		RequestIDHandler: func(c echo.Context, requestID string) {
+			c.Set(echo.HeaderXRequestID, requestID)
+		},
+	}))
 	// Add the healthcheck endpoint
 	e.GET(`/healthcheck`, healthcheck.Healthcheck)
 

@@ -47,13 +47,14 @@ func NewAuthMiddleware() *AuthMiddleware {
 	}
 }
 
+// ToDo
+// Transfer headers ..
 // Validate is middleware that extracts data from Authorization header and validates it
 func (m *AuthMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			ctx   = c.Request().Context()
-			l     = zerolog.Ctx(ctx)
-			trcID = GetTraceID(ctx)
+			ctx = c.Request().Context()
+			l   = zerolog.Ctx(ctx)
 			// Authorization: Bearer <token>
 			token = ExtractTokenFromString(c.Request().Header.Get("Authorization"))
 		)
@@ -63,7 +64,6 @@ func (m *AuthMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			l.Error().Err(err).Interface("req", req).Msg("Couldn't form request")
 			return c.JSON(http.StatusInternalServerError, response.Error{
-				TraceID:     trcID,
 				Code:        errorcode.InternalError,
 				Description: `couldn't check authenticity`,
 			})
@@ -74,7 +74,6 @@ func (m *AuthMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			l.Error().Err(err).Interface("req", req).Msg("Couldn't do request")
 			return c.JSON(http.StatusInternalServerError, response.Error{
-				TraceID:     trcID,
 				Code:        errorcode.InternalError,
 				Description: `couldn't check authenticity`,
 			})
@@ -83,7 +82,6 @@ func (m *AuthMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 		// if status code is not 2xx
 		if !(resp.StatusCode >= 200 && resp.StatusCode <= 299) {
 			return c.JSON(http.StatusUnauthorized, response.Error{
-				TraceID:     trcID,
 				Code:        errorcode.BadAuth,
 				Description: `not valid token in Authorization header`,
 			})
@@ -93,7 +91,6 @@ func (m *AuthMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			l.Error().Err(err).Interface("req", req).Msg("failed to decode token")
 			return c.JSON(http.StatusInternalServerError, response.Error{
-				TraceID:     trcID,
 				Code:        errorcode.InternalError,
 				Description: `failed to decode token`,
 			})
@@ -101,7 +98,6 @@ func (m *AuthMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 
 		if jwtPayload.UserID == "" {
 			return c.JSON(http.StatusNotFound, response.Error{
-				TraceID:     trcID,
 				Code:        errorcode.NoEntity,
 				Description: `No such user exists`,
 			})

@@ -16,12 +16,9 @@ var (
 
 			return false, nil
 		},
-		AllowMethods: []string{
-			http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete, http.MethodOptions,
-		},
-		AllowHeaders: []string{
-			echo.HeaderAuthorization, echo.HeaderContentType,
-		},
+		AllowCredentials: true,
+		AllowMethods:     []string{"GET, POST, PUT, OPTIONS, DELETE, PATCH"},
+		AllowHeaders:     []string{"Authorization, X-PINGOTHER, Content-Type, X-Requested-With, X-Request-ID"},
 	})
 
 	CORSHandler = CORS(func(c echo.Context) error { return c.NoContent(http.StatusNoContent) })
