@@ -2,10 +2,13 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"path"
 
+	"github.com/go-openapi/loads"
 	swagMW "github.com/go-openapi/runtime/middleware"
 	"github.com/labstack/echo-contrib/prometheus"
 	"github.com/labstack/echo/v4"
@@ -62,6 +65,34 @@ func (s *HttpServer) SetAuthMiddleware(authTool *middleware.AuthMiddleware) {
 	s.authTool = authTool
 }
 
+func setDocsMiddleware(e *echo.Echo) {
+	specDoc, err := loads.Spec("./swagger.json")
+	if err != nil {
+		return
+	}
+
+	doc, err := json.MarshalIndent(specDoc.Spec(), "", "  ")
+	if err != nil {
+		return
+	}
+
+	e.Use(echo.WrapMiddleware(
+		func(h http.Handler) http.Handler {
+			return swagMW.Spec("/", doc, h)
+		},
+	))
+
+	e.Use(echo.WrapMiddleware(
+		func(h http.Handler) http.Handler {
+			return swagMW.SwaggerUI(swagMW.SwaggerUIOpts{
+				BasePath: "/",
+				SpecURL:  path.Join("/", "swagger.json"),
+				Path:     "docs",
+			}, h)
+		},
+	))
+}
+
 // NewHttpServer returns new API instance.
 func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool *middleware.AuthMiddleware) *HttpServer {
 	// sets CORS headers if Origin is present
@@ -79,12 +110,6 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool *middlew
 		}),
 	)
 
-	e.Server.Handler = swagMW.SwaggerUI(swagMW.SwaggerUIOpts{
-		BasePath: "/",
-		SpecURL:  path.Join("/", "swagger.json"),
-		Path:     "docs",
-	}, e.Server.Handler)
-
 	// Set context logger
 	e.Use(middleware.SetLogger)
 	e.Use(middleware.SetRequestTime)
@@ -100,6 +125,9 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool *middlew
 	// Add prometheus metrics
 	p := prometheus.NewPrometheus("echo", nil)
 	p.Use(e)
+
+	// Set docs middleware
+	setDocsMiddleware(e)
 
 	// avoid any native logging of echo, because we use custom library for logging
 	e.HideBanner = true        // don't log the banner on startup
