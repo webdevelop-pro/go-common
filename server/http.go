@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"path"
+
+	swagMW "github.com/go-openapi/runtime/middleware"
 	"github.com/labstack/echo-contrib/prometheus"
 	"github.com/labstack/echo/v4"
 	echoMW "github.com/labstack/echo/v4/middleware"
@@ -75,6 +78,12 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool *middlew
 			AllowHeaders:     []string{"Authorization, X-PINGOTHER, Content-Type, X-Requested-With, X-Request-ID, Vary"},
 		}),
 	)
+
+	e.Server.Handler = swagMW.SwaggerUI(swagMW.SwaggerUIOpts{
+		BasePath: "/",
+		SpecURL:  path.Join("/", "swagger.json"),
+		Path:     "docs",
+	}, e.Server.Handler)
 
 	// Set context logger
 	e.Use(middleware.SetLogger)
