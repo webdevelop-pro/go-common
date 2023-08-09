@@ -62,6 +62,7 @@ func (s *HttpServer) AddRoute(route Route) {
 	}
 
 	if !route.NoCORS && route.Method != http.MethodOptions {
+		route.Middlewares = append(route.Middlewares, middleware.CORS)
 		route.Middlewares = append(route.Middlewares, defaultCORSHeadersMiddleware)
 		s.Echo.OPTIONS(route.Path, middleware.CORSHandler)
 	}
