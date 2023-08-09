@@ -61,6 +61,12 @@ func (s *HttpServer) AddRoute(route Route) {
 		route.Middlewares = append(route.Middlewares, s.authTool.Validate)
 	}
 
+	if !route.NoCORS && route.Method != http.MethodOptions {
+		route.Middlewares = append(route.Middlewares, middleware.CORS)
+		route.Middlewares = append(route.Middlewares, defaultCORSHeadersMiddleware)
+		s.Echo.OPTIONS(route.Path, middleware.CORSHandler)
+	}
+
 	if route.IdentityAuth {
 		route.Middlewares = append(route.Middlewares, func(next echo.HandlerFunc) echo.HandlerFunc {
 			return func(c echo.Context) error {
