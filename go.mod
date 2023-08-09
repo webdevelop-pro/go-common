@@ -3,6 +3,7 @@ module github.com/webdevelop-pro/go-common
 go 1.18
 
 require (
+	github.com/go-openapi/loads v0.21.2
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/jinzhu/copier v0.3.5
 	github.com/joho/godotenv v1.5.1
@@ -20,7 +21,6 @@ require (
 	github.com/go-openapi/errors v0.20.3 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.20.0 // indirect
-	github.com/go-openapi/loads v0.21.2 // indirect
 	github.com/go-openapi/spec v0.20.8 // indirect
 	github.com/go-openapi/strfmt v0.21.7 // indirect
 	github.com/go-openapi/swag v0.22.3 // indirect
