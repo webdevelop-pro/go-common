@@ -127,6 +127,21 @@ func setDocsMiddleware(e *echo.Echo) {
 
 // NewHttpServer returns new API instance.
 func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool *middleware.AuthMiddleware) *HttpServer {
+	// sets CORS headers if Origin is present
+	e.Use(
+		echoMW.CORSWithConfig(echoMW.CORSConfig{
+			Skipper: func(c echo.Context) bool {
+				return false
+			},
+			AllowOriginFunc: func(origin string) (bool, error) {
+				return true, nil
+			},
+			AllowCredentials: true,
+			AllowMethods:     []string{"GET, POST, PUT, OPTIONS, DELETE, PATCH"},
+			AllowHeaders:     []string{"Authorization, X-PINGOTHER, Content-Type, X-Requested-With, X-Request-ID, Vary"},
+		}),
+	)
+
 	// Set context logger
 	e.Use(middleware.SetLogger)
 	e.Use(middleware.SetRequestTime)
