@@ -2,10 +2,12 @@ package tests
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"reflect"
 	"strconv"
 	"strings"
@@ -14,9 +16,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (f FixturesManager) LoadFixtures() error {
-	for table, file := range f.fixtures {
-		err := f.LoadFixture(table, file)
+func (f FixturesManager) LoadFixtures(fixtures []Fixture) error {
+	for _, fixture := range fixtures {
+		fmt.Println("apply fixtures", fixture.table, fixture.filePath)
+		err := f.LoadFixture(fixture.table, fixture.filePath)
 		if err != nil {
 			return err
 		}
@@ -25,7 +28,7 @@ func (f FixturesManager) LoadFixtures() error {
 }
 
 func (f FixturesManager) LoadFixture(tableName, fileName string) error {
-	file, err := os.Open(fileName)
+	file, err := os.Open(GetAbsPath("/tests/" + fileName))
 	if err != nil {
 		return err
 	}
@@ -39,7 +42,7 @@ func (f FixturesManager) LoadFixture(tableName, fileName string) error {
 		return err
 	}
 
-	cols, err := f.columns(tableName)
+	cols, err := f.columns(f.cfg.Database, tableName)
 	if err != nil {
 		return err
 	}
@@ -82,7 +85,7 @@ func (f FixturesManager) LoadFixture(tableName, fileName string) error {
 			vals = append(vals, v)
 		}
 		q := fmt.Sprintf(`INSERT INTO %s (%s) VALUES (%s)`, tableName, strings.Join(fields, ","), valuePlaceholders)
-		ct, err := f.db.Exec(q, vals...)
+		ct, err := f.db.Exec(context.Background(), q, vals...)
 		if err != nil {
 			e := fmt.Errorf("Failed to insert row #%d: %v\n\nquery: %s\n\nvals: %+v\n", rowID, err, q, vals)
 			log.Fatal(e.Error())
@@ -98,10 +101,12 @@ func (f FixturesManager) LoadFixture(tableName, fileName string) error {
 		}
 		os.Exit(1)
 	}
+	return nil
 }
 
 func (f FixturesManager) columns(dbName, tableName string) (map[string]string, error) {
 	rows, err := f.db.Query(
+		context.Background(),
 		`SELECT column_name, data_type
 		FROM information_schema.columns
 		WHERE table_name = $1 AND table_catalog=$2`,
@@ -121,4 +126,16 @@ func (f FixturesManager) columns(dbName, tableName string) (map[string]string, e
 		cols[n] = t
 	}
 	return cols, nil
+}
+
+func GetAbsPath(relativePath string) string {
+	currentDir, _ := os.Getwd()
+
+	for path.Base(currentDir) != "tests" {
+		currentDir = path.Dir(currentDir)
+	}
+
+	currentDir = path.Dir(currentDir)
+
+	return path.Join(currentDir, relativePath)
 }
