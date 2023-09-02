@@ -2,14 +2,9 @@ package server
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
-	"path"
-
-	"github.com/go-openapi/loads"
-	swagMW "github.com/go-openapi/runtime/middleware"
 	"github.com/labstack/echo-contrib/prometheus"
 	"github.com/labstack/echo/v4"
 	echoMW "github.com/labstack/echo/v4/middleware"
@@ -21,6 +16,7 @@ import (
 	"github.com/webdevelop-pro/go-common/server/healthcheck"
 	"github.com/webdevelop-pro/go-common/server/middleware"
 	"github.com/webdevelop-pro/go-common/server/response"
+	"github.com/webdevelop-pro/go-common/server/validator"
 	"go.uber.org/fx"
 )
 
@@ -92,34 +88,6 @@ func (s *HttpServer) SetAuthMiddleware(authTool *middleware.AuthMiddleware) {
 	s.authTool = authTool
 }
 
-func setDocsMiddleware(e *echo.Echo) {
-	specDoc, err := loads.Spec("./swagger.json")
-	if err != nil {
-		return
-	}
-
-	doc, err := json.MarshalIndent(specDoc.Spec(), "", "  ")
-	if err != nil {
-		return
-	}
-
-	e.Use(echo.WrapMiddleware(
-		func(h http.Handler) http.Handler {
-			return swagMW.Spec("/", doc, h)
-		},
-	))
-
-	e.Use(echo.WrapMiddleware(
-		func(h http.Handler) http.Handler {
-			return swagMW.SwaggerUI(swagMW.SwaggerUIOpts{
-				BasePath: "/",
-				SpecURL:  path.Join("/", "swagger.json"),
-				Path:     "docs",
-			}, h)
-		},
-	))
-}
-
 // NewHttpServer returns new API instance.
 func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool *middleware.AuthMiddleware) *HttpServer {
 	// sets CORS headers if Origin is present
@@ -149,12 +117,16 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool *middlew
 	// Add the healthcheck endpoint
 	e.GET(`/healthcheck`, healthcheck.Healthcheck)
 
+	// get an instance of a validator
+	playgroundValidator := validator.New()
+	e.Validator = &playgroundValidator{validator: playgroundValidator}
+
 	// Add prometheus metrics
 	p := prometheus.NewPrometheus("echo", nil)
 	p.Use(e)
 
 	// Set docs middleware
-	setDocsMiddleware(e)
+	// setDocsMiddleware(e)
 
 	// avoid any native logging of echo, because we use custom library for logging
 	e.HideBanner = true        // don't log the banner on startup
