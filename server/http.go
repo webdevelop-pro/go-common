@@ -118,8 +118,7 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool *middlew
 	e.GET(`/healthcheck`, healthcheck.Healthcheck)
 
 	// get an instance of a validator
-	playgroundValidator := validator.New()
-	e.Validator = &playgroundValidator{validator: playgroundValidator}
+	e.Validator = validator.New()
 
 	// Add prometheus metrics
 	p := prometheus.NewPrometheus("echo", nil)

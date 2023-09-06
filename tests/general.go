@@ -8,7 +8,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -193,68 +192,5 @@ func CompareJsonBody(t *testing.T, actual, expected []byte) {
 		return
 	}
 
-	checkMaps(t, actualBody, expectedBody, "")
-}
-
-// FixME: use sprew
-func checkMaps(t *testing.T, dict, subDict map[string]interface{}, baseField string) {
-	for key, subValue := range subDict {
-		fieldPath := fmt.Sprintf("%s_%s", baseField, key)
-
-		value, ok := dict[key]
-		if !ok {
-			assert.FailNow(t, fieldPath+" not exist")
-			return
-		}
-
-		if subValue == nil {
-			if value == nil {
-				continue
-			} else {
-				assert.Fail(t, fieldPath+" not nil")
-			}
-		}
-
-		if reflect.TypeOf(value) != reflect.TypeOf(subValue) {
-			assert.Fail(t, fieldPath+" different types")
-			return
-		}
-
-		switch reflect.TypeOf(value).Kind() {
-		case reflect.Array, reflect.Slice:
-			checkArrays(t, value.([]interface{}), subValue.([]interface{}), fieldPath)
-		case reflect.Map:
-			checkMaps(t, value.(map[string]interface{}), subValue.(map[string]interface{}), fieldPath)
-		default:
-			assert.Equalf(t, subValue, value, fieldPath)
-		}
-	}
-}
-
-// FixME: use sprew
-func checkArrays(t *testing.T, array, subArray []interface{}, baseField string) {
-	if len(array) != len(subArray) {
-		assert.FailNow(t, baseField+" expected array and actual have different length")
-		return
-	}
-
-	for index, subValue := range subArray {
-		fieldPath := fmt.Sprintf("%s_%d", baseField, index)
-
-		value := array[index]
-
-		if reflect.TypeOf(value) != reflect.TypeOf(subValue) {
-			assert.Fail(t, fieldPath+" different types")
-			return
-		}
-
-		switch reflect.TypeOf(value).Kind() {
-		case reflect.Array, reflect.Slice:
-			checkArrays(t, value.([]interface{}), subValue.([]interface{}), fieldPath)
-		case reflect.Map:
-			checkMaps(t, value.(map[string]interface{}), subValue.(map[string]interface{}), fieldPath)
-		default:
-			assert.Equalf(t, subValue, value, fieldPath)
-		}
-	}
+	assert.EqualValuesf(t, expectedBody, actualBody, "responses not equal")
 }
