@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/webdevelop-pro/lib/server/response"
+	"github.com/webdevelop-pro/go-common/server/response"
 )
 
 const (
