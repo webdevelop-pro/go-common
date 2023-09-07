@@ -3,19 +3,15 @@ package server
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/labstack/echo-contrib/prometheus"
 	"github.com/labstack/echo/v4"
 	echoMW "github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
-	zerolog "github.com/rs/zerolog/log"
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/logger"
-	"github.com/webdevelop-pro/go-common/server/errorcode"
 	"github.com/webdevelop-pro/go-common/server/healthcheck"
 	"github.com/webdevelop-pro/go-common/server/middleware"
-	"github.com/webdevelop-pro/go-common/server/response"
 	"github.com/webdevelop-pro/go-common/server/validator"
 	"go.uber.org/fx"
 )
@@ -55,29 +51,6 @@ func (s *HttpServer) AddRoute(route Route) {
 
 	if s.authTool != nil && !route.NoAuth {
 		route.Middlewares = append(route.Middlewares, s.authTool.Validate)
-	}
-
-	if route.IdentityAuth {
-		route.Middlewares = append(route.Middlewares, func(next echo.HandlerFunc) echo.HandlerFunc {
-			return func(c echo.Context) error {
-				identityID := c.Request().Header.Get("identity_id")
-
-				if identityID == "" {
-					return c.JSON(http.StatusUnauthorized, response.Error{
-						Code:        errorcode.BadAuth,
-						Description: `empty identity_id`,
-					})
-				}
-
-				ctx := c.Request().Context()
-				ctx = context.WithValue(ctx, "identity_id", identityID)
-				l := zerolog.Ctx(ctx).With().Str("user_id", identityID).Logger()
-				ctx = l.WithContext(ctx)
-				c.SetRequest(c.Request().WithContext(ctx))
-
-				return next(c)
-			}
-		})
 	}
 
 	s.Echo.Add(route.Method, route.Path, handle, route.Middlewares...)
