@@ -151,6 +151,7 @@ func RunApiTest(t *testing.T, Description string, fixtures FixturesManager, scen
 			err := fixtures.CleanAndApply(scenario.Fixtures)
 			if err != nil {
 				assert.Fail(t, "Failed apply fixtures", err)
+				log.Panic("Failed apply fixtures")
 			}
 
 			result, code, err := SendTestRequest(scenario.Request)

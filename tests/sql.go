@@ -17,7 +17,7 @@ func AssertSQL(t *testing.T, fManager FixturesManager, testCase SQLTestCase) {
 
 	actualResult, err := fManager.SelectQuery(testCase.ExpectedSelectQuery)
 	if err != nil {
-		assert.FailNow(t, err.Error(), fmt.Sprintf("failed sql: %s", testCase.ExpectedSelectQuery))
+		assert.FailNow(t, err.Error()+fmt.Sprintf(" failed sql: %s", testCase.ExpectedSelectQuery))
 	}
 
 	CompareJsonBody(t, []byte(actualResult), []byte(testCase.ExpectedResult))
