@@ -1,30 +1,29 @@
 package response
 
-import (
-	"encoding/json"
-)
+import "net/http"
 
-const defaultError = "Something went wrong"
-
-// Error is generic error struct
 type Error struct {
-	Code        string `json:"code,omitempty"`
-	Error       string `json:"error,omitempty"`
-	TraceID     string `json:"trace_id,omitempty"`
-	Description string `json:"description,omitempty"`
+	StatusCode int
+	Message    map[string][]string
+	Err        error
 }
 
-//MarshalJSON is custom Marshal function
-func (e Error) MarshalJSON() ([]byte, error) {
-	type Alias Error
-
-	if e.Error == "" {
-		e.Error = defaultError
+func New(err error, status int, msg map[string][]string) Error {
+	return Error{
+		StatusCode: status,
+		Err:        err,
+		Message:    msg,
 	}
+}
 
-	return json.Marshal(&struct {
-		Alias
-	}{
-		(Alias)(e),
-	})
+func (r Error) Error() string {
+	return r.Err.Error()
+}
+
+func BadRequest(err error) Error {
+	return New(
+		err,
+		http.StatusBadRequest,
+		BadRequestMsg,
+	)
 }

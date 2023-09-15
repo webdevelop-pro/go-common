@@ -9,8 +9,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/webdevelop-pro/go-common/configurator"
 	logger "github.com/webdevelop-pro/go-common/logger"
-	"github.com/webdevelop-pro/go-common/server/errorcode"
-	"github.com/webdevelop-pro/go-common/server/response"
 )
 
 // AuthMiddleware is struct which store instance of auth middleware
@@ -25,7 +23,7 @@ type Config struct {
 }
 
 // NewAuthMW is a constructor of AuthMiddleware
-func NewAuthMW(cfg *Config) *AuthMiddleware {
+func NewAuth0MW(cfg *Config) *AuthMiddleware {
 	return &AuthMiddleware{
 		validateURI: cfg.AuthValidateURI,
 		log:         logger.NewComponentLogger("auth_tool", nil),
@@ -63,44 +61,38 @@ func (m *AuthMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 		req, err := http.NewRequest(http.MethodGet, m.validateURI, nil)
 		if err != nil {
 			l.Error().Err(err).Interface("req", req).Msg("Couldn't form request")
-			return c.JSON(http.StatusInternalServerError, response.Error{
-				Code:        errorcode.InternalError,
-				Description: `couldn't check authenticity`,
-			})
+			return c.JSON(http.StatusForbidden, map[string][]string{"__error__": {"couldn't check authenticity"}})
 		}
 
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			l.Error().Err(err).Interface("req", req).Msg("Couldn't do request")
-			return c.JSON(http.StatusInternalServerError, response.Error{
-				Code:        errorcode.InternalError,
-				Description: `couldn't check authenticity`,
-			})
+			return c.JSON(http.StatusForbidden, map[string][]string{"__error__": {"couldn't check authenticity"}})
 		}
 
 		// if status code is not 2xx
 		if !(resp.StatusCode >= 200 && resp.StatusCode <= 299) {
-			return c.JSON(http.StatusUnauthorized, response.Error{
-				Code:        errorcode.BadAuth,
-				Description: `not valid token in Authorization header`,
-			})
+			return c.JSON(
+				http.StatusUnauthorized,
+				map[string][]string{"__error__": {"not valid token in Authorization header"}},
+			)
 		}
 
 		jwtPayload, err := ParseJWTPayload(token)
 		if err != nil {
 			l.Error().Err(err).Interface("req", req).Msg("failed to decode token")
-			return c.JSON(http.StatusInternalServerError, response.Error{
-				Code:        errorcode.InternalError,
-				Description: `failed to decode token`,
-			})
+			return c.JSON(
+				http.StatusBadRequest,
+				map[string][]string{"__error__": {"failed to decode token"}},
+			)
 		}
 
 		if jwtPayload.UserID == "" {
-			return c.JSON(http.StatusNotFound, response.Error{
-				Code:        errorcode.NoEntity,
-				Description: `No such user exists`,
-			})
+			return c.JSON(
+				http.StatusNotFound,
+				map[string][]string{"__error__": {"wrong user"}},
+			)
 		}
 
 		SetJWTPayload(c, jwtPayload)
