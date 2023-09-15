@@ -81,6 +81,7 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool *middlew
 	// Set context logger
 	e.Use(middleware.SetLogger)
 	e.Use(middleware.SetRequestTime)
+	e.Use(middleware.SetIPAddress)
 	// Trace ID middleware generates a unique id for a request.
 	e.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
 		RequestIDHandler: func(c echo.Context, requestID string) {

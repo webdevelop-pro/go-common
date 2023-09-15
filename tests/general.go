@@ -181,15 +181,26 @@ func RunApiTest(t *testing.T, Description string, fixtures FixturesManager, scen
 func CompareJsonBody(t *testing.T, actual, expected []byte) {
 	var actualBody, expectedBody map[string]interface{}
 
+	if len(actual) == 0 {
+		assert.Fail(t, "server return no data, nothing to compare")
+		return
+	}
+
+	// Remove tabs and double spaces
+	actual = bytes.ReplaceAll(actual, []byte("\t"), []byte(""))
+	expected = bytes.ReplaceAll(expected, []byte("\t"), []byte(""))
+	actual = bytes.ReplaceAll(actual, []byte("  "), []byte(" "))
+	expected = bytes.ReplaceAll(expected, []byte("  "), []byte(" "))
+
 	err := json.Unmarshal(actual, &actualBody)
 	if err != nil {
-		assert.Failf(t, "failed unmarshal actualBody", "body: %s", actual)
+		assert.Failf(t, "failed unmarshal actualBody", "%s, %s", err.Error(), actual)
 		return
 	}
 
 	err = json.Unmarshal(expected, &expectedBody)
 	if err != nil {
-		assert.Failf(t, "failed unmarshal expectedBody %s", err.Error())
+		assert.Failf(t, "failed unmarshal expectedBody", "%s %s", err.Error(), expected)
 		return
 	}
 
