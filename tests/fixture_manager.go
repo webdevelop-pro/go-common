@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/webdevelop-pro/go-common/configurator"
-	"github.com/webdevelop-pro/lib/db"
+	"github.com/webdevelop-pro/go-common/db"
 )
 
 type Fixture struct {
