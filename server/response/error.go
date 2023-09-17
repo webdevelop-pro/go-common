@@ -2,6 +2,7 @@ package response
 
 import "net/http"
 
+// swagger:model
 type Error struct {
 	StatusCode int
 	Message    map[string][]string
