@@ -78,7 +78,7 @@ func (f FixturesManager) CleanAndApply(fixtures []Fixture) error {
 
 func (f FixturesManager) Clean(table string) error {
 	query := fmt.Sprintf("TRUNCATE TABLE %s CASCADE", table)
-	fmt.Println(query)
+	// fmt.Println(query)
 	_, err := f.db.Exec(context.TODO(), query)
 	if err != nil {
 		return fmt.Errorf("failed delete fixtures: %w", err)

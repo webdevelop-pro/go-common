@@ -18,12 +18,12 @@ import (
 
 func (f FixturesManager) LoadFixtures(fixtures []Fixture) error {
 	for _, fixture := range fixtures {
-		fmt.Println("apply fixtures", fixture.table, fixture.filePath)
 		err := f.LoadFixture(fixture.table, fixture.filePath)
 		if err != nil {
 			return err
 		}
 	}
+	// fmt.Printf("applied %d fixtures", len(fixtures))
 	return nil
 }
 
@@ -93,7 +93,7 @@ func (f FixturesManager) LoadFixture(tableName, fileName string) error {
 		}
 		totalInserted += ct.RowsAffected()
 	}
-	fmt.Printf("Inserted %d rows into %s\n", totalInserted, tableName)
+	// fmt.Printf("Inserted %d rows into %s\n", totalInserted, tableName)
 	if len(errors) > 0 {
 		fmt.Printf("Errors occured during execution (%d):\n", len(errors))
 		for i, err := range errors {
