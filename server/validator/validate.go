@@ -16,6 +16,7 @@ const (
 	MsgMin      = "Shorter than minimum length %s."
 	MsgMax      = "Longer than maximum length %s."
 	MsgGte      = "Greater than or equal to %s."
+	MsgGt       = "Greater than %s."
 	MsgOneOf    = "Must be one of: %s."
 )
 
@@ -48,6 +49,8 @@ func beautifulMsg(fe validator.FieldError) string {
 		return fmt.Sprintf(MsgMin, fe.Param())
 	case "max":
 		return fmt.Sprintf(MsgMax, fe.Param())
+	case "gt":
+		return fmt.Sprintf(MsgGt, fe.Param())
 	case "gte":
 		return fmt.Sprintf(MsgGte, fe.Param())
 	case "oneof":
