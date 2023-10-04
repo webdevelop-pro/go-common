@@ -21,6 +21,10 @@ func (r Error) Error() string {
 	return r.Err.Error()
 }
 
+func (r Error) Unwrap() error {
+	return r.Err
+}
+
 func BadRequest(err error) Error {
 	return New(
 		err,
