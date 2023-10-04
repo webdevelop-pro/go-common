@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"net/http"
 	"strings"
 
@@ -34,9 +33,7 @@ func SetIPAddress(next echo.HandlerFunc) echo.HandlerFunc {
 			ip = xrIP
 		}
 
-		ctx := context.WithValue(c.Request().Context(), IpAddressContextKey, ip)
-
-		c.SetRequest(c.Request().WithContext(ctx))
+		c.Set(IpAddressContextKey, ip)
 
 		return next(c)
 	}
