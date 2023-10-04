@@ -60,7 +60,7 @@ func beautifulMsg(fe validator.FieldError) string {
 }
 
 // Validate check payloads and return error list
-func (va Validator) Validate(i interface{}, httpStatus int) error {
+func (va Validator) Verify(i interface{}, httpStatus int) error {
 	// call the `Struct` function passing in your payload
 	err := va.validator.Struct(i)
 	if err != nil {
@@ -88,6 +88,6 @@ func (va Validator) Validate(i interface{}, httpStatus int) error {
 }
 
 // ValidateBadRequest execute Validate with default BadRequest response
-func (va Validator) ValidateBadRequest(i interface{}) error {
-	return va.Validate(i, http.StatusBadRequest)
+func (va Validator) Validate(i interface{}) error {
+	return va.Verify(i, http.StatusBadRequest)
 }
