@@ -21,7 +21,7 @@ err := c.Validate(&requestData)
 ```go
 validate := validator.New()
 if err := validate.Validate(dto.ProfileForStripe(profile.Data), http.StatusPreconditionFailed); err != nil {
-		return err
+	return err
 }
 ```
 In this example, we are using custom dto structure with requirements for the stripe profile. And in case of the error we creating `response.Error` object with `PreconditionFailed` status
