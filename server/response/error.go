@@ -1,6 +1,9 @@
 package response
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 // swagger:model
 type Error struct {
@@ -30,5 +33,13 @@ func BadRequest(err error) Error {
 		err,
 		http.StatusBadRequest,
 		BadRequestMsg,
+	)
+}
+
+func BadRequestMsg(msg string) Error {
+	return New(
+		fmt.Errorf(""),
+		http.StatusBadRequest,
+		map[string][]string{"__error__": {msg}},
 	)
 }
