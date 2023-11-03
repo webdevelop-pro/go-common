@@ -22,6 +22,7 @@ var (
 		AllowHeaders: []string{
 			echo.HeaderAuthorization, echo.HeaderContentType,
 		},
+		AllowCredentials: true,
 	})
 
 	CORSHandler = CORS(func(c echo.Context) error { return c.NoContent(http.StatusNoContent) })
