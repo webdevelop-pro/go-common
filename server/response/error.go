@@ -28,18 +28,34 @@ func (r Error) Unwrap() error {
 	return r.Err
 }
 
-func BadRequest(err error) Error {
+// BadRequest shortcut to return http.StatusBadRequest with custom error and msg
+func BadRequest(err error, msg string) Error {
+	if err == nil {
+		err = fmt.Errorf("")
+	}
+	finalMsg := map[string][]string{"__error__": {msg}}
+	if msg == "" {
+		finalMsg = MsgBadRequest
+	}
 	return New(
 		err,
 		http.StatusBadRequest,
-		BadRequestMsg,
+		finalMsg,
 	)
 }
 
-func BadRequestMsg(msg string) Error {
+// NotFound shortcut to return http.StatusNotFound with custom error and msg
+func NotFound(err error, msg string) Error {
+	if err == nil {
+		err = fmt.Errorf("")
+	}
+	finalMsg := map[string][]string{"__error__": {msg}}
+	if msg == "" {
+		finalMsg = MsgNotFound
+	}
 	return New(
-		fmt.Errorf(""),
+		err,
 		http.StatusBadRequest,
-		map[string][]string{"__error__": {msg}},
+		finalMsg,
 	)
 }
