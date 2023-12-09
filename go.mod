@@ -7,9 +7,9 @@ require (
 	github.com/jinzhu/copier v0.3.5
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/labstack/echo-contrib v0.14.1
-	github.com/labstack/echo/v4 v4.11.1
-	github.com/labstack/gommon v0.4.0
+	github.com/labstack/echo-contrib v0.15.0
+	github.com/labstack/echo/v4 v4.11.3
+	github.com/labstack/gommon v0.4.1
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.29.0
 	github.com/stretchr/testify v1.8.4
