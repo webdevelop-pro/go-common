@@ -36,19 +36,19 @@ type Route struct {
 }
 
 // AddRoute adds route to the router.
-func (s *HttpServer) AddRoute(route Route) {
+func (h *HttpServer) AddRoute(route Route) {
 	handle := route.Handle
 
-	if s.authTool != nil && !route.NoAuth {
-		route.Middlewares = append(route.Middlewares, s.authTool.Validate)
+	if h.authTool != nil && !route.NoAuth {
+		route.Middlewares = append(route.Middlewares, h.authTool.Validate)
 	}
 
-	s.Echo.Add(route.Method, route.Path, handle, route.Middlewares...)
+	h.Echo.Add(route.Method, route.Path, handle, route.Middlewares...)
 }
 
 // SetAuthMiddleware sets auth middleware to the router.
-func (s *HttpServer) SetAuthMiddleware(authTool *middleware.AuthMiddleware) {
-	s.authTool = authTool
+func (h *HttpServer) SetAuthMiddleware(authTool *middleware.AuthMiddleware) {
+	h.authTool = authTool
 }
 
 // NewHttpServer returns new API instance.
