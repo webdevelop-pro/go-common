@@ -42,9 +42,18 @@ Application should create Message using `map[string][]interface{}` type to simpl
 ## Consts
 
 Typical error messages:
-- `codes.BadRequestMsg` - return `bad request` error to frontend. Used when error message is not accesible or when you don't want to give any detail regarding error to the client
-- `codes.NotAuthorizedMsg` - return `authorization error`. Used when used trying to access authorized method without or with incorrect credentials
-- `codes.InternalErrMsg` - return `internal/server error`. Used during internal errors when you don't want to give any additional details to the client
+```json
+  // MsgBadRequest used to indicate error in incoming data
+	MsgBadRequest = map[string][]string{"__error__": {"bad request"}}
+	// MsgNotFound typically used when element haven't been found
+	MsgNotFound = map[string][]string{"__error__": {"not found"}}
+	// MsgUnauthorized signalizes lack of token or other authorization data
+	MsgUnauthorized = map[string][]string{"__error__": {"authorization error"}}
+	// MsgForbidden used when user does not have any permissions to perform action
+	MsgForbidden = map[string][]string{"__error__": {"forbidden error"}}
+	// MsgInternalErr server side error
+	MsgInternalErr = map[string][]string{"__error__": {"internal/server error"}}
+```
 
 Useful methods:
 - `response.New` - takes `error`, `statusCode`, `message` as input
@@ -54,7 +63,7 @@ if err != nil {
   return response.New(
     err,
     http.StatusInternalServerError,
-    response.InternalErrMsg,
+    response.MsgInternalErr,
   )
 }
 ```
@@ -62,14 +71,13 @@ if err != nil {
 - `response.BadRequest` - create generic `BadRequest` response with custom error handler
 ```go
 if err = c.Bind(&reqData); err != nil {
-	return response.BadRequest(err)
+	return response.BadRequest(err, "")
 }
 ```
-
-- `response.BadRequestMsg` - create generic `BadRequestMsg` response with client message
+or 
 ```go
 if err = c.Decode(&reqData); err != nil {
-	return response.BadRequestMsg(fmt.Errorf("cannot decode incoming data"))
+	return response.BadRequest(nil, fmt.Errorf("cannot decode incoming data"))
 }
 ```
 
