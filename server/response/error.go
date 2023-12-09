@@ -55,7 +55,7 @@ func NotFound(err error, msg string) Error {
 	}
 	return New(
 		err,
-		http.StatusBadRequest,
+		http.StatusNotFound,
 		finalMsg,
 	)
 }
