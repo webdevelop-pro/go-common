@@ -21,7 +21,7 @@ func LogRequests(next echo.HandlerFunc) echo.HandlerFunc {
 			raw, _ := io.ReadAll(c.Request().Body)
 			c.Request().Body = io.NopCloser(bytes.NewReader(raw))
 			log.Trace().Interface("headers", c.Request().Header).Msg("headers")
-			log.Trace().Interface("body", string(raw)).Msg("raw body")
+			log.Trace().Str("path", c.Request().RequestURI).Interface("body", string(raw)).Msg("raw body")
 		}
 		// next handler
 		return next(c)
