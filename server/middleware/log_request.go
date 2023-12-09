@@ -20,7 +20,7 @@ func LogRequests(next echo.HandlerFunc) echo.HandlerFunc {
 			// enrich context
 			raw, _ := io.ReadAll(c.Request().Body)
 			c.Request().Body = io.NopCloser(bytes.NewReader(raw))
-			log.Trace().Str("path %s", c.Request().RequestURI).Interface("headers", c.Request().Header).Interface("body", string(raw)).Msg("raw request")
+			log.Trace().Str("path", c.Request().RequestURI).Interface("headers", c.Request().Header).Interface("body", string(raw)).Msg("raw request")
 		}
 		// next handler
 		return next(c)
