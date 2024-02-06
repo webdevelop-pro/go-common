@@ -100,3 +100,19 @@ func NewComponentLogger(component string, c echo.Context) Logger {
 
 	return NewLogger(component, cfg.LogLevel, output, c)
 }
+
+func NewDefaultComponent(component string) Logger {
+	conf := configurator.NewConfigurator()
+	cfg := conf.New("logger", &Config{}).(*Config)
+
+	var output io.Writer
+	// Beautiful output
+	if cfg.LogConsole {
+		output = zerolog.NewConsoleWriter()
+	} else {
+		output = os.Stdout
+	}
+
+	return NewLogger(component, cfg.LogLevel, output, nil)
+}
+
