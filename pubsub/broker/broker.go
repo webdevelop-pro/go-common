@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-logger"
 	"google.golang.org/api/option"
 
@@ -21,15 +20,8 @@ type Broker struct {
 	cfg    *Config         // broker config
 }
 
-func New(ctx context.Context) (Broker, error) {
+func New(ctx context.Context, cfg Config) (Broker, error) {
 	var err error
-	log := logger.NewComponentLogger("pubsub-broker", nil)
-	cfg := Config{}
-
-	err = configurator.NewConfiguration(&cfg, "pubsub")
-	if err != nil {
-		log.Fatal().Err(err).Msg("cannot parse pubsub config")
-	}
 
 	b := Broker{
 		log: logger.NewComponentLogger(pkgName, nil),

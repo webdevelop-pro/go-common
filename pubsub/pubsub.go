@@ -24,12 +24,17 @@ type PubSubRoute struct {
 }
 
 func New(c *configurator.Configurator, routes []PubSubRoute) PubSubListener {
-	cfg := c.New(pkgName, &Config{}, pkgName).(*Config)
-	log := logger.NewComponentLogger("ports-pubsub", nil)
+	log := logger.NewComponentLogger("pubsub", nil)
+	cfg := Config{}
+
+	err := configurator.NewConfiguration(&cfg, "pubsub")
+	if err != nil {
+		log.Fatal().Err(err).Msg("cannot parse pubsub config")
+	}
 
 	p := PubSubListener{
 		log: log,
-		cfg: cfg,
+		cfg: &cfg,
 	}
 
 	p.AddRoutes(routes)
