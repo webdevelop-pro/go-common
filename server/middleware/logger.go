@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/webdevelop-pro/go-common/logger"
+	logger "github.com/webdevelop-pro/go-logger"
 )
 
 // SetLogger adds logger to context

@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/tracelog"
 	"github.com/webdevelop-pro/go-common/configurator"
-	comLogger "github.com/webdevelop-pro/go-common/logger"
+	comLogger "github.com/webdevelop-pro/go-logger"
 )
 
 var (

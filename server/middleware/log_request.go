@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/labstack/echo/v4"
-	"github.com/webdevelop-pro/go-common/logger"
+	logger "github.com/webdevelop-pro/go-logger"
 )
 
 // Writes down every request to the log file

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/tracelog"
-	comLogger "github.com/webdevelop-pro/go-common/logger"
+	comLogger "github.com/webdevelop-pro/go-logger"
 )
 
 // Logger is a struct that represent logger for DB
