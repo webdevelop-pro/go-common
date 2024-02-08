@@ -45,7 +45,8 @@ func New(c *configurator.Configurator, routes []PubSubRoute) PubSubListener {
 func (p PubSubListener) Start() {
 	ctx := context.Background()
 	for _, b := range p.routes {
-		go b.broker.Listen(ctx, b.Listener)
+		br := b
+		go br.broker.Listen(ctx, br.Listener)
 	}
 }
 
