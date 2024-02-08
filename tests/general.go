@@ -2,6 +2,7 @@ package tests
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/assert"
+	pubsub "github.com/webdevelop-pro/go-common/pubsub/client"
 )
 
 type BodyType string
@@ -34,6 +36,16 @@ type ApiTestCase struct {
 	ExpectedResponseCode int
 
 	TestFunc func(map[string]interface{})
+}
+
+type ApiTestCaseV2 struct {
+	Description      string
+	UserID           string
+	OnlyForDebugMode bool
+
+	Fixtures []Fixture
+	Actions  []SomeAction
+	Checks   []SomeAction
 }
 
 func CreateDefaultRequest(method, path string, body []byte) *http.Request {
@@ -175,6 +187,41 @@ func RunApiTest(t *testing.T, Description string, fixtures FixturesManager, scen
 			}
 		})
 	}
+}
+
+func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
+	fixtures := NewFixturesManager()
+	pubsubClient, _ := pubsub.NewPubsubClient(context.Background())
+
+	t.Run(scenario.Description, func(t *testing.T) {
+		testContext := TestContext{
+			pubsubClient: *pubsubClient,
+		}
+
+		err := fixtures.CleanAndApply(scenario.Fixtures)
+		if err != nil {
+			assert.Fail(t, "Failed apply fixtures", err)
+			log.Panic("Failed apply fixtures")
+		}
+
+		for _, action := range scenario.Actions {
+			_, err := action(testContext)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
+		for _, action := range scenario.Checks {
+			res, err := action(testContext)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			if ok, bres := res.(bool); ok {
+				assert.True(t, bres)
+			}
+		}
+	})
 }
 
 // FixME: use sprew
