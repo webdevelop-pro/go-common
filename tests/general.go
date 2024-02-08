@@ -9,11 +9,15 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"os/user"
 	"strings"
 	"testing"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/assert"
+	"github.com/webdevelop-pro/go-common/configurator"
+	"github.com/webdevelop-pro/go-common/db"
 	pubsub "github.com/webdevelop-pro/go-common/pubsub/client"
 )
 
@@ -46,6 +50,23 @@ type ApiTestCaseV2 struct {
 	Fixtures []Fixture
 	Actions  []SomeAction
 	Checks   []SomeAction
+}
+
+func LoadEnv(envPath string) {
+	usr, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	vars, err := godotenv.Read(envPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for key, value := range vars {
+		value = strings.ReplaceAll(value, "~", usr.HomeDir)
+		os.Setenv(key, value)
+	}
 }
 
 func CreateDefaultRequest(method, path string, body []byte) *http.Request {
@@ -192,10 +213,13 @@ func RunApiTest(t *testing.T, Description string, fixtures FixturesManager, scen
 func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 	fixtures := NewFixturesManager()
 	pubsubClient, _ := pubsub.NewPubsubClient(context.Background())
+	dbClient := db.New(configurator.NewConfigurator())
 
 	t.Run(scenario.Description, func(t *testing.T) {
 		testContext := TestContext{
-			pubsubClient: *pubsubClient,
+			pubsub: *pubsubClient,
+			db:     dbClient,
+			t:      t,
 		}
 
 		err := fixtures.CleanAndApply(scenario.Fixtures)
@@ -217,7 +241,7 @@ func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 				log.Fatal(err)
 			}
 
-			if ok, bres := res.(bool); ok {
+			if bres, ok := res.(bool); ok {
 				assert.True(t, bres)
 			}
 		}

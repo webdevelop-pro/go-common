@@ -2,20 +2,17 @@
 package test
 
 import (
-	"log"
 	"os"
 	"testing"
 	"time"
 
-	"github.com/joho/godotenv"
 	. "github.com/webdevelop-pro/go-common/tests"
 )
 
 func TestMain(m *testing.M) {
-	err := godotenv.Load(".env.tests")
-	if err != nil {
-		log.Fatalln(err)
-	}
+	LoadEnv(".env.tests")
+
+	// go start.Server()
 
 	os.Exit(m.Run())
 }
@@ -32,6 +29,13 @@ func TestExample(t *testing.T) {
 			},
 			Checks: []SomeAction{
 				Sleep(time.Second * 2),
+				SQL(
+					"select 1 as col_1, 'a' as col_2 limit 1",
+					ExpectedResult{
+						"col_1": 1.0,
+						"col_2": "a",
+					},
+				),
 			},
 		},
 	)

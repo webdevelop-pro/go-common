@@ -2,8 +2,12 @@ package tests
 
 import (
 	"context"
+	"fmt"
+	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/webdevelop-pro/go-common/db"
 	pubsub "github.com/webdevelop-pro/go-common/pubsub/client"
 )
 
@@ -24,10 +28,13 @@ import (
 // }
 
 type TestContext struct {
-	pubsubClient pubsub.PubsubClient
+	pubsub pubsub.PubsubClient
+	db     *db.DB
+	t      *testing.T
 }
 
 type SomeAction func(t TestContext) (interface{}, error)
+type ExpectedResult map[string]interface{}
 
 func SendHttpRequst(method, path string, body []byte) SomeAction {
 	return func(t TestContext) (interface{}, error) {
@@ -37,15 +44,31 @@ func SendHttpRequst(method, path string, body []byte) SomeAction {
 
 func SendPubSubEvent(topic, body string, attr map[string]string) SomeAction {
 	return func(t TestContext) (interface{}, error) {
-		msgID, err := t.pubsubClient.PublishMessageToTopic(context.Background(), topic, attr, []byte(body))
+		msgID, err := t.pubsub.PublishMessageToTopic(context.Background(), topic, attr, []byte(body))
 
 		return msgID, err
 	}
 }
 
-func SQL(query string) SomeAction {
+func SQL(query string, expected ExpectedResult) SomeAction {
 	return func(t TestContext) (interface{}, error) {
-		return false, nil
+		var res map[string]interface{}
+
+		query = "select row_to_json(q)::jsonb from (" + query + ") as q"
+
+		err := t.db.QueryRow(context.Background(), query).Scan(&res)
+		if err != nil {
+			return nil, err
+		}
+
+		for key, value := range expected {
+			expValue, ok := res[key]
+			if assert.True(t.t, ok, fmt.Sprintf("Expected column %s not exist in resukt", key)) {
+				assert.Equal(t.t, expValue, value)
+			}
+		}
+
+		return true, nil
 	}
 }
 
