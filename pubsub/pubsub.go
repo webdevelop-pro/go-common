@@ -25,7 +25,7 @@ func New(c *configurator.Configurator, routes []PubSubRoute) PubSubListener {
 	log := logger.NewComponentLogger("pubsub", nil)
 	cfg := Config{}
 
-	err := configurator.NewConfiguration(&cfg, "gcp")
+	err := configurator.NewConfiguration(&cfg, "gcp_pubsub")
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot parse pubsub config")
 	}
