@@ -8,8 +8,6 @@ import (
 	"github.com/webdevelop-pro/go-logger"
 )
 
-const pkgName = "pubsub"
-
 type PubSubListener struct {
 	cfg    *Config
 	log    logger.Logger
@@ -27,7 +25,7 @@ func New(c *configurator.Configurator, routes []PubSubRoute) PubSubListener {
 	log := logger.NewComponentLogger("pubsub", nil)
 	cfg := Config{}
 
-	err := configurator.NewConfiguration(&cfg, "pubsub")
+	err := configurator.NewConfiguration(&cfg, "gcp")
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot parse pubsub config")
 	}

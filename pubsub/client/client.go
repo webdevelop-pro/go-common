@@ -25,7 +25,7 @@ func NewPubsubClient(ctx context.Context) (*PubsubClient, error) {
 	log := logger.NewComponentLogger("pubsub-adapter", nil)
 	cfg := Config{}
 
-	err := configurator.NewConfiguration(&cfg, "pubsub")
+	err := configurator.NewConfiguration(&cfg, "gcp")
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot parse pubsub config")
 	}
