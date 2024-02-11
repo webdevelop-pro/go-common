@@ -18,6 +18,7 @@ const (
 	MsgGte      = "Greater than or equal to %s."
 	MsgGt       = "Greater than %s."
 	MsgOneOf    = "Must be one of: %s."
+	MsgEq       = "Must be equal to: %s."
 )
 
 type FieldError struct {
@@ -55,6 +56,8 @@ func beautifulMsg(fe validator.FieldError) string {
 		return fmt.Sprintf(MsgGte, fe.Param())
 	case "oneof":
 		return fmt.Sprintf(MsgOneOf, fe.Param())
+	case "eq":
+		return fmt.Sprintf(MsgEq, fe.Param())
 	}
 	return fe.Error() // default error
 }

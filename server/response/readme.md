@@ -44,15 +44,15 @@ Application should create Message using `map[string][]interface{}` type to simpl
 Typical error messages:
 ```json
   // MsgBadRequest used to indicate error in incoming data
-	MsgBadRequest = map[string][]string{"__error__": {"bad request"}}
+	MsgBadRequest = map[string][]string{"__error__": {"Bad request."}}
 	// MsgNotFound typically used when element haven't been found
-	MsgNotFound = map[string][]string{"__error__": {"not found"}}
+	MsgNotFound = map[string][]string{"__error__": {"Not found."}}
 	// MsgUnauthorized signalizes lack of token or other authorization data
-	MsgUnauthorized = map[string][]string{"__error__": {"authorization error"}}
+	MsgUnauthorized = map[string][]string{"__error__": {"Authorization error."}}
 	// MsgForbidden used when user does not have any permissions to perform action
-	MsgForbidden = map[string][]string{"__error__": {"forbidden error"}}
+	MsgForbidden = map[string][]string{"__error__": {"Forbidden error."}}
 	// MsgInternalErr server side error
-	MsgInternalErr = map[string][]string{"__error__": {"internal/server error"}}
+	MsgInternalErr = map[string][]string{"__error__": {"Internal/server error."}}
 ```
 
 Useful methods:
