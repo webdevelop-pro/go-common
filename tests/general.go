@@ -2,17 +2,23 @@ package tests
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
+	"os/user"
 	"strings"
 	"testing"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/gommon/log"
 	"github.com/stretchr/testify/assert"
+	"github.com/webdevelop-pro/go-common/configurator"
+	"github.com/webdevelop-pro/go-common/db"
+	pubsub "github.com/webdevelop-pro/go-common/pubsub/client"
 )
 
 type BodyType string
@@ -34,6 +40,33 @@ type ApiTestCase struct {
 	ExpectedResponseCode int
 
 	TestFunc func(map[string]interface{})
+}
+
+type ApiTestCaseV2 struct {
+	Description      string
+	UserID           string
+	OnlyForDebugMode bool
+
+	Fixtures []Fixture
+	Actions  []SomeAction
+	Checks   []SomeAction
+}
+
+func LoadEnv(envPath string) {
+	usr, err := user.Current()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	vars, err := godotenv.Read(envPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for key, value := range vars {
+		value = strings.ReplaceAll(value, "~", usr.HomeDir)
+		os.Setenv(key, value)
+	}
 }
 
 func CreateDefaultRequest(method, path string, body []byte) *http.Request {
@@ -175,6 +208,44 @@ func RunApiTest(t *testing.T, Description string, fixtures FixturesManager, scen
 			}
 		})
 	}
+}
+
+func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
+	fixtures := NewFixturesManager()
+	pubsubClient, _ := pubsub.NewPubsubClient(context.Background())
+	dbClient := db.New(configurator.NewConfigurator())
+
+	t.Run(scenario.Description, func(t *testing.T) {
+		testContext := TestContext{
+			pubsub: *pubsubClient,
+			db:     dbClient,
+			t:      t,
+		}
+
+		err := fixtures.CleanAndApply(scenario.Fixtures)
+		if err != nil {
+			assert.Fail(t, "Failed apply fixtures", err)
+			log.Panic("Failed apply fixtures")
+		}
+
+		for _, action := range scenario.Actions {
+			_, err := action(testContext)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
+		for _, action := range scenario.Checks {
+			res, err := action(testContext)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			if bres, ok := res.(bool); ok {
+				assert.True(t, bres)
+			}
+		}
+	})
 }
 
 // FixME: use sprew

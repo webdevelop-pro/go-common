@@ -131,11 +131,13 @@ func (f FixturesManager) columns(dbName, tableName string) (map[string]string, e
 func GetAbsPath(relativePath string) string {
 	currentDir, _ := os.Getwd()
 
-	for path.Base(currentDir) != "tests" {
+	if _, err := os.Stat(currentDir + "/tests"); os.IsNotExist(err) {
+		if path.Base(currentDir) != "tests" {
+			currentDir = path.Dir(currentDir)
+		}
+
 		currentDir = path.Dir(currentDir)
 	}
-
-	currentDir = path.Dir(currentDir)
 
 	return path.Join(currentDir, relativePath)
 }
