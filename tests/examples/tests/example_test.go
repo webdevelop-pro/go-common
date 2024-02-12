@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	. "github.com/webdevelop-pro/go-common/tests"
 )
 
@@ -23,11 +24,9 @@ func TestExample(t *testing.T) {
 		ApiTestCaseV2{
 			Description: "Example case",
 			Fixtures:    []Fixture{},
-			Actions: []SomeAction{
+			TestActions: []SomeAction{
 				// SendHttpRequst("POST", "/events/sendgrid/test_topic?object=email&action=update&auth_type=auto&auth_token=XXXXX", []byte(`{"test": "message"}`)),
 				SendPubSubEvent("test_topic", "{}", map[string]string{}),
-			},
-			Checks: []SomeAction{
 				Sleep(time.Second * 2),
 				SQL(
 					"select 1 as col_1, 'a' as col_2 limit 1",
@@ -36,6 +35,26 @@ func TestExample(t *testing.T) {
 						"col_2": "a",
 					},
 				),
+				SendHttpRequst(
+					Request{
+						Scheme: "https",
+						Host:   "google.com",
+						Method: "GET",
+						Path:   "/",
+					},
+					ExpectedResponse{
+						Code: 200,
+					},
+				),
+				func(tc TestContext) error {
+					// Some custom test code
+					// tc.DB.Query ...
+					// tc.Pubsub....
+
+					assert.True(tc.T, true)
+
+					return nil
+				},
 			},
 		},
 	)

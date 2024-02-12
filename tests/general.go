@@ -47,9 +47,8 @@ type ApiTestCaseV2 struct {
 	UserID           string
 	OnlyForDebugMode bool
 
-	Fixtures []Fixture
-	Actions  []SomeAction
-	Checks   []SomeAction
+	Fixtures    []Fixture
+	TestActions []SomeAction
 }
 
 func LoadEnv(envPath string) {
@@ -69,18 +68,25 @@ func LoadEnv(envPath string) {
 	}
 }
 
-func CreateDefaultRequest(method, path string, body []byte) *http.Request {
+func CreateDefaultRequest(scheme, host, method, path string, body []byte) *http.Request {
+	if host == "" {
+		appHost := os.Getenv("HOST")
+		appPort := os.Getenv("PORT")
 
-	appHost := os.Getenv("HOST")
-	appPort := os.Getenv("PORT")
+		if appHost == "" || appPort == "" {
+			log.Fatalf("please set HOST and PORT vars")
+		}
 
-	if appHost == "" || appPort == "" {
-		log.Fatalf("please set HOST and PORT vars")
+		host = appHost + ":" + appPort
+	}
+
+	if scheme == "" {
+		scheme = "http"
 	}
 
 	req, err := http.NewRequest(
 		method,
-		fmt.Sprintf("http://%s:%s%s", appHost, appPort, path),
+		fmt.Sprintf("%s://%s%s", scheme, host, path),
 		bytes.NewBuffer((body)),
 	)
 	if err != nil {
@@ -217,9 +223,9 @@ func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 
 	t.Run(scenario.Description, func(t *testing.T) {
 		testContext := TestContext{
-			pubsub: *pubsubClient,
-			db:     dbClient,
-			t:      t,
+			Pubsub: *pubsubClient,
+			DB:     dbClient,
+			T:      t,
 		}
 
 		err := fixtures.CleanAndApply(scenario.Fixtures)
@@ -228,21 +234,10 @@ func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 			log.Panic("Failed apply fixtures")
 		}
 
-		for _, action := range scenario.Actions {
-			_, err := action(testContext)
+		for _, action := range scenario.TestActions {
+			err := action(testContext)
 			if err != nil {
 				log.Fatal(err)
-			}
-		}
-
-		for _, action := range scenario.Checks {
-			res, err := action(testContext)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			if bres, ok := res.(bool); ok {
-				assert.True(t, bres)
 			}
 		}
 	})

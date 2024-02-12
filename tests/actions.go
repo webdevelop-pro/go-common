@@ -28,54 +28,78 @@ import (
 // }
 
 type TestContext struct {
-	pubsub pubsub.PubsubClient
-	db     *db.DB
-	t      *testing.T
+	Pubsub pubsub.PubsubClient
+	DB     *db.DB
+	T      *testing.T
 }
 
-type SomeAction func(t TestContext) (interface{}, error)
+type SomeAction func(t TestContext) error
 type ExpectedResult map[string]interface{}
 
-func SendHttpRequst(method, path string, body []byte) SomeAction {
-	return func(t TestContext) (interface{}, error) {
-		return false, nil
+type Request struct {
+	Scheme, Host, Method, Path string
+	Body                       []byte
+}
+
+type ExpectedResponse struct {
+	Code int
+	Body []byte
+}
+
+func SendHttpRequst(req Request, checks ...ExpectedResponse) SomeAction {
+	return func(t TestContext) error {
+		result, code, err := SendTestRequest(CreateDefaultRequest(req.Scheme, req.Host, req.Method, req.Path, req.Body))
+
+		assert.Nil(t.T, err)
+
+		for _, expected := range checks {
+			assert.Equal(t.T, expected.Code, code, "Invalid response code")
+
+			if expected.Body != nil {
+				CompareJsonBody(t.T, result, expected.Body)
+			}
+		}
+
+		return nil
 	}
 }
 
 func SendPubSubEvent(topic, body string, attr map[string]string) SomeAction {
-	return func(t TestContext) (interface{}, error) {
-		msgID, err := t.pubsub.PublishMessageToTopic(context.Background(), topic, attr, []byte(body))
+	return func(t TestContext) error {
+		_, err := t.Pubsub.PublishMessageToTopic(context.Background(), topic, attr, []byte(body))
 
-		return msgID, err
+		return err
 	}
 }
 
-func SQL(query string, expected ExpectedResult) SomeAction {
-	return func(t TestContext) (interface{}, error) {
+func SQL(query string, expected ...ExpectedResult) SomeAction {
+	return func(t TestContext) error {
 		var res map[string]interface{}
 
 		query = "select row_to_json(q)::jsonb from (" + query + ") as q"
 
-		err := t.db.QueryRow(context.Background(), query).Scan(&res)
+		err := t.DB.QueryRow(context.Background(), query).Scan(&res)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		for key, value := range expected {
-			expValue, ok := res[key]
-			if assert.True(t.t, ok, fmt.Sprintf("Expected column %s not exist in resukt", key)) {
-				assert.Equal(t.t, expValue, value)
+		for _, exp := range expected {
+			for key, value := range exp {
+				expValue, ok := res[key]
+				if assert.True(t.T, ok, fmt.Sprintf("Expected column %s not exist in resukt", key)) {
+					assert.Equal(t.T, expValue, value)
+				}
 			}
 		}
 
-		return true, nil
+		return nil
 	}
 }
 
 func Sleep(d time.Duration) SomeAction {
-	return func(t TestContext) (interface{}, error) {
+	return func(t TestContext) error {
 		time.Sleep(d)
 
-		return true, nil
+		return nil
 	}
 }
