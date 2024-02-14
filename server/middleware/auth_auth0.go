@@ -11,8 +11,12 @@ import (
 	logger "github.com/webdevelop-pro/go-logger"
 )
 
+type AuthMiddleware interface {
+	Validate(next echo.HandlerFunc) echo.HandlerFunc
+}
+
 // AuthMiddleware is struct which store instance of auth middleware
-type AuthMiddleware struct {
+type authMiddleware struct {
 	validateURI string
 	log         logger.Logger
 }
@@ -23,15 +27,15 @@ type Config struct {
 }
 
 // NewAuthMW is a constructor of AuthMiddleware
-func NewAuth0MW(cfg *Config) *AuthMiddleware {
-	return &AuthMiddleware{
+func NewAuth0MW(cfg *Config) AuthMiddleware {
+	return &authMiddleware{
 		validateURI: cfg.AuthValidateURI,
 		log:         logger.NewComponentLogger("auth_tool", nil),
 	}
 }
 
 // NewAuthMiddleware returns a new instance of AuthMiddleware
-func NewAuthMiddleware() *AuthMiddleware {
+func NewAuthMiddleware() AuthMiddleware {
 	cfg := &Config{}
 	l := logger.NewComponentLogger("auth_tool", nil)
 
@@ -39,7 +43,7 @@ func NewAuthMiddleware() *AuthMiddleware {
 		l.Fatal().Err(err).Msg("failed to get configuration of db")
 	}
 
-	return &AuthMiddleware{
+	return &authMiddleware{
 		validateURI: cfg.AuthValidateURI,
 		log:         l,
 	}
@@ -48,7 +52,7 @@ func NewAuthMiddleware() *AuthMiddleware {
 // ToDo
 // Transfer headers ..
 // Validate is middleware that extracts data from Authorization header and validates it
-func (m *AuthMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
+func (m *authMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
 			ctx = c.Request().Context()

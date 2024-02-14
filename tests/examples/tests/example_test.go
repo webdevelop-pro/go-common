@@ -39,6 +39,9 @@ func TestExample(t *testing.T) {
 					Request{
 						Scheme: "https",
 						Host:   "google.com",
+						Headers: map[string]string{
+							"identity_id": "test",
+						},
 						Method: "GET",
 						Path:   "/",
 					},
