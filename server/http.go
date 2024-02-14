@@ -105,7 +105,7 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool middlewa
 	}
 }
 
-func New() *HttpServer {
+func New(authTool middleware.AuthMiddleware) *HttpServer {
 	cfg := &Config{}
 	l := logger.NewComponentLogger("http_server", nil)
 
@@ -113,7 +113,7 @@ func New() *HttpServer {
 		l.Fatal().Err(err).Msg("failed to get configuration of server")
 	}
 
-	return NewHttpServer(echo.New(), l, cfg, nil)
+	return NewHttpServer(echo.New(), l, cfg, authTool)
 }
 
 // StartServer is function that registers start of http server in lifecycle
