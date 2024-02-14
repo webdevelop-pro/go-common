@@ -24,7 +24,7 @@ func NewAuthIdentityHeaderMW() AuthMiddleware {
 
 func (m *authIdentityHeaderMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		identityID := c.Request().Header.Get("identity_id")
+		identityID := c.Request().Header.Get("Authorization")
 
 		if identityID == "" {
 			return c.JSON(http.StatusUnauthorized, response.Error{
