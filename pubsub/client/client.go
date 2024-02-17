@@ -65,7 +65,7 @@ func (p *PubsubClient) PublishMessageToTopic(ctx context.Context, topicID string
 		msgID, err = res.Get(ctx)
 		if err != nil {
 			// Error handling code can be added here.
-			p.log.Err(err).Msg(broker.ErrPublish)
+			p.log.Err(err).Msg(broker.ErrPublish.Error())
 			return
 		}
 		p.log.Info().Msgf("Published message; msg ID: %v\n", msgID)

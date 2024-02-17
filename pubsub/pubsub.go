@@ -25,9 +25,9 @@ func New(c *configurator.Configurator, routes []PubSubRoute) PubSubListener {
 	log := logger.NewComponentLogger("pubsub", nil)
 	cfg := Config{}
 
-	err := configurator.NewConfiguration(&cfg, "gcp_pubsub")
+	err := configurator.NewConfiguration(&cfg, "pubsub")
 	if err != nil {
-		log.Fatal().Err(err).Msg("cannot parse pubsub config")
+		log.Fatal().Stack().Err(err).Msg(broker.ErrConfigParse.Error())
 	}
 
 	p := PubSubListener{
@@ -60,7 +60,7 @@ func (p *PubSubListener) AddRoutes(routes []PubSubRoute) error {
 			return err
 		}
 
-		route.broker = broker
+		route.Broker = broker
 		p.routes = append(p.routes, route)
 	}
 
