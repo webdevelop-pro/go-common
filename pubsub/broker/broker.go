@@ -103,9 +103,6 @@ func (b *Broker) Close() {
 	}
 }
 
-type T interface {
-}
-
 func (b *Broker) Listen(ctx context.Context, callback func(ctx context.Context, msg Message) error) error {
 	var err error
 
@@ -133,14 +130,14 @@ func (b *Broker) Listen(ctx context.Context, callback func(ctx context.Context, 
 	sub := b.client.Subscription(b.cfg.Subscription)
 	ok, err = sub.Exists(ctx)
 	if err != nil {
-		b.log.Fatal().Err(err).Interface("name", name).Msgf(ErrConnectSubscription.Error())
+		b.log.Fatal().Stack().Err(err).Interface("name", name).Msgf(ErrConnectSubscription.Error())
 		return fmt.Errorf("%w: %w", ErrConnectSubscription, err)
 	}
 	if !ok {
-		b.log.Fatal().Err(err).Interface("name", name).Msgf(ErrSubscriptionNotExist.Error())
+		b.log.Fatal().Stack().Err(err).Interface("name", b.cfg.Subscription).Msgf(ErrSubscriptionNotExist.Error())
 		return fmt.Errorf("%w: %w", ErrSubscriptionNotExist, err)
 	}
-	b.log.Trace().Msgf("connected to subscription %s listen for new messages", name)
+	b.log.Trace().Msgf("connected to subscription %s listen for new messages", b.cfg.Subscription)
 	go b.listenGoroutine(ctx, callback, sub)
 	return nil
 }
@@ -164,7 +161,7 @@ func (b *Broker) listenGoroutine(ctx context.Context, callback func(ctx context.
 		msg.Ack()
 	})
 	if err != nil {
-		b.log.Fatal().Err(err).Msgf(ErrReceiveSubscription.Error())
+		b.log.Fatal().Stack().Err(err).Msgf(ErrReceiveSubscription.Error())
 	}
 	<-ctx.Done()
 	b.log.Trace().Msgf("stop listen for new messages for %s", sub.ID())
