@@ -39,6 +39,7 @@ type ExpectedResult map[string]interface{}
 type Request struct {
 	Scheme, Host, Method, Path string
 	Body                       []byte
+	Headers                    map[string]string
 }
 
 type ExpectedResponse struct {
@@ -48,7 +49,7 @@ type ExpectedResponse struct {
 
 func SendHttpRequst(req Request, checks ...ExpectedResponse) SomeAction {
 	return func(t TestContext) error {
-		result, code, err := SendTestRequest(CreateDefaultRequest(req.Scheme, req.Host, req.Method, req.Path, req.Body))
+		result, code, err := SendTestRequest(CreateDefaultRequest(req))
 
 		assert.Nil(t.T, err)
 

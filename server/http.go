@@ -20,7 +20,7 @@ type HttpServer struct {
 	Echo     *echo.Echo
 	log      logger.Logger
 	config   *Config
-	authTool *middleware.AuthMiddleware
+	authTool middleware.AuthMiddleware
 }
 
 // Route is a http route.
@@ -47,12 +47,12 @@ func (h *HttpServer) AddRoute(route Route) {
 }
 
 // SetAuthMiddleware sets auth middleware to the router.
-func (h *HttpServer) SetAuthMiddleware(authTool *middleware.AuthMiddleware) {
+func (h *HttpServer) SetAuthMiddleware(authTool middleware.AuthMiddleware) {
 	h.authTool = authTool
 }
 
 // NewHttpServer returns new API instance.
-func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool *middleware.AuthMiddleware) *HttpServer {
+func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool middleware.AuthMiddleware) *HttpServer {
 	// sets CORS headers if Origin is present
 	e.Use(
 		echoMW.CORSWithConfig(echoMW.CORSConfig{
@@ -105,7 +105,7 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool *middlew
 	}
 }
 
-func New() *HttpServer {
+func New(authTool middleware.AuthMiddleware) *HttpServer {
 	cfg := &Config{}
 	l := logger.NewComponentLogger("http_server", nil)
 
@@ -113,7 +113,7 @@ func New() *HttpServer {
 		l.Fatal().Err(err).Msg("failed to get configuration of server")
 	}
 
-	return NewHttpServer(echo.New(), l, cfg, nil)
+	return NewHttpServer(echo.New(), l, cfg, authTool)
 }
 
 // StartServer is function that registers start of http server in lifecycle

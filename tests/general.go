@@ -68,8 +68,8 @@ func LoadEnv(envPath string) {
 	}
 }
 
-func CreateDefaultRequest(scheme, host, method, path string, body []byte) *http.Request {
-	if host == "" {
+func CreateDefaultRequest(req Request) *http.Request {
+	if req.Host == "" {
 		appHost := os.Getenv("HOST")
 		appPort := os.Getenv("PORT")
 
@@ -77,24 +77,29 @@ func CreateDefaultRequest(scheme, host, method, path string, body []byte) *http.
 			log.Fatalf("please set HOST and PORT vars")
 		}
 
-		host = appHost + ":" + appPort
+		req.Host = appHost + ":" + appPort
 	}
 
-	if scheme == "" {
-		scheme = "http"
+	if req.Scheme == "" {
+		req.Scheme = "http"
 	}
 
-	req, err := http.NewRequest(
-		method,
-		fmt.Sprintf("%s://%s%s", scheme, host, path),
-		bytes.NewBuffer((body)),
+	r, err := http.NewRequest(
+		req.Method,
+		fmt.Sprintf("%s://%s%s", req.Scheme, req.Host, req.Path),
+		bytes.NewBuffer((req.Body)),
 	)
 	if err != nil {
 		log.Fatalf("cannot create new request %s", err.Error())
 	}
 
-	req.Header.Add("content-type", "application/json")
-	return req
+	r.Header.Add("content-type", "application/json")
+
+	for key, value := range req.Headers {
+		r.Header.Add(key, value)
+	}
+
+	return r
 }
 
 func CreateRequestWithFiles(method, path string, body map[string]interface{}, files map[string]string) *http.Request {
