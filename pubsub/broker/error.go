@@ -2,6 +2,7 @@ package broker
 
 import "github.com/pkg/errors"
 
+var ErrConfigParse = errors.New("Cannot parse pubsub config")
 var ErrConnection = errors.New("Connection error")
 var ErrCreateSubscription = errors.New("Cannot create subscription")
 var ErrPublish = errors.New("Cannot publish message")

@@ -14,7 +14,7 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
-	"github.com/labstack/gommon/log"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/db"
@@ -29,8 +29,10 @@ const (
 )
 
 type ApiTestCase struct {
-	Description      string
-	UserID           string
+	Description string
+	UserID      string
+	// ToDo
+	// Write down description why its needed
 	OnlyForDebugMode bool
 	Fixtures         []Fixture
 
@@ -43,14 +45,18 @@ type ApiTestCase struct {
 }
 
 type ApiTestCaseV2 struct {
-	Description      string
-	UserID           string
+	Description string
+	UserID      string
+	// ToDo
+	// Write down description why its needed
 	OnlyForDebugMode bool
 
 	Fixtures    []Fixture
 	TestActions []SomeAction
 }
 
+// ToDo
+// Create in go-common configuration to load env
 func LoadEnv(envPath string) {
 	usr, err := user.Current()
 	if err != nil {
@@ -102,6 +108,8 @@ func CreateDefaultRequest(req Request) *http.Request {
 	return r
 }
 
+// ToDo
+// Create in go-common xserver utils method to make request with files
 func CreateRequestWithFiles(method, path string, body map[string]interface{}, files map[string]string) *http.Request {
 	buf := new(bytes.Buffer)
 	w := multipart.NewWriter(buf)
@@ -248,7 +256,8 @@ func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 	})
 }
 
-// FixME: use sprew
+// ToDo
+// use sprew or other library to better show different in maps
 func CompareJsonBody(t *testing.T, actual, expected []byte) {
 	var actualBody, expectedBody map[string]interface{}
 

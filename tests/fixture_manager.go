@@ -77,7 +77,10 @@ func (f FixturesManager) CleanAndApply(fixtures []Fixture) error {
 }
 
 func (f FixturesManager) Clean(table string) error {
-	query := fmt.Sprintf("TRUNCATE TABLE %s CASCADE", table)
+	query := fmt.Sprintf(
+		"DELETE FROM %s; select setval('{self.table}_id_seq',(select max(id)+1 from %s)) %s CASCADE",
+		table, table,
+	)
 	// fmt.Println(query)
 	_, err := f.db.Exec(context.TODO(), query)
 	if err != nil {

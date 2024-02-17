@@ -12,6 +12,8 @@ type SQLTestCase struct {
 	ExpectedResult      string
 }
 
+// ToDo
+// Do we still need it?
 func AssertSQL(t *testing.T, fManager FixturesManager, testCase SQLTestCase) {
 	t.Helper()
 

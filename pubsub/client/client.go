@@ -7,6 +7,7 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/webdevelop-pro/go-common/configurator"
+	"github.com/webdevelop-pro/go-common/pubsub/broker"
 	"github.com/webdevelop-pro/go-logger"
 	"google.golang.org/api/option"
 )
@@ -25,14 +26,14 @@ func NewPubsubClient(ctx context.Context) (*PubsubClient, error) {
 	log := logger.NewComponentLogger("pubsub-adapter", nil)
 	cfg := Config{}
 
-	err := configurator.NewConfiguration(&cfg, "gcp_pubsub")
+	err := configurator.NewConfiguration(&cfg, "pubsub")
 	if err != nil {
-		log.Fatal().Err(err).Msg("cannot parse pubsub config")
+		log.Fatal().Err(err).Msg(broker.ErrConfigParse.Error())
 	}
 
 	client, err := pubsub.NewClient(ctx, cfg.ProjectID, option.WithCredentialsFile(cfg.ServiceAccountCredentials))
 	if err != nil {
-		log.Error().Err(err).Msgf("error")
+		log.Error().Err(err).Msgf(broker.ErrConnection.Error())
 		return nil, fmt.Errorf("%w", err)
 	}
 
@@ -64,7 +65,7 @@ func (p *PubsubClient) PublishMessageToTopic(ctx context.Context, topicID string
 		msgID, err = res.Get(ctx)
 		if err != nil {
 			// Error handling code can be added here.
-			// p.log.Err(err).Msgf("Failed to publish: %w", err)
+			p.log.Err(err).Msg(broker.ErrPublish)
 			return
 		}
 		p.log.Info().Msgf("Published message; msg ID: %v\n", msgID)

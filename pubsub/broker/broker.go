@@ -154,7 +154,7 @@ func (b *Broker) listenGoroutine(ctx context.Context, callback func(ctx context.
 		m.Attributes = msg.Attributes
 		m.ID = msg.ID
 
-		b.log.Trace().Str("msg", string(m.Data)).Msgf("received new message")
+		b.log.Debug().Str("msg", string(m.Data)).Msgf("received new message")
 		err := callback(ctx, m)
 		if err != nil {
 			b.log.Error().Err(err).Msgf(ErrReceiveCallback.Error())

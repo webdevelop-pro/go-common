@@ -18,7 +18,7 @@ type PubSubRoute struct {
 	Topic        string
 	Subscription string
 	Listener     func(ctx context.Context, msg broker.Message) error
-	broker       broker.Broker
+	Broker       broker.Broker
 }
 
 func New(c *configurator.Configurator, routes []PubSubRoute) PubSubListener {
@@ -44,7 +44,7 @@ func (p PubSubListener) Start() {
 	ctx := context.Background()
 	for _, b := range p.routes {
 		br := b
-		go br.broker.Listen(ctx, br.Listener)
+		go br.Broker.Listen(ctx, br.Listener)
 	}
 }
 

@@ -86,8 +86,10 @@ func SQL(query string, expected ...ExpectedResult) SomeAction {
 
 		for _, exp := range expected {
 			for key, value := range exp {
+				// ToDo:
+				// Find library to have colorful compare for maps
 				expValue, ok := res[key]
-				if assert.True(t.T, ok, fmt.Sprintf("Expected column %s not exist in resukt", key)) {
+				if assert.True(t.T, ok, fmt.Sprintf("Expected column %s not exist in result", key)) {
 					assert.Equal(t.T, expValue, value)
 				}
 			}
@@ -97,6 +99,35 @@ func SQL(query string, expected ...ExpectedResult) SomeAction {
 	}
 }
 
+/*
+ToDo:
+  - client does not have Listen method
+  - Merge broker with client its all client
+  - rename pubsub to queue
+func CheckPubSubEvent(subID string, msg broker.Message) SomeAction {
+	return func(t TestContext) error {
+		var equal bool
+
+		log.Trace().Msg("waiting for 5 seconds to get message")
+
+		timer := time.NewTimer(time.Second * 5)
+		t.Pubsub.Listen(func(ctx context.Context, msg2 broker.Message) error {
+			equal = cmp.Equal(msg, msg2)
+			if !equal {
+				log.Trace().Interface("msg", msg).Msg("Not equal")
+			} else {
+				return nil
+			}
+			return fmt.Errorf("not equal")
+		})
+		<-timer.C
+
+		return nil
+	}
+}
+*/
+
+// Please usage example
 func Sleep(d time.Duration) SomeAction {
 	return func(t TestContext) error {
 		time.Sleep(d)
