@@ -74,6 +74,8 @@ func LoadEnv(envPath string) {
 	}
 }
 
+// ToDo
+// Create in go-common xserver utils method to make http request
 func CreateDefaultRequest(req Request) *http.Request {
 	if req.Host == "" {
 		appHost := os.Getenv("HOST")
