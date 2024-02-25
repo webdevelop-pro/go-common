@@ -67,12 +67,7 @@ func SendHttpRequst(req Request, checks ...ExpectedResponse) SomeAction {
 
 func SendPubSubEvent(topic, body string, attr map[string]string) SomeAction {
 	return func(t TestContext) error {
-		msg, err := pclient.NewMessage(map[string]any{"body": body}, attr)
-		if err != nil {
-			return err
-		}
-		_, err := t.Pubsub.PublishToTopic(context.Background(), topic, msg)
-
+		_, err := t.Pubsub.PublishToTopic(context.Background(), topic, body, attr)
 		return err
 	}
 }

@@ -174,11 +174,11 @@ func (b *Client) listenGoroutine(ctx context.Context, callback func(ctx context.
 	return nil
 }
 
-func (b *Client) Publish(ctx context.Context, data any, attr map[string]string) error {
+func (b *Client) Publish(ctx context.Context, data any, attr map[string]string) (*Message, error) {
 	return b.PublishToTopic(ctx, b.topic.ID(), data, attr)
 }
 
-func (b *Client) PublishToTopic(ctx context.Context, topicID string, data any, attr map[string]string) error {
+func (b *Client) PublishToTopic(ctx context.Context, topicID string, data any, attr map[string]string) (*Message, error) {
 	var (
 		wg    sync.WaitGroup
 		msgID string
@@ -189,13 +189,13 @@ func (b *Client) PublishToTopic(ctx context.Context, topicID string, data any, a
 	ok, err := t.Exists(ctx)
 	if !ok {
 		b.log.Error().Err(err).Interface("topic", topicID).Msgf(ErrTopicNotExists.Error())
-		return fmt.Errorf("%w: %s", err, b.cfg.Topic)
+		return nil, fmt.Errorf("%w: %s", err, b.cfg.Topic)
 	}
 
 	msg, err := NewMessage(data, attr)
 	if err != nil {
 		b.log.Error().Err(err).Interface("data", data).Interface("attr", attr).Msgf(ErrUnmarshalPubSub.Error())
-		return err
+		return nil, err
 	}
 
 	wg.Add(1)
@@ -221,5 +221,5 @@ func (b *Client) PublishToTopic(ctx context.Context, topicID string, data any, a
 	wg.Wait()
 	msg.ID = msgID
 
-	return nil
+	return msg, nil
 }

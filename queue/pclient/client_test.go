@@ -3,6 +3,7 @@ package pclient
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 
@@ -21,13 +22,21 @@ func TestPubSubPublish(t *testing.T) {
 
 	pubsubClient.CreateTopic(ctx, pubsubClient.cfg.Topic)
 	t.Run("success publish", func(t *testing.T) {
-		err := pubsubClient.Publish(ctx,
+		msg, err := pubsubClient.Publish(ctx,
 			map[string]any{"investment_id": 5},
 			map[string]string{"ip_address": "31.5.12.199", "request_id": "Xbsdf124d"},
 		)
 
 		if err != nil {
 			t.Errorf("errors don't match: expected nil, got %s", err)
+		}
+
+		id, err := strconv.Atoi(msg.ID)
+		if err != nil {
+			t.Errorf("pubsub emulator return ID as int, maybe you  are not using it? %s", err)
+		}
+		if id <= 0 {
+			t.Errorf("msg id should be more that 0 %s", err)
 		}
 	})
 }
