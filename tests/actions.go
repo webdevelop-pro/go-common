@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/webdevelop-pro/go-common/db"
-	pubsub "github.com/webdevelop-pro/go-common/pubsub/client"
+	"github.com/webdevelop-pro/go-common/queue/pclient"
 )
 
 // func SendTestRequest(req *http.Request) ([]byte, int, error) {
@@ -28,7 +28,7 @@ import (
 // }
 
 type TestContext struct {
-	Pubsub pubsub.PubsubClient
+	Pubsub pclient.Client
 	DB     *db.DB
 	T      *testing.T
 }
@@ -67,7 +67,11 @@ func SendHttpRequst(req Request, checks ...ExpectedResponse) SomeAction {
 
 func SendPubSubEvent(topic, body string, attr map[string]string) SomeAction {
 	return func(t TestContext) error {
-		_, err := t.Pubsub.PublishMessageToTopic(context.Background(), topic, attr, []byte(body))
+		msg, err := pclient.NewMessage(map[string]any{"body": body}, attr)
+		if err != nil {
+			return err
+		}
+		_, err := t.Pubsub.PublishToTopic(context.Background(), topic, msg)
 
 		return err
 	}

@@ -1,10 +1,10 @@
-package pubsub
+package queue
 
 import (
 	"context"
 
 	"github.com/webdevelop-pro/go-common/configurator"
-	"github.com/webdevelop-pro/go-common/pubsub/broker"
+	"github.com/webdevelop-pro/go-common/queue/pclient"
 	"github.com/webdevelop-pro/go-logger"
 )
 
@@ -17,8 +17,8 @@ type PubSubListener struct {
 type PubSubRoute struct {
 	Topic        string
 	Subscription string
-	Listener     func(ctx context.Context, msg broker.Message) error
-	Broker       broker.Broker
+	Listener     func(ctx context.Context, msg pclient.Message) error
+	Client       pclient.Client
 }
 
 func New(c *configurator.Configurator, routes []PubSubRoute) PubSubListener {
@@ -27,7 +27,7 @@ func New(c *configurator.Configurator, routes []PubSubRoute) PubSubListener {
 
 	err := configurator.NewConfiguration(&cfg, "pubsub")
 	if err != nil {
-		log.Fatal().Stack().Err(err).Msg(broker.ErrConfigParse.Error())
+		log.Fatal().Stack().Err(err).Msg(pclient.ErrConfigParse.Error())
 	}
 
 	p := PubSubListener{
@@ -44,13 +44,13 @@ func (p PubSubListener) Start() {
 	ctx := context.Background()
 	for _, b := range p.routes {
 		br := b
-		go br.Broker.Listen(ctx, br.Listener)
+		go br.Client.Listen(ctx, br.Listener)
 	}
 }
 
 func (p *PubSubListener) AddRoutes(routes []PubSubRoute) error {
 	for _, route := range routes {
-		broker, err := broker.New(context.Background(), broker.Config{
+		client, err := pclient.New(context.Background(), pclient.Config{
 			ServiceAccountCredentials: p.cfg.ServiceAccountCredentials,
 			ProjectID:                 p.cfg.ProjectID,
 			Topic:                     route.Topic,
@@ -60,7 +60,7 @@ func (p *PubSubListener) AddRoutes(routes []PubSubRoute) error {
 			return err
 		}
 
-		route.Broker = broker
+		route.Client = client
 		p.routes = append(p.routes, route)
 	}
 

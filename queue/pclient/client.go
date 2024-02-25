@@ -1,29 +1,31 @@
-package broker
+package pclient
 
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/webdevelop-pro/go-logger"
 	"google.golang.org/api/option"
 
+	"cloud.google.com/go/pubsub"
 	gpubsub "cloud.google.com/go/pubsub"
 )
 
 const pkgName = "pubsub"
 
-type Broker struct {
+type Client struct {
 	client *gpubsub.Client // google cloud pubsub client
 	topic  *gpubsub.Topic  // google cloud pubsub topic
-	log    logger.Logger   // Broker logger
-	cfg    *Config         // broker config
+	log    logger.Logger   // client logger
+	cfg    *Config         // client config
 }
 
-func New(ctx context.Context, cfg Config) (Broker, error) {
+func New(ctx context.Context, cfg Config) (Client, error) {
 	var err error
 
-	b := Broker{
+	b := Client{
 		log: logger.NewComponentLogger(pkgName, nil),
 		cfg: &cfg,
 	}
@@ -39,7 +41,7 @@ func New(ctx context.Context, cfg Config) (Broker, error) {
 	return b, nil
 }
 
-func (b *Broker) CreateTopic(ctx context.Context, name string) (*gpubsub.Topic, error) {
+func (b *Client) CreateTopic(ctx context.Context, name string) (*gpubsub.Topic, error) {
 	b.log.Trace().Msgf("creating topic %s", name)
 	if b.client == nil {
 		return nil, ErrNotConnected
@@ -52,7 +54,7 @@ func (b *Broker) CreateTopic(ctx context.Context, name string) (*gpubsub.Topic, 
 	return topic, nil
 }
 
-func (b *Broker) DeleteTopic(ctx context.Context, name string) error {
+func (b *Client) DeleteTopic(ctx context.Context, name string) error {
 	b.log.Trace().Msgf("deleting topic %s", name)
 	if b.client == nil {
 		return ErrNotConnected
@@ -61,7 +63,7 @@ func (b *Broker) DeleteTopic(ctx context.Context, name string) error {
 	return topic.Delete(ctx)
 }
 
-func (b *Broker) CreateSubscription(ctx context.Context, name string) (*gpubsub.Subscription, error) {
+func (b *Client) CreateSubscription(ctx context.Context, name string) (*gpubsub.Subscription, error) {
 	b.log.Trace().Msgf("creating subscription %s", name)
 	if b.client == nil {
 		return nil, ErrNotConnected
@@ -85,15 +87,20 @@ func (b *Broker) CreateSubscription(ctx context.Context, name string) (*gpubsub.
 	return sub, nil
 }
 
-func (b *Broker) SetTopic(topic string) error {
+func (b *Client) SetTopic(ctx context.Context, topic string) error {
 	if b.client == nil {
 		return ErrNotConnected
 	}
 	b.topic = b.client.Topic(topic)
+	ok, err := b.topic.Exists(ctx)
+	if !ok {
+		b.log.Error().Err(err).Interface("topic", topic).Msgf(ErrTopicNotExists.Error())
+		return fmt.Errorf("%w: %s", err, b.cfg.Topic)
+	}
 	return nil
 }
 
-func (b *Broker) Close() {
+func (b *Client) Close() {
 	if b.client != nil {
 		// timeout for Listen to process all messages
 		time.Sleep(time.Second)
@@ -103,7 +110,7 @@ func (b *Broker) Close() {
 	}
 }
 
-func (b *Broker) Listen(ctx context.Context, callback func(ctx context.Context, msg Message) error) error {
+func (b *Client) Listen(ctx context.Context, callback func(ctx context.Context, msg Message) error) error {
 	var err error
 
 	if b.client == nil {
@@ -115,9 +122,8 @@ func (b *Broker) Listen(ctx context.Context, callback func(ctx context.Context, 
 	}
 
 	ok, err := b.topic.Exists(ctx)
-
 	if !ok {
-		b.log.Fatal().Interface("cfg", b.cfg).Msgf(ErrTopicNotExists.Error())
+		b.log.Fatal().Err(err).Interface("cfg", b.cfg).Msgf(ErrTopicNotExists.Error())
 		return fmt.Errorf("%w: %s", ErrTopicNotExists, b.cfg.Topic)
 	}
 
@@ -142,7 +148,7 @@ func (b *Broker) Listen(ctx context.Context, callback func(ctx context.Context, 
 	return nil
 }
 
-func (b *Broker) listenGoroutine(ctx context.Context, callback func(ctx context.Context, msg Message) error, sub *gpubsub.Subscription) error {
+func (b *Client) listenGoroutine(ctx context.Context, callback func(ctx context.Context, msg Message) error, sub *gpubsub.Subscription) error {
 	// Start consuming messages from the subscription
 	err := sub.Receive(ctx, func(ctx context.Context, msg *gpubsub.Message) {
 		// Unmarshal the message data into a struct
@@ -168,20 +174,46 @@ func (b *Broker) listenGoroutine(ctx context.Context, callback func(ctx context.
 	return nil
 }
 
-func (b *Broker) Publish(ctx context.Context, msg *Message) (string, error) {
+func (b *Client) Publish(ctx context.Context, msg *Message) error {
+	return b.PublishToTopic(ctx, b.topic.ID(), msg)
+}
 
-	if b.topic == nil {
-		return "", ErrTopicNotSet
+func (b *Client) PublishToTopic(ctx context.Context, topicID string, msg *Message) error {
+	var (
+		wg    sync.WaitGroup
+		msgID string
+		err   error
+	)
+
+	t := b.client.Topic(topicID)
+	ok, err := t.Exists(ctx)
+	if !ok {
+		b.log.Error().Err(err).Interface("topic", topicID).Msgf(ErrTopicNotExists.Error())
+		return fmt.Errorf("%w: %s", err, b.cfg.Topic)
 	}
 
-	gMsg := gpubsub.Message{Data: msg.Data, Attributes: msg.Attributes}
-	msgId, err := b.topic.Publish(ctx, &gMsg).Get(ctx)
+	wg.Add(1)
+	result := t.Publish(ctx, &pubsub.Message{
+		Data:       msg.Data,
+		Attributes: msg.Attributes,
+	})
 
-	if err != nil {
-		b.log.Error().Err(err).Interface("msg", msg).Msgf(ErrPublish.Error())
-		return "", fmt.Errorf("%w: %w", ErrPublish, err)
-	}
+	go func(res *pubsub.PublishResult) {
+		defer wg.Done()
+		// The Get method blocks until a server-generated ID or
+		// an error is returned for the published message.
+		msgID, err = res.Get(ctx)
+		if err != nil {
+			// Error handling code can be added here.
+			b.log.Err(err).Msg(ErrPublish.Error())
+			return
+		}
 
-	b.log.Trace().Msgf("sent message %s to %s", msgId, b.topic.ID())
-	return msgId, nil
+		b.log.Debug().Msgf("Published message; msg ID: %v\n", msgID)
+	}(result)
+
+	wg.Wait()
+	msg.ID = msgID
+
+	return nil
 }

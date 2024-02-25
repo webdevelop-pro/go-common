@@ -1,4 +1,4 @@
-package broker
+package pclient
 
 type Config struct {
 	ServiceAccountCredentials string `required:"true" split_words:"true"`

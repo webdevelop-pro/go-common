@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/db"
-	pubsub "github.com/webdevelop-pro/go-common/pubsub/client"
+	pclient "github.com/webdevelop-pro/go-common/queue/pclient"
 )
 
 type BodyType string
@@ -233,7 +233,7 @@ func RunApiTest(t *testing.T, Description string, fixtures FixturesManager, scen
 
 func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 	fixtures := NewFixturesManager()
-	pubsubClient, _ := pubsub.NewPubsubClient(context.Background())
+	pubsubClient, _ := pclient.NewPubsubClient(context.Background())
 	dbClient := db.New(configurator.NewConfigurator())
 
 	t.Run(scenario.Description, func(t *testing.T) {
