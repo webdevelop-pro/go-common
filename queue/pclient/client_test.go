@@ -10,25 +10,6 @@ import (
 )
 
 func TestPubSubPublish(t *testing.T) {
-	msg, err := NewMessage(
-		map[string]any{"investment_id": 5},
-		map[string]string{"ip_address": "31.5.12.199", "request_id": "Xbsdf124d"},
-	)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
-
-	tests := map[string]struct {
-		msg         *Message
-		resultID    string
-		expectedErr error
-	}{
-		"success publish": {
-			msg:         msg,
-			expectedErr: nil,
-		},
-	}
-
 	cfg := Config{}
 	configurator := configurator.NewConfigurator()
 	configurator.New(pkgName, &cfg, pkgName)
@@ -39,22 +20,19 @@ func TestPubSubPublish(t *testing.T) {
 	}
 
 	pubsubClient.CreateTopic(ctx, pubsubClient.cfg.Topic)
-	for name, test := range tests {
-		t.Run(name, func(t *testing.T) {
-			err := pubsubClient.Publish(ctx, test.msg)
+	t.Run("success publish", func(t *testing.T) {
+		err := pubsubClient.Publish(ctx,
+			map[string]any{"investment_id": 5},
+			map[string]string{"ip_address": "31.5.12.199", "request_id": "Xbsdf124d"},
+		)
 
-			if err != test.expectedErr {
-				t.Errorf("errors don't match: expected %s, got %s", test.expectedErr, err)
-			}
-		})
-	}
+		if err != nil {
+			t.Errorf("errors don't match: expected nil, got %s", err)
+		}
+	})
 }
 
 func TestPubSubListenNack(t *testing.T) {
-	test_msg, err := NewMessage(map[string]int{"message": 123}, map[string]string{})
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
 	received_counter := 0
 
 	cfg := Config{}
@@ -85,8 +63,8 @@ func TestPubSubListenNack(t *testing.T) {
 		if err != nil {
 			t.Fatalf("cannot listen: %s", err)
 		}
-		pubsubClient.Publish(ctx, test_msg)
-		pubsubClient.Publish(ctx, test_msg)
+		pubsubClient.Publish(ctx, map[string]int{"message": 123}, map[string]string{})
+		pubsubClient.Publish(ctx, map[string]int{"message": 123}, map[string]string{})
 		time.Sleep(time.Second * 4)
 		if received_counter != 4 {
 			t.Errorf("we should receive same message 4 since listen return an error but got: %d", received_counter)
