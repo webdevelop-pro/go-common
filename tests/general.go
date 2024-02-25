@@ -131,7 +131,7 @@ func CreateRequestWithFiles(method, path string, body map[string]interface{}, fi
 	for k, v := range files {
 		f, err := os.Open(v)
 		if err != nil {
-			log.Fatal().Err(err).Msgf("cannot open file %s", f)
+			log.Fatal().Err(err).Msgf("cannot open file %s", v)
 		}
 		values[k] = f
 	}
@@ -233,12 +233,17 @@ func RunApiTest(t *testing.T, Description string, fixtures FixturesManager, scen
 
 func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 	fixtures := NewFixturesManager()
-	pubsubClient, _ := pclient.NewPubsubClient(context.Background())
+	cfg := pclient.Config{}
+	err := configurator.NewConfiguration(&cfg, "pubsub")
+	if err != nil {
+		log.Fatal().Err(err).Msg(pclient.ErrConfigParse.Error())
+	}
+	pubsubClient, _ := pclient.New(context.Background(), cfg)
 	dbClient := db.New(configurator.NewConfigurator())
 
 	t.Run(scenario.Description, func(t *testing.T) {
 		testContext := TestContext{
-			Pubsub: *pubsubClient,
+			Pubsub: pubsubClient,
 			DB:     dbClient,
 			T:      t,
 		}
