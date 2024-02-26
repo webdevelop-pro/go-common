@@ -10,7 +10,7 @@ import (
 	"github.com/webdevelop-pro/go-common/configurator"
 )
 
-func TestPubSubPublish(t *testing.T) {
+func TestPublish(t *testing.T) {
 	cfg := Config{}
 	configurator := configurator.NewConfigurator()
 	configurator.New(pkgName, &cfg, pkgName)
@@ -41,7 +41,7 @@ func TestPubSubPublish(t *testing.T) {
 	})
 }
 
-func TestPubSubListenNack(t *testing.T) {
+func TestListenNack(t *testing.T) {
 	received_counter := 0
 
 	cfg := Config{}
@@ -62,7 +62,7 @@ func TestPubSubListenNack(t *testing.T) {
 	pubsubClient.CreateSubscription(ctx, pubsubClient.cfg.Subscription)
 
 	t.Run("success nack", func(t *testing.T) {
-		err := pubsubClient.Listen(ctx, func(ctx context.Context, msg Message) error {
+		err := pubsubClient.ListenRawMsgs(ctx, func(ctx context.Context, msg Message) error {
 			received_counter++
 			if received_counter%2 != 0 {
 				return fmt.Errorf("odd number return an error ... ")
@@ -78,6 +78,42 @@ func TestPubSubListenNack(t *testing.T) {
 		if received_counter != 4 {
 			t.Errorf("we should receive same message 4 since listen return an error but got: %d", received_counter)
 		}
+		cancel()
+	})
+	pubsubClient.Close()
+}
+
+func TestListenAck(t *testing.T) {
+	cfg := Config{}
+	configurator := configurator.NewConfigurator()
+	configurator.New(pkgName, &cfg, pkgName)
+	ctx, cancel := context.WithCancel(context.TODO())
+	pubsubClient, err := New(ctx, cfg)
+	if err != nil {
+		t.Fatalf("cannot connect %s", err)
+	}
+
+	pubsubClient.DeleteTopic(ctx, pubsubClient.cfg.Topic)
+	// pubsub emulator has a bug
+	// we need to delete subscription manually
+	sub := pubsubClient.client.Subscription(pubsubClient.cfg.Topic)
+	sub.Delete(ctx)
+	pubsubClient.CreateTopic(ctx, pubsubClient.cfg.Topic)
+	pubsubClient.CreateSubscription(ctx, pubsubClient.cfg.Subscription)
+
+	t.Run("success ack", func(t *testing.T) {
+		err := pubsubClient.ListenEvents(ctx, func(ctx context.Context, msg Event) error {
+			if msg.ID == "" || msg.Action == "" || msg.ObjectID == 0 || msg.ObjectName == "" {
+				return fmt.Errorf("event is empty, its not correct")
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatalf("cannot listen: %s", err)
+		}
+		pubsubClient.Publish(ctx, map[string]int{"message": 123}, map[string]string{})
+		pubsubClient.Publish(ctx, map[string]int{"message": 123}, map[string]string{})
+		time.Sleep(time.Second * 4)
 		cancel()
 	})
 	pubsubClient.Close()

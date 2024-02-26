@@ -3,13 +3,11 @@ package pclient
 import (
 	"context"
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/webdevelop-pro/go-logger"
 	"google.golang.org/api/option"
 
-	"cloud.google.com/go/pubsub"
 	gpubsub "cloud.google.com/go/pubsub"
 )
 
@@ -108,118 +106,4 @@ func (b *Client) Close() {
 			b.log.Error().Err(err).Msgf(ErrCloseConnection.Error())
 		}
 	}
-}
-
-func (b *Client) Listen(ctx context.Context, callback func(ctx context.Context, msg Message) error) error {
-	var err error
-
-	if b.client == nil {
-		return ErrNotConnected
-	}
-
-	if b.topic == nil {
-		return ErrTopicNotSet
-	}
-
-	ok, err := b.topic.Exists(ctx)
-	if !ok {
-		b.log.Fatal().Err(err).Interface("cfg", b.cfg).Msgf(ErrTopicNotExists.Error())
-		return fmt.Errorf("%w: %s", ErrTopicNotExists, b.cfg.Topic)
-	}
-
-	if err != nil {
-		b.log.Fatal().Err(err).Interface("cfg", b.cfg).Msgf(ErrTopicConnect.Error())
-		return fmt.Errorf("%w: %w", ErrTopicConnect, err)
-	}
-
-	name := b.topic.ID()
-	sub := b.client.Subscription(b.cfg.Subscription)
-	ok, err = sub.Exists(ctx)
-	if err != nil {
-		b.log.Fatal().Stack().Err(err).Interface("name", name).Msgf(ErrConnectSubscription.Error())
-		return fmt.Errorf("%w: %w", ErrConnectSubscription, err)
-	}
-	if !ok {
-		b.log.Fatal().Stack().Err(err).Interface("name", b.cfg.Subscription).Msgf(ErrSubscriptionNotExist.Error())
-		return fmt.Errorf("%w: %w", ErrSubscriptionNotExist, err)
-	}
-	b.log.Trace().Msgf("connected to subscription %s listen for new messages", b.cfg.Subscription)
-	go b.listenGoroutine(ctx, callback, sub)
-	return nil
-}
-
-func (b *Client) listenGoroutine(ctx context.Context, callback func(ctx context.Context, msg Message) error, sub *gpubsub.Subscription) error {
-	// Start consuming messages from the subscription
-	err := sub.Receive(ctx, func(ctx context.Context, msg *gpubsub.Message) {
-		// Unmarshal the message data into a struct
-		m := Message{}
-		m.Data = msg.Data
-		m.Attributes = msg.Attributes
-		m.ID = msg.ID
-
-		b.log.Debug().Str("msg", string(m.Data)).Msgf("received new message")
-		err := callback(ctx, m)
-		if err != nil {
-			b.log.Error().Err(err).Msgf(ErrReceiveCallback.Error())
-			msg.Nack()
-			return
-		}
-		msg.Ack()
-	})
-	if err != nil {
-		b.log.Fatal().Stack().Err(err).Msgf(ErrReceiveSubscription.Error())
-	}
-	<-ctx.Done()
-	b.log.Trace().Msgf("stop listen for new messages for %s", sub.ID())
-	return nil
-}
-
-func (b *Client) Publish(ctx context.Context, data any, attr map[string]string) (*Message, error) {
-	return b.PublishToTopic(ctx, b.topic.ID(), data, attr)
-}
-
-func (b *Client) PublishToTopic(ctx context.Context, topicID string, data any, attr map[string]string) (*Message, error) {
-	var (
-		wg    sync.WaitGroup
-		msgID string
-		err   error
-	)
-
-	t := b.client.Topic(topicID)
-	ok, err := t.Exists(ctx)
-	if !ok {
-		b.log.Error().Err(err).Interface("topic", topicID).Msgf(ErrTopicNotExists.Error())
-		return nil, fmt.Errorf("%w: %s", err, b.cfg.Topic)
-	}
-
-	msg, err := NewMessage(data, attr)
-	if err != nil {
-		b.log.Error().Err(err).Interface("data", data).Interface("attr", attr).Msgf(ErrUnmarshalPubSub.Error())
-		return nil, err
-	}
-
-	wg.Add(1)
-	result := t.Publish(ctx, &pubsub.Message{
-		Data:       msg.Data,
-		Attributes: msg.Attributes,
-	})
-
-	go func(res *pubsub.PublishResult) {
-		defer wg.Done()
-		// The Get method blocks until a server-generated ID or
-		// an error is returned for the published message.
-		msgID, err = res.Get(ctx)
-		if err != nil {
-			// Error handling code can be added here.
-			b.log.Err(err).Msg(ErrPublish.Error())
-			return
-		}
-
-		b.log.Debug().Msgf("Published message; msg ID: %v\n", msgID)
-	}(result)
-
-	wg.Wait()
-	msg.ID = msgID
-
-	return msg, nil
 }
