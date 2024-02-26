@@ -61,6 +61,15 @@ func (b *Client) DeleteTopic(ctx context.Context, name string) error {
 	return topic.Delete(ctx)
 }
 
+func (b *Client) DeleteSubscription(ctx context.Context, name string) error {
+	b.log.Trace().Msgf("deleting subscription %s", name)
+	if b.client == nil {
+		return ErrNotConnected
+	}
+	subscription := b.client.Subscription(name)
+	return subscription.Delete(ctx)
+}
+
 func (b *Client) CreateSubscription(ctx context.Context, name string) (*gpubsub.Subscription, error) {
 	b.log.Trace().Msgf("creating subscription %s", name)
 	if b.client == nil {

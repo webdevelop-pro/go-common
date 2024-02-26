@@ -96,7 +96,7 @@ func (b *Client) listenWebhookGoroutine(ctx context.Context, callback func(ctx c
 	err := sub.Receive(ctx, func(ctx context.Context, msg *gpubsub.Message) {
 		webhook := Webhook{}
 		if err := json.Unmarshal(msg.Data, &webhook); err != nil {
-			b.log.Error().Err(err).Msgf(ErrUnmarshalPubSub.Error())
+			b.log.Error().Err(fmt.Errorf("cannot unmarshal: %s", msg.Data)).Msgf(ErrUnmarshalPubSub.Error())
 			msg.Nack()
 			return
 		}
@@ -135,7 +135,7 @@ func (b *Client) listenEventGoroutine(ctx context.Context, callback func(ctx con
 	err := sub.Receive(ctx, func(ctx context.Context, msg *gpubsub.Message) {
 		event := Event{}
 		if err := json.Unmarshal(msg.Data, &event); err != nil {
-			b.log.Error().Err(err).Msgf(ErrUnmarshalPubSub.Error())
+			b.log.Error().Err(fmt.Errorf("cannot unmarshal: %s", msg.Data)).Msgf(ErrUnmarshalPubSub.Error())
 			msg.Nack()
 			return
 		}

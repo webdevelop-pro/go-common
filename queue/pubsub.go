@@ -15,10 +15,15 @@ type PubSubListener struct {
 }
 
 type PubSubRoute struct {
-	Topic        string
-	Subscription string
-	Listener     func(ctx context.Context, msg pclient.Message) error
-	Client       pclient.Client
+	// ToDo
+	// enum: event, webhook, raw
+	Topic            string
+	Name             string
+	Subscription     string
+	WebhooksListener func(ctx context.Context, msg pclient.Webhook) error
+	EventsListener   func(ctx context.Context, msg pclient.Event) error
+	MsgsListener     func(ctx context.Context, msg pclient.Message) error
+	Client           pclient.Client
 }
 
 func New(c *configurator.Configurator, routes []PubSubRoute) PubSubListener {
@@ -44,7 +49,20 @@ func (p PubSubListener) Start() {
 	ctx := context.Background()
 	for _, b := range p.routes {
 		br := b
-		go br.Client.Listen(ctx, br.Listener)
+		if br.Name == "webhooks" {
+			go br.Client.ListenWebhooks(ctx, br.WebhooksListener)
+			continue
+		}
+		if br.Name == "events" {
+			go br.Client.ListenEvents(ctx, br.EventsListener)
+			continue
+		}
+		if br.Name == "messages" {
+			go br.Client.ListenRawMsgs(ctx, br.MsgsListener)
+			continue
+		}
+		log := logger.NewComponentLogger("pubsub", nil)
+		log.Fatal().Stack().Msgf("topic name %s incorrect", br.Name)
 	}
 }
 

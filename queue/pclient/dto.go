@@ -43,10 +43,10 @@ type Event struct {
 }
 
 type Webhook struct {
-	ID      string         `json:"id"`
-	Action  string         `json:"action" validate:"required"`
-	Object  string         `json:"object" validate:"required"`
-	Service string         `json:"service" validate:"required"`
-	Headers map[string]any `json:"headers"`
-	Data    map[string]any `json:"data"`
+	ID      string              `json:"id"`
+	Action  string              `json:"action" validate:"required"`
+	Object  string              `json:"object" validate:"required"`
+	Service string              `json:"service" validate:"required"`
+	Headers map[string][]string `json:"headers"`
+	Data    map[string]any      `json:"data"`
 }
