@@ -72,6 +72,7 @@ func (PubSubF PubSubFixturesManager) Clean(topic string, subscription string) er
 	if err != nil {
 		return fmt.Errorf("failed create topic: %w", err)
 	}
+	PubSubF.client.SetTopic(ctx, topic)
 
 	_, err = PubSubF.client.CreateSubscription(ctx, subscription)
 	if err != nil {

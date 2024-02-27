@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/webdevelop-pro/go-common/queue/pclient"
 	. "github.com/webdevelop-pro/go-common/tests"
 )
 
@@ -41,6 +42,21 @@ func TestExample(t *testing.T) {
 						"col_1": 1.0,
 						"col_2": "a",
 					},
+				),
+				SendPubSubEvent(
+					os.Getenv("PUBSUB_TOPIC"),
+					pclient.Webhook{
+						Object:  "profile",
+						Action:  "update_accr",
+						Service: "north_capital",
+						Data: map[string]any{
+							"accountId":        []string{"NO_INVESTMENTS"},
+							"airequestId":      []string{"Tzboaa"},
+							"aiRequestStatus":  []string{"Approved"},
+							"accreditedStatus": []string{"Verified Accredited"},
+						},
+					},
+					map[string]string{},
 				),
 				SendHttpRequst(
 					Request{
