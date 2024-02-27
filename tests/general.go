@@ -14,11 +14,11 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
-	"github.com/labstack/gommon/log"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/db"
-	pubsub "github.com/webdevelop-pro/go-common/pubsub/client"
+	pclient "github.com/webdevelop-pro/go-common/queue/pclient"
 )
 
 type BodyType string
@@ -29,8 +29,10 @@ const (
 )
 
 type ApiTestCase struct {
-	Description      string
-	UserID           string
+	Description string
+	UserID      string
+	// ToDo
+	// Write down description why its needed
 	OnlyForDebugMode bool
 	Fixtures         []Fixture
 
@@ -43,23 +45,28 @@ type ApiTestCase struct {
 }
 
 type ApiTestCaseV2 struct {
-	Description      string
-	UserID           string
+	Description string
+	UserID      string
+	// ToDo
+	// Write down description why its needed
 	OnlyForDebugMode bool
 
-	Fixtures    []Fixture
-	TestActions []SomeAction
+	Fixtures       []Fixture
+	PubSubFixtures []PubSubFixture
+	TestActions    []SomeAction
 }
 
+// ToDo
+// Create in go-common configuration to load env
 func LoadEnv(envPath string) {
 	usr, err := user.Current()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("cannot get user")
 	}
 
 	vars, err := godotenv.Read(envPath)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msgf("cannot read %s", envPath)
 	}
 
 	for key, value := range vars {
@@ -68,13 +75,15 @@ func LoadEnv(envPath string) {
 	}
 }
 
+// ToDo
+// Create in go-common xserver utils method to make http request
 func CreateDefaultRequest(req Request) *http.Request {
 	if req.Host == "" {
 		appHost := os.Getenv("HOST")
 		appPort := os.Getenv("PORT")
 
 		if appHost == "" || appPort == "" {
-			log.Fatalf("please set HOST and PORT vars")
+			log.Fatal().Msg("please set HOST and PORT vars")
 		}
 
 		req.Host = appHost + ":" + appPort
@@ -90,7 +99,7 @@ func CreateDefaultRequest(req Request) *http.Request {
 		bytes.NewBuffer((req.Body)),
 	)
 	if err != nil {
-		log.Fatalf("cannot create new request %s", err.Error())
+		log.Fatal().Err(err).Msgf("cannot create new request")
 	}
 
 	r.Header.Add("content-type", "application/json")
@@ -102,6 +111,8 @@ func CreateDefaultRequest(req Request) *http.Request {
 	return r
 }
 
+// ToDo
+// Create in go-common xserver utils method to make request with files
 func CreateRequestWithFiles(method, path string, body map[string]interface{}, files map[string]string) *http.Request {
 	buf := new(bytes.Buffer)
 	w := multipart.NewWriter(buf)
@@ -110,7 +121,7 @@ func CreateRequestWithFiles(method, path string, body map[string]interface{}, fi
 	appPort := os.Getenv("PORT")
 
 	if appHost == "" || appPort == "" {
-		log.Fatalf("please set HOST and PORT vars")
+		log.Fatal().Msg("please set HOST and PORT vars")
 	}
 
 	values := map[string]io.Reader{}
@@ -121,7 +132,7 @@ func CreateRequestWithFiles(method, path string, body map[string]interface{}, fi
 	for k, v := range files {
 		f, err := os.Open(v)
 		if err != nil {
-			log.Fatalf("cannot open file %s", f)
+			log.Fatal().Err(err).Msgf("cannot open file %s", v)
 		}
 		values[k] = f
 	}
@@ -135,16 +146,16 @@ func CreateRequestWithFiles(method, path string, body map[string]interface{}, fi
 		// upload a file
 		if _, ok := r.(*os.File); ok {
 			if fw, err = w.CreateFormFile(key, files[key]); err != nil {
-				log.Fatalf("cannot CreateFormFile %s, %s", key, err.Error())
+				log.Fatal().Err(err).Msgf("cannot CreateFormFile %s, %s", key, err.Error())
 			}
 		} else {
 			// Add other fields
 			if fw, err = w.CreateFormField(key); err != nil {
-				log.Fatalf("cannot CreateFormField %s, %s", key, err.Error())
+				log.Fatal().Err(err).Msgf("cannot CreateFormField %s, %s", key, err.Error())
 			}
 		}
 		if _, err = io.Copy(fw, r); err != nil {
-			log.Fatalf("cannot io.Copy %s, %s", key, err.Error())
+			log.Fatal().Err(err).Msgf("cannot io.Copy %s, %s", key, err.Error())
 		}
 	}
 	// Don't forget to close the multipart writer.
@@ -158,7 +169,7 @@ func CreateRequestWithFiles(method, path string, body map[string]interface{}, fi
 		buf,
 	)
 	if err != nil {
-		log.Fatalf("cannot create new request %s", err.Error())
+		log.Fatal().Err(err).Msgf("cannot create new request %s", err.Error())
 	}
 
 	// Don't forget to set the content type, this will contain the boundary.
@@ -178,7 +189,7 @@ func SendTestRequest(req *http.Request) ([]byte, int, error) {
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Errorf("cannot read response body %s", err.Error())
+		log.Error().Err(err).Msgf("cannot read response body %s", err.Error())
 		return nil, 0, nil
 	}
 
@@ -195,7 +206,7 @@ func RunApiTest(t *testing.T, Description string, fixtures FixturesManager, scen
 			err := fixtures.CleanAndApply(scenario.Fixtures)
 			if err != nil {
 				assert.Fail(t, "Failed apply fixtures", err)
-				log.Panic("Failed apply fixtures")
+				log.Fatal().Err(err).Msgf("Failed apply fixtures")
 			}
 
 			result, code, err := SendTestRequest(scenario.Request)
@@ -223,12 +234,18 @@ func RunApiTest(t *testing.T, Description string, fixtures FixturesManager, scen
 
 func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 	fixtures := NewFixturesManager()
-	pubsubClient, _ := pubsub.NewPubsubClient(context.Background())
+	cfg := pclient.Config{}
+	err := configurator.NewConfiguration(&cfg, "pubsub")
+	if err != nil {
+		log.Fatal().Err(err).Msg(pclient.ErrConfigParse.Error())
+	}
+	pubsubClient, _ := pclient.New(context.Background(), cfg)
+	pubsubFixtures := NewPubSubFixturesManager(&pubsubClient)
 	dbClient := db.New(configurator.NewConfigurator())
 
 	t.Run(scenario.Description, func(t *testing.T) {
 		testContext := TestContext{
-			Pubsub: *pubsubClient,
+			Pubsub: pubsubClient,
 			DB:     dbClient,
 			T:      t,
 		}
@@ -236,19 +253,25 @@ func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 		err := fixtures.CleanAndApply(scenario.Fixtures)
 		if err != nil {
 			assert.Fail(t, "Failed apply fixtures", err)
-			log.Panic("Failed apply fixtures")
+			log.Fatal().Err(err).Msgf("Failed apply fixtures")
+		}
+		err = pubsubFixtures.CleanAndApply(scenario.PubSubFixtures)
+		if err != nil {
+			assert.Fail(t, "Failed apply pubsub fixtures", err)
+			log.Fatal().Err(err).Msgf("Failed apply pubsub fixtures")
 		}
 
 		for _, action := range scenario.TestActions {
 			err := action(testContext)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatal().Err(err).Msgf("scenario return an error")
 			}
 		}
 	})
 }
 
-// FixME: use sprew
+// ToDo
+// use sprew or other library to better show different in maps
 func CompareJsonBody(t *testing.T, actual, expected []byte) {
 	var actualBody, expectedBody map[string]interface{}
 

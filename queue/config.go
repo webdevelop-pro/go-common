@@ -1,4 +1,4 @@
-package pubsub
+package queue
 
 type Config struct {
 	ServiceAccountCredentials string `required:"true" split_words:"true"`

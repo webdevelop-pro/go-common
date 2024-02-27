@@ -59,3 +59,19 @@ func NotFound(err error, msg string) Error {
 		finalMsg,
 	)
 }
+
+// NotFound shortcut to return http.StatusNotFound with custom error and msg
+func InternalError(err error, msg string) Error {
+	if err == nil {
+		err = fmt.Errorf("")
+	}
+	finalMsg := map[string][]string{"__error__": {msg}}
+	if msg == "" {
+		finalMsg = MsgInternalErr
+	}
+	return New(
+		err,
+		http.StatusInternalServerError,
+		finalMsg,
+	)
+}
