@@ -49,12 +49,12 @@ func TestExample(t *testing.T) {
 						Object:  "profile",
 						Action:  "update_accr",
 						Service: "north_capital",
-						Data: map[string]any{
-							"accountId":        []string{"NO_INVESTMENTS"},
-							"airequestId":      []string{"Tzboaa"},
-							"aiRequestStatus":  []string{"Approved"},
-							"accreditedStatus": []string{"Verified Accredited"},
-						},
+						Data: []byte(`
+							"accountId":["NO_INVESTMENTS"],
+							"airequestId":["Tzboaa"],
+							"aiRequestStatus":["Approved"],
+							"accreditedStatus":["Verified Accredited"],
+						}`),
 					},
 					map[string]string{},
 				),

@@ -48,5 +48,5 @@ type Webhook struct {
 	Object  string              `json:"object" validate:"required"`
 	Service string              `json:"service" validate:"required"`
 	Headers map[string][]string `json:"headers"`
-	Data    map[string]any      `json:"data"`
+	Data    []byte              `json:"data"`
 }
