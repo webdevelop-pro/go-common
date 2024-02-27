@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-logger"
 	"google.golang.org/api/option"
 
@@ -15,27 +16,30 @@ const pkgName = "pubsub"
 
 type Client struct {
 	client *gpubsub.Client // google cloud pubsub client
-	topic  *gpubsub.Topic  // google cloud pubsub topic
 	log    logger.Logger   // client logger
 	cfg    *Config         // client config
 }
 
-func New(ctx context.Context, cfg Config) (Client, error) {
-	var err error
+func New(ctx context.Context) (Client, error) {
+	cfg := Config{}
+	log := logger.NewComponentLogger(pkgName, nil)
+
+	err := configurator.NewConfiguration(&cfg, "pubsub")
+	if err != nil {
+		log.Fatal().Stack().Err(err).Msg(ErrConfigParse.Error())
+	}
+
+	bclient, err := gpubsub.NewClient(ctx, cfg.ProjectID, option.WithCredentialsFile(cfg.ServiceAccountCredentials))
+	if err != nil {
+		log.Fatal().Stack().Err(err).Msg(err.Error())
+	}
 
 	b := Client{
-		log: logger.NewComponentLogger(pkgName, nil),
-		cfg: &cfg,
+		log:    log,
+		cfg:    &cfg,
+		client: bclient,
 	}
 
-	b.log.Trace().Msgf("New pubsub %s", cfg.Topic)
-	b.client, err = gpubsub.NewClient(ctx, cfg.ProjectID, option.WithCredentialsFile(cfg.ServiceAccountCredentials))
-	if err != nil {
-		b.log.Error().Err(err).Interface("cfg", b.cfg).Msgf(ErrConnection.Error())
-		return b, fmt.Errorf("%w: %w", ErrConnection, err)
-	}
-
-	b.topic = b.client.Topic(cfg.Topic)
 	return b, nil
 }
 
@@ -70,18 +74,18 @@ func (b *Client) DeleteSubscription(ctx context.Context, name string) error {
 	return subscription.Delete(ctx)
 }
 
-func (b *Client) CreateSubscription(ctx context.Context, name string) (*gpubsub.Subscription, error) {
+func (b *Client) CreateSubscription(ctx context.Context, name, topic string) (*gpubsub.Subscription, error) {
 	b.log.Trace().Msgf("creating subscription %s", name)
 	if b.client == nil {
 		return nil, ErrNotConnected
 	}
-	if b.topic == nil {
-		return nil, ErrTopicNotSet
-	}
+
+	p_topic := b.client.Topic(topic)
+
 	// FixME
 	// Add RetryPolicy
 	sub, err := b.client.CreateSubscription(ctx, name, gpubsub.SubscriptionConfig{
-		Topic: b.topic,
+		Topic: p_topic,
 		RetryPolicy: &gpubsub.RetryPolicy{
 			MinimumBackoff: time.Duration(2),
 			MaximumBackoff: time.Duration(120),
@@ -92,18 +96,6 @@ func (b *Client) CreateSubscription(ctx context.Context, name string) (*gpubsub.
 		return nil, fmt.Errorf("%w: %w", ErrCreateSubscription, err)
 	}
 	return sub, nil
-}
-
-func (b *Client) SetTopic(ctx context.Context, topic string) error {
-	b.topic = b.client.Topic(topic)
-	/*
-		ok, err := b.topic.Exists(ctx)
-		if !ok {
-			b.log.Error().Err(err).Interface("topic", topic).Msgf(ErrTopicNotExists.Error())
-			return fmt.Errorf("%w: %s", err, topic)
-		}
-	*/
-	return nil
 }
 
 func (b *Client) TopicExist(ctx context.Context, topic string) (bool, error) {

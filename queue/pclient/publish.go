@@ -10,26 +10,26 @@ import (
 	"github.com/webdevelop-pro/go-common/server/validator"
 )
 
-func (b *Client) PublishEvent(ctx context.Context, event Event) (*Message, error) {
+func (b *Client) PublishEvent(ctx context.Context, topic string, event Event) (*Message, error) {
 	valid := validator.New()
 	if err := valid.Verify(event, http.StatusPreconditionFailed); err != nil {
 		return nil, err
 	}
 	attr := map[string]string{}
-	return b.PublishToTopic(ctx, b.topic.ID(), event, attr)
+	return b.PublishToTopic(ctx, topic, event, attr)
 }
 
-func (b *Client) PublishWebhook(ctx context.Context, webhook Webhook) (*Message, error) {
+func (b *Client) PublishWebhook(ctx context.Context, topic string, webhook Webhook) (*Message, error) {
 	valid := validator.New()
 	if err := valid.Verify(webhook, http.StatusPreconditionFailed); err != nil {
 		return nil, err
 	}
 	attr := map[string]string{}
-	return b.PublishToTopic(ctx, b.topic.ID(), webhook, attr)
+	return b.PublishToTopic(ctx, topic, webhook, attr)
 }
 
-func (b *Client) Publish(ctx context.Context, data any, attr map[string]string) (*Message, error) {
-	return b.PublishToTopic(ctx, b.topic.ID(), data, attr)
+func (b *Client) Publish(ctx context.Context, topic string, data any, attr map[string]string) (*Message, error) {
+	return b.PublishToTopic(ctx, topic, data, attr)
 }
 
 func (b *Client) PublishToTopic(ctx context.Context, topicID string, data any, attr map[string]string) (*Message, error) {
