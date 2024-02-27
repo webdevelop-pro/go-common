@@ -28,7 +28,7 @@ func New(ctx context.Context, cfg Config) (Client, error) {
 		cfg: &cfg,
 	}
 
-	b.log.Trace().Msgf("Connecting to %s", cfg.Topic)
+	b.log.Trace().Msgf("New pubsub %s", cfg.Topic)
 	b.client, err = gpubsub.NewClient(ctx, cfg.ProjectID, option.WithCredentialsFile(cfg.ServiceAccountCredentials))
 	if err != nil {
 		b.log.Error().Err(err).Interface("cfg", b.cfg).Msgf(ErrConnection.Error())

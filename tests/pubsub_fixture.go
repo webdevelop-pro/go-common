@@ -16,7 +16,7 @@ type PubSubFixture struct {
 func NewPubSubFixture(topic, subscription, initData string) PubSubFixture {
 	return PubSubFixture{
 		topic:        topic,
-		subscription: topic,
+		subscription: subscription,
 		initData:     initData,
 	}
 }
