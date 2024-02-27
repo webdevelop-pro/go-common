@@ -22,7 +22,7 @@ func (b *Client) getSubscription(ctx context.Context) (*pubsub.Subscription, err
 	ok, err := b.topic.Exists(ctx)
 	if !ok {
 		b.log.Fatal().Stack().Err(err).Interface("cfg", b.cfg).Msgf(ErrTopicNotExists.Error())
-		return nil, fmt.Errorf("%w: %s", ErrTopicNotExists, b.cfg.Topic)
+		return nil, fmt.Errorf("%w: %s", ErrTopicNotExists, b.topic.ID())
 	}
 
 	if err != nil {
@@ -30,11 +30,10 @@ func (b *Client) getSubscription(ctx context.Context) (*pubsub.Subscription, err
 		return nil, fmt.Errorf("%w: %w", ErrTopicConnect, err)
 	}
 
-	name := b.topic.ID()
 	sub := b.client.Subscription(b.cfg.Subscription)
 	ok, err = sub.Exists(ctx)
 	if err != nil {
-		b.log.Fatal().Stack().Err(err).Interface("name", name).Msgf(ErrConnectSubscription.Error())
+		b.log.Fatal().Stack().Err(err).Interface("name", b.cfg.Subscription).Msgf(ErrConnectSubscription.Error())
 		return nil, fmt.Errorf("%w: %w", ErrConnectSubscription, err)
 	}
 	if !ok {

@@ -28,14 +28,14 @@ func New(ctx context.Context, cfg Config) (Client, error) {
 		cfg: &cfg,
 	}
 
-	b.log.Trace().Msgf("Connecting to %s", b.cfg.Topic)
+	b.log.Trace().Msgf("Connecting to %s", cfg.Topic)
 	b.client, err = gpubsub.NewClient(ctx, cfg.ProjectID, option.WithCredentialsFile(cfg.ServiceAccountCredentials))
 	if err != nil {
 		b.log.Error().Err(err).Interface("cfg", b.cfg).Msgf(ErrConnection.Error())
 		return b, fmt.Errorf("%w: %w", ErrConnection, err)
 	}
 
-	b.topic = b.client.Topic(b.cfg.Topic)
+	b.topic = b.client.Topic(cfg.Topic)
 	return b, nil
 }
 
@@ -95,16 +95,39 @@ func (b *Client) CreateSubscription(ctx context.Context, name string) (*gpubsub.
 }
 
 func (b *Client) SetTopic(ctx context.Context, topic string) error {
-	if b.client == nil {
-		return ErrNotConnected
-	}
 	b.topic = b.client.Topic(topic)
-	ok, err := b.topic.Exists(ctx)
-	if !ok {
-		b.log.Error().Err(err).Interface("topic", topic).Msgf(ErrTopicNotExists.Error())
-		return fmt.Errorf("%w: %s", err, b.cfg.Topic)
-	}
+	/*
+		ok, err := b.topic.Exists(ctx)
+		if !ok {
+			b.log.Error().Err(err).Interface("topic", topic).Msgf(ErrTopicNotExists.Error())
+			return fmt.Errorf("%w: %s", err, topic)
+		}
+	*/
 	return nil
+}
+
+func (b *Client) TopicExist(ctx context.Context, topic string) (bool, error) {
+	if b.client == nil {
+		return false, ErrNotConnected
+	}
+	top := b.client.Topic(topic)
+	ok, err := top.Exists(ctx)
+	if err != nil {
+		return false, err
+	}
+	return ok, nil
+}
+
+func (b *Client) SubscriptionExist(ctx context.Context, sub string) (bool, error) {
+	if b.client == nil {
+		return false, ErrNotConnected
+	}
+	subscription := b.client.Subscription(sub)
+	ok, err := subscription.Exists(ctx)
+	if err != nil {
+		return false, err
+	}
+	return ok, nil
 }
 
 func (b *Client) Close() {

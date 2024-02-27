@@ -81,7 +81,6 @@ func (f FixturesManager) Clean(table string) error {
 		"DELETE FROM %s; select setval('%s_id_seq',(select max(id)+1 from %s));",
 		table, table, table,
 	)
-	// fmt.Println(query)
 	_, err := f.db.Exec(context.TODO(), query)
 	if err != nil {
 		return fmt.Errorf("failed delete fixtures: %w", err)

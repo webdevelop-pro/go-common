@@ -51,8 +51,9 @@ type ApiTestCaseV2 struct {
 	// Write down description why its needed
 	OnlyForDebugMode bool
 
-	Fixtures    []Fixture
-	TestActions []SomeAction
+	Fixtures       []Fixture
+	PubSubFixtures []PubSubFixture
+	TestActions    []SomeAction
 }
 
 // ToDo
@@ -239,6 +240,7 @@ func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 		log.Fatal().Err(err).Msg(pclient.ErrConfigParse.Error())
 	}
 	pubsubClient, _ := pclient.New(context.Background(), cfg)
+	pubsubFixtures := NewPubSubFixturesManager(&pubsubClient)
 	dbClient := db.New(configurator.NewConfigurator())
 
 	t.Run(scenario.Description, func(t *testing.T) {
@@ -252,6 +254,11 @@ func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 		if err != nil {
 			assert.Fail(t, "Failed apply fixtures", err)
 			log.Fatal().Err(err).Msgf("Failed apply fixtures")
+		}
+		err = pubsubFixtures.CleanAndApply(scenario.PubSubFixtures)
+		if err != nil {
+			assert.Fail(t, "Failed apply pubsub fixtures", err)
+			log.Fatal().Err(err).Msgf("Failed apply pubsub fixtures")
 		}
 
 		for _, action := range scenario.TestActions {
