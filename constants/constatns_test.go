@@ -17,4 +17,5 @@ func TestContext(t *testing.T) {
 	assert.Equal(t, "RequestID", GetCtxValue(ctx, RequestID))
 	assert.Equal(t, 1, GetCtxValue(ctx, MSGID))
 	assert.Equal(t, "0.0.0.0", GetCtxValue(ctx, IPAddress))
+	assert.Equal(t, nil, GetCtxValue(ctx, CtxTraceID))
 }
