@@ -1,6 +1,8 @@
 package keys
 
-import "context"
+import (
+	"context"
+)
 
 type ContextKey rune
 
