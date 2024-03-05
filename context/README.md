@@ -1,6 +1,6 @@
 # context
 
-This package contains all constants common to projects, including keys for working with context
+This package contains keys for working with context
 
 For extract some value from context use:
 
