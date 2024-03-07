@@ -7,25 +7,19 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx"
 	"github.com/motemen/go-loghttp"
 	"github.com/webdevelop-pro/go-common/context/keys"
 	"github.com/webdevelop-pro/go-logger"
 )
 
-const log_id = "log_id"
-
-type HttpWrapper interface {
-	SetHttpClient(client *http.Client)
+type DB interface {
+	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
+	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 }
 
-func RegisterThirdPartyLogger(serviceName string) func(wrapper HttpWrapper, pgPool *pgxpool.Pool) {
-	return func(wrapper HttpWrapper, pgPool *pgxpool.Pool) {
-		wrapper.SetHttpClient(CreateHttpClient(serviceName, pgPool))
-	}
-}
-
-func CreateHttpClient(serviceName string, pgPool *pgxpool.Pool) *http.Client {
+func CreateHttpClient(serviceName string, pgPool DB) *http.Client {
 	log := logger.NewComponentLogger(serviceName, nil)
 
 	return &http.Client{
@@ -36,7 +30,7 @@ func CreateHttpClient(serviceName string, pgPool *pgxpool.Pool) *http.Client {
 	}
 }
 
-func logRequest(log logger.Logger, serviceName string, pgPool *pgxpool.Pool) func(req *http.Request) {
+func logRequest(log logger.Logger, serviceName string, pgPool DB) func(req *http.Request) {
 	return func(req *http.Request) {
 		var logID int
 		sql := `
@@ -75,7 +69,7 @@ func logRequest(log logger.Logger, serviceName string, pgPool *pgxpool.Pool) fun
 	}
 }
 
-func logResponse(log logger.Logger, serviceName string, pgPool *pgxpool.Pool) func(req *http.Response) {
+func logResponse(log logger.Logger, serviceName string, pgPool DB) func(req *http.Response) {
 	return func(resp *http.Response) {
 		logID := resp.Request.Context().Value(keys.RequestLogID).(int)
 		sql := `
