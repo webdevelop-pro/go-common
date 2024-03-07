@@ -15,8 +15,8 @@ fx.New(
   ...
   fx.Invoke(
     ...
-    func(dwolla dwolla.DwollaWrapper, pgPool *pgxpool.Pool) {
-        dwolla.SetHttpClient(client_middleware.CreateHttpClient("dwolla", pgPool))
+    func(dwolla dwolla.DwollaWrapper, db client_middleware.DB) {
+        dwolla.SetHttpClient(client_middleware.CreateHttpClient("dwolla", db))
     },
   ),
 )
