@@ -78,7 +78,7 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool middlewa
 		return func(c echo.Context) error {
 			requestID := c.Request().Header.Get(echo.HeaderXRequestID)
 
-			c.Set(string(keys.RequestID), requestID)
+			c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), keys.RequestID, requestID)))
 
 			return next(c)
 		}
