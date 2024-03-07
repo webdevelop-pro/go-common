@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v5"
 	"github.com/motemen/go-loghttp"
 	"github.com/webdevelop-pro/go-common/context/keys"
 	"github.com/webdevelop-pro/go-logger"
