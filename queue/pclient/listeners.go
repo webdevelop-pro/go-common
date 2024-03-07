@@ -7,6 +7,7 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	gpubsub "cloud.google.com/go/pubsub"
+	"github.com/webdevelop-pro/go-common/context/keys"
 )
 
 func (b *Client) getSubscription(ctx context.Context, subscription, topic string) (*pubsub.Subscription, error) {
@@ -64,6 +65,8 @@ func (b *Client) listenRawGoroutine(ctx context.Context, callback func(ctx conte
 		m.Attributes = msg.Attributes
 		m.ID = msg.ID
 
+		ctx = keys.SetCtxValue(ctx, keys.MSGID, msg.ID)
+
 		b.log.Debug().Str("msg", string(m.Data)).Msgf("received message")
 		err := callback(ctx, m)
 		if err != nil {
@@ -103,6 +106,8 @@ func (b *Client) listenWebhookGoroutine(ctx context.Context, callback func(ctx c
 		}
 		webhook.ID = msg.ID
 
+		ctx = keys.SetCtxValue(ctx, keys.MSGID, webhook.ID)
+
 		b.log.Debug().Interface("msg", webhook).Msgf("received webhook")
 		err := callback(ctx, webhook)
 		if err != nil {
@@ -141,6 +146,10 @@ func (b *Client) listenEventGoroutine(ctx context.Context, callback func(ctx con
 			return
 		}
 		event.ID = msg.ID
+
+		ctx = keys.SetCtxValue(ctx, keys.RequestID, event.RequestID)
+		ctx = keys.SetCtxValue(ctx, keys.IPAddress, event.IPAddress)
+		ctx = keys.SetCtxValue(ctx, keys.MSGID, event.ID)
 
 		b.log.Debug().Interface("msg", event).Msgf("received event")
 		err := callback(ctx, event)
