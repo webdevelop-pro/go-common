@@ -7,22 +7,25 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	gpubsub "cloud.google.com/go/pubsub"
+	"github.com/webdevelop-pro/go-common/context/keys"
 )
 
-func (b *Client) getSubscription(ctx context.Context) (*pubsub.Subscription, error) {
+func (b *Client) getSubscription(ctx context.Context, subscription, topic string) (*pubsub.Subscription, error) {
 	var err error
 	if b.client == nil {
 		return nil, ErrNotConnected
 	}
 
-	if b.topic == nil {
+	b_topic := b.client.Topic(topic)
+
+	if b_topic == nil {
 		return nil, ErrTopicNotSet
 	}
 
-	ok, err := b.topic.Exists(ctx)
+	ok, err := b_topic.Exists(ctx)
 	if !ok {
 		b.log.Fatal().Stack().Err(err).Interface("cfg", b.cfg).Msgf(ErrTopicNotExists.Error())
-		return nil, fmt.Errorf("%w: %s", ErrTopicNotExists, b.topic.ID())
+		return nil, fmt.Errorf("%w: %s", ErrTopicNotExists, b_topic.ID())
 	}
 
 	if err != nil {
@@ -30,22 +33,22 @@ func (b *Client) getSubscription(ctx context.Context) (*pubsub.Subscription, err
 		return nil, fmt.Errorf("%w: %w", ErrTopicConnect, err)
 	}
 
-	sub := b.client.Subscription(b.cfg.Subscription)
+	sub := b.client.Subscription(subscription)
 	ok, err = sub.Exists(ctx)
 	if err != nil {
-		b.log.Fatal().Stack().Err(err).Interface("name", b.cfg.Subscription).Msgf(ErrConnectSubscription.Error())
+		b.log.Fatal().Stack().Err(err).Interface("name", subscription).Msgf(ErrConnectSubscription.Error())
 		return nil, fmt.Errorf("%w: %w", ErrConnectSubscription, err)
 	}
 	if !ok {
-		b.log.Fatal().Stack().Err(err).Interface("name", b.cfg.Subscription).Msgf(ErrSubscriptionNotExist.Error())
+		b.log.Fatal().Stack().Err(err).Interface("name", subscription).Msgf(ErrSubscriptionNotExist.Error())
 		return nil, fmt.Errorf("%w: %w", ErrSubscriptionNotExist, err)
 	}
 	return sub, nil
 }
 
-func (b *Client) ListenRawMsgs(ctx context.Context, callback func(ctx context.Context, msg Message) error) error {
+func (b *Client) ListenRawMsgs(ctx context.Context, subscription, topic string, callback func(ctx context.Context, msg Message) error) error {
 
-	sub, err := b.getSubscription(ctx)
+	sub, err := b.getSubscription(ctx, subscription, topic)
 	if err != nil {
 		return err
 	}
@@ -62,6 +65,8 @@ func (b *Client) listenRawGoroutine(ctx context.Context, callback func(ctx conte
 		m.Attributes = msg.Attributes
 		m.ID = msg.ID
 
+		ctx = keys.SetCtxValue(ctx, keys.MSGID, msg.ID)
+
 		b.log.Debug().Str("msg", string(m.Data)).Msgf("received message")
 		err := callback(ctx, m)
 		if err != nil {
@@ -74,15 +79,15 @@ func (b *Client) listenRawGoroutine(ctx context.Context, callback func(ctx conte
 	if err != nil {
 		b.log.Fatal().Stack().Err(err).Msgf(ErrReceiveSubscription.Error())
 	}
-	b.log.Trace().Msgf("connected to subscription %s listen messages", b.cfg.Subscription)
+	b.log.Trace().Msgf("connected to subscription %s listen messages", sub.ID())
 	<-ctx.Done()
 	b.log.Trace().Msgf("stop listen messages for %s", sub.ID())
 	return nil
 }
 
-func (b *Client) ListenWebhooks(ctx context.Context, callback func(ctx context.Context, msg Webhook) error) error {
+func (b *Client) ListenWebhooks(ctx context.Context, subscription, topic string, callback func(ctx context.Context, msg Webhook) error) error {
 
-	sub, err := b.getSubscription(ctx)
+	sub, err := b.getSubscription(ctx, subscription, topic)
 	if err != nil {
 		return err
 	}
@@ -101,6 +106,8 @@ func (b *Client) listenWebhookGoroutine(ctx context.Context, callback func(ctx c
 		}
 		webhook.ID = msg.ID
 
+		ctx = keys.SetCtxValue(ctx, keys.MSGID, webhook.ID)
+
 		b.log.Debug().Interface("msg", webhook).Msgf("received webhook")
 		err := callback(ctx, webhook)
 		if err != nil {
@@ -113,15 +120,15 @@ func (b *Client) listenWebhookGoroutine(ctx context.Context, callback func(ctx c
 	if err != nil {
 		b.log.Fatal().Stack().Err(err).Msgf(ErrReceiveSubscription.Error())
 	}
-	b.log.Trace().Msgf("connected to subscription %s listen for webhooks", b.cfg.Subscription)
+	b.log.Trace().Msgf("connected to subscription %s listen for webhooks", sub.ID())
 	<-ctx.Done()
 	b.log.Trace().Msgf("stop listen for webhooks for %s", sub.ID())
 	return nil
 }
 
-func (b *Client) ListenEvents(ctx context.Context, callback func(ctx context.Context, msg Event) error) error {
+func (b *Client) ListenEvents(ctx context.Context, subscription, topic string, callback func(ctx context.Context, msg Event) error) error {
 
-	sub, err := b.getSubscription(ctx)
+	sub, err := b.getSubscription(ctx, subscription, topic)
 	if err != nil {
 		return err
 	}
@@ -140,6 +147,10 @@ func (b *Client) listenEventGoroutine(ctx context.Context, callback func(ctx con
 		}
 		event.ID = msg.ID
 
+		ctx = keys.SetCtxValue(ctx, keys.RequestID, event.RequestID)
+		ctx = keys.SetCtxValue(ctx, keys.IPAddress, event.IPAddress)
+		ctx = keys.SetCtxValue(ctx, keys.MSGID, event.ID)
+
 		b.log.Debug().Interface("msg", event).Msgf("received event")
 		err := callback(ctx, event)
 		if err != nil {
@@ -152,7 +163,7 @@ func (b *Client) listenEventGoroutine(ctx context.Context, callback func(ctx con
 	if err != nil {
 		b.log.Fatal().Stack().Err(err).Msgf(ErrReceiveSubscription.Error())
 	}
-	b.log.Trace().Msgf("connected to subscription %s listen for events", b.cfg.Subscription)
+	b.log.Trace().Msgf("connected to subscription %s listen for events", sub.ID())
 	<-ctx.Done()
 	b.log.Trace().Msgf("stop listen for events for %s", sub.ID())
 	return nil

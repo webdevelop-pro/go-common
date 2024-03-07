@@ -234,12 +234,8 @@ func RunApiTest(t *testing.T, Description string, fixtures FixturesManager, scen
 
 func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 	fixtures := NewFixturesManager()
-	cfg := pclient.Config{}
-	err := configurator.NewConfiguration(&cfg, "pubsub")
-	if err != nil {
-		log.Fatal().Err(err).Msg(pclient.ErrConfigParse.Error())
-	}
-	pubsubClient, _ := pclient.New(context.Background(), cfg)
+	pubsubClient, _ := pclient.New(context.Background())
+	pubsubClient.PublishToTopic(context.Background(), "test_wallet", "{}", map[string]string{})
 	pubsubFixtures := NewPubSubFixturesManager(&pubsubClient)
 	dbClient := db.New(configurator.NewConfigurator())
 
