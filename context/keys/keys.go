@@ -13,6 +13,7 @@ const (
 	MSGID
 	IdentityID
 	LogInfo
+	RequestLogID
 )
 
 func GetCtxValue(ctx context.Context, key ContextKey) any {
