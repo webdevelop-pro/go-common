@@ -10,14 +10,15 @@ import (
 	"time"
 )
 
-var topic = "test"
-var subscription = "test_sub"
+var (
+	topic        = "test"
+	subscription = "test_sub"
+)
 
 func TestPublish(t *testing.T) {
 	usr, _ := user.Current()
 
 	os.Setenv("PUBSUB_SERVICE_ACCOUNT_CREDENTIALS", usr.HomeDir+"/.config/gcloud/application_default_credentials.json")
-	os.Setenv("PUBSUB_PROJECT_ID", usr.HomeDir+"webdevelop-live")
 	os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8085")
 
 	ctx := context.Background()
@@ -26,6 +27,11 @@ func TestPublish(t *testing.T) {
 		t.Fatalf("cannot connect %s", err)
 	}
 
+	pubsubClient.DeleteTopic(ctx, topic)
+	// pubsub emulator has a bug
+	// we need to delete subscription manually
+	sub := pubsubClient.client.Subscription(topic)
+	sub.Delete(ctx)
 	pubsubClient.CreateTopic(ctx, topic)
 	t.Run("success publish", func(t *testing.T) {
 		msg, err := pubsubClient.Publish(ctx,
@@ -33,7 +39,6 @@ func TestPublish(t *testing.T) {
 			map[string]any{"investment_id": 5},
 			map[string]string{"ip_address": "31.5.12.199", "request_id": "Xbsdf124d"},
 		)
-
 		if err != nil {
 			t.Errorf("errors don't match: expected nil, got %s", err)
 		}
@@ -54,7 +59,6 @@ func TestListenNack(t *testing.T) {
 	usr, _ := user.Current()
 
 	os.Setenv("PUBSUB_SERVICE_ACCOUNT_CREDENTIALS", usr.HomeDir+"/.config/gcloud/application_default_credentials.json")
-	os.Setenv("PUBSUB_PROJECT_ID", usr.HomeDir+"webdevelop-live")
 	os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8085")
 
 	ctx, cancel := context.WithCancel(context.TODO())
@@ -72,7 +76,7 @@ func TestListenNack(t *testing.T) {
 	pubsubClient.CreateSubscription(ctx, subscription, topic)
 
 	t.Run("success nack", func(t *testing.T) {
-		err := pubsubClient.ListenRawMsgs(ctx, topic, subscription, func(ctx context.Context, msg Message) error {
+		err := pubsubClient.ListenRawMsgs(ctx, subscription, topic, func(ctx context.Context, msg Message) error {
 			received_counter++
 			if received_counter%2 != 0 {
 				return fmt.Errorf("odd number return an error ... ")
@@ -97,7 +101,6 @@ func TestListenAck(t *testing.T) {
 	usr, _ := user.Current()
 
 	os.Setenv("PUBSUB_SERVICE_ACCOUNT_CREDENTIALS", usr.HomeDir+"/.config/gcloud/application_default_credentials.json")
-	os.Setenv("PUBSUB_PROJECT_ID", usr.HomeDir+"webdevelop-live")
 	os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8085")
 
 	ctx, cancel := context.WithCancel(context.TODO())
@@ -115,7 +118,7 @@ func TestListenAck(t *testing.T) {
 	pubsubClient.CreateSubscription(ctx, subscription, topic)
 
 	t.Run("success ack", func(t *testing.T) {
-		err := pubsubClient.ListenEvents(ctx, topic, subscription, func(ctx context.Context, msg Event) error {
+		err := pubsubClient.ListenEvents(ctx, subscription, topic, func(ctx context.Context, msg Event) error {
 			if msg.ID == "" || msg.Action == "" || msg.ObjectID == 0 || msg.ObjectName == "" {
 				return fmt.Errorf("event is empty, its not correct")
 			}

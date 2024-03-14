@@ -24,12 +24,12 @@ func (b *Client) getSubscription(ctx context.Context, subscription, topic string
 
 	ok, err := b_topic.Exists(ctx)
 	if !ok {
-		b.log.Fatal().Stack().Err(err).Interface("cfg", b.cfg).Msgf(ErrTopicNotExists.Error())
+		b.log.Fatal().Stack().Err(err).Str("topic", topic).Msgf(ErrTopicNotExists.Error())
 		return nil, fmt.Errorf("%w: %s", ErrTopicNotExists, b_topic.ID())
 	}
 
 	if err != nil {
-		b.log.Fatal().Stack().Err(err).Interface("cfg", b.cfg).Msgf(ErrTopicConnect.Error())
+		b.log.Fatal().Stack().Err(err).Str("topic", topic).Msgf(ErrTopicConnect.Error())
 		return nil, fmt.Errorf("%w: %w", ErrTopicConnect, err)
 	}
 
