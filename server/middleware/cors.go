@@ -18,7 +18,7 @@ var (
 		},
 		AllowCredentials: true,
 		AllowMethods:     []string{"GET, POST, PUT, OPTIONS, DELETE, PATCH"},
-		AllowHeaders:     []string{"Authorization, X-PINGOTHER, Content-Type, X-Requested-With, X-Request-ID"},
+		AllowHeaders:     []string{"Authorization, X-PINGOTHER, Content-Type, X-Requested-With, X-Request-ID, Vary"},
 	})
 
 	CORSHandler = CORS(func(c echo.Context) error { return c.NoContent(http.StatusNoContent) })
