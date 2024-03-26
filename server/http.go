@@ -74,15 +74,6 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool middlewa
 	e.Use(middleware.SetLogger)
 	e.Use(middleware.SetRequestTime)
 	e.Use(middleware.SetIPAddress)
-	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			requestID := c.Request().Header.Get(echo.HeaderXRequestID)
-
-			c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), keys.RequestID, requestID)))
-
-			return next(c)
-		}
-	})
 	e.Use(middleware.LogRequests)
 	// Trace ID middleware generates a unique id for a request.
 	e.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
@@ -153,6 +144,15 @@ func StartServer(lc fx.Lifecycle, srv *HttpServer) {
 			},
 		},
 	)
+}
+
+func SetDefaultHTTP(echoContext echo.Context) context.Context {
+	ctx := SetDefaultHTTPCtx(echoContext.Request().Context(), echoContext.Request().Header)
+	if ctx.Value(keys.RequestID).(string) == "" {
+		requestID := echoContext.Get(echo.HeaderXRequestID).(string)
+		ctx = keys.SetCtxValue(ctx, keys.RequestID, requestID)
+	}
+	return ctx
 }
 
 func SetDefaultHTTPCtx(ctx context.Context, headers http.Header) context.Context {
