@@ -75,7 +75,8 @@ func (f FixturesManager) LoadFixture(tableName, fileName string) error {
 					b := bytes.NewBuffer(nil)
 					err = json.NewEncoder(b).Encode(v)
 					if err != nil {
-						e := fmt.Errorf("Failed to encode json field %s: %v\n", k, err)
+						file.Close()
+						e := fmt.Errorf("failed to encode json field %s: %v", k, err)
 						log.Fatal(e.Error())
 						errors = append(errors, e)
 					}
@@ -87,7 +88,7 @@ func (f FixturesManager) LoadFixture(tableName, fileName string) error {
 		q := fmt.Sprintf(`INSERT INTO %s (%s) VALUES (%s)`, tableName, strings.Join(fields, ","), valuePlaceholders)
 		ct, err := f.db.Exec(context.Background(), q, vals...)
 		if err != nil {
-			e := fmt.Errorf("Failed to insert row #%d: %v\n\nquery: %s\n\nvals: %+v\n", rowID, err, q, vals)
+			e := fmt.Errorf("failed to insert row #%d: %v\n\nquery: %s\n\nvals: %+v", rowID, err, q, vals)
 			log.Fatal(e.Error())
 			errors = append(errors, e)
 		}

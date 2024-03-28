@@ -80,12 +80,12 @@ func (b *Client) CreateSubscription(ctx context.Context, name, topic string) (*g
 		return nil, ErrNotConnected
 	}
 
-	p_topic := b.client.Topic(topic)
+	pTopic := b.client.Topic(topic)
 
 	// FixME
 	// Add RetryPolicy
 	sub, err := b.client.CreateSubscription(ctx, name, gpubsub.SubscriptionConfig{
-		Topic: p_topic,
+		Topic: pTopic,
 		RetryPolicy: &gpubsub.RetryPolicy{
 			MinimumBackoff: time.Duration(2),
 			MaximumBackoff: time.Duration(120),

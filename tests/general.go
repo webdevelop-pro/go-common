@@ -186,6 +186,7 @@ func SendTestRequest(req *http.Request) ([]byte, int, error) {
 	if err != nil {
 		return nil, 0, err
 	}
+	defer resp.Body.Close()
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -222,7 +223,7 @@ func RunApiTest(t *testing.T, Description string, fixtures FixturesManager, scen
 			if scenario.TestFunc != nil {
 				bodyMap := make(map[string]interface{})
 				if len(result) > 0 {
-					if err := json.Unmarshal([]byte(result), &bodyMap); err != nil {
+					if err := json.Unmarshal(result, &bodyMap); err != nil {
 						t.Errorf("cannot convert body %s to map[string]interface, %s", result, err.Error())
 					}
 				}

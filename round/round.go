@@ -59,10 +59,10 @@ func getDecimalPart(x float64) float64 {
 // SmartRound - method for rounding percents to integers
 // in sum it must be 100% (can be changed in requiredSum argument)
 // it's use larges reminder method but keep this extra requirement:
-// - if values is equal, after rounding the must be equal (if it possible)
-// 		example: 66.6666%, 16.666%, 16.666%
-// 		correct: 66, 17, 17
-// 		incorrect: 67, 17, 16
+//   - if values is equal, after rounding the must be equal (if it possible)
+//     example: 66.6666%, 16.666%, 16.666%
+//     correct: 66, 17, 17
+//     incorrect: 67, 17, 16
 func SmartRound(values Values, requiredSum int) error {
 	sorted := newSortValues(values)
 
@@ -119,7 +119,7 @@ func SmartRound(values Values, requiredSum int) error {
 				continue
 			}
 
-			sorted.values[i] += 1
+			sorted.values[i]++
 			diff--
 		}
 	}
@@ -142,6 +142,6 @@ func SmartRound(values Values, requiredSum int) error {
 
 func addOne(arr []float64, start, end int) {
 	for i := start; i <= end; i++ {
-		arr[i] += 1
+		arr[i]++
 	}
 }
