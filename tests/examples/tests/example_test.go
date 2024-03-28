@@ -11,6 +11,12 @@ import (
 	. "github.com/webdevelop-pro/go-common/tests"
 )
 
+/*
+PROBLEM:
+
+- this line set up INCORRECT envs for me
+- so I cannot run test with it
+
 func TestMain(m *testing.M) {
 	LoadEnv(".env.tests")
 
@@ -18,6 +24,7 @@ func TestMain(m *testing.M) {
 
 	os.Exit(m.Run())
 }
+*/
 
 func TestExample(t *testing.T) {
 	RunApiTestV2(t,
