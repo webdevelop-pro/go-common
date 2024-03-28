@@ -52,7 +52,6 @@ func (db *DB) Subscribe(ctx context.Context, topicName string) (<-chan *[]byte, 
 				return
 			default:
 				n, err := conn.Conn().WaitForNotification(ctx)
-
 				if err != nil {
 					db.log.Error().Err(err).Msg("Can't receive notification, continuing")
 

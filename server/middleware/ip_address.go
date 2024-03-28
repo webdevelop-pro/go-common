@@ -14,6 +14,8 @@ const (
 )
 
 func GetIpAddress(headers http.Header) string {
+	// ToDo
+	// Use echo context.RealIP()
 	ip := "127.0.0.1"
 	if xOFF := headers.Get("X-Original-Forwarded-For"); xOFF != "" {
 		i := strings.Index(xOFF, ", ")

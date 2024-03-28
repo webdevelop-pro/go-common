@@ -186,6 +186,7 @@ func SendTestRequest(req *http.Request) ([]byte, int, error) {
 	if err != nil {
 		return nil, 0, err
 	}
+	defer resp.Body.Close()
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -222,7 +223,7 @@ func RunApiTest(t *testing.T, Description string, fixtures FixturesManager, scen
 			if scenario.TestFunc != nil {
 				bodyMap := make(map[string]interface{})
 				if len(result) > 0 {
-					if err := json.Unmarshal([]byte(result), &bodyMap); err != nil {
+					if err := json.Unmarshal(result, &bodyMap); err != nil {
 						t.Errorf("cannot convert body %s to map[string]interface, %s", result, err.Error())
 					}
 				}
@@ -235,7 +236,6 @@ func RunApiTest(t *testing.T, Description string, fixtures FixturesManager, scen
 func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 	fixtures := NewFixturesManager()
 	pubsubClient, _ := pclient.New(context.Background())
-	pubsubClient.PublishToTopic(context.Background(), "test_wallet", "{}", map[string]string{})
 	pubsubFixtures := NewPubSubFixturesManager(&pubsubClient)
 	dbClient := db.New(configurator.NewConfigurator())
 
@@ -266,6 +266,23 @@ func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 	})
 }
 
+func allowAny(src, dst map[string]interface{}) {
+	for k, v := range dst {
+		switch val := v.(type) {
+		case string:
+			if val == "%any%" {
+				dst[k] = src[k]
+			}
+			/*
+				case int:
+					if val == math.MinInt {
+						dst[k] = src[k]
+					}
+			*/
+		}
+	}
+}
+
 // ToDo
 // use sprew or other library to better show different in maps
 func CompareJsonBody(t *testing.T, actual, expected []byte) {
@@ -294,5 +311,6 @@ func CompareJsonBody(t *testing.T, actual, expected []byte) {
 		return
 	}
 
+	allowAny(actualBody, expectedBody)
 	assert.EqualValuesf(t, expectedBody, actualBody, "responses not equal")
 }

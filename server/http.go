@@ -3,14 +3,12 @@ package server
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/labstack/echo-contrib/prometheus"
 	"github.com/labstack/echo/v4"
 	echoMW "github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/webdevelop-pro/go-common/configurator"
-	"github.com/webdevelop-pro/go-common/context/keys"
 	"github.com/webdevelop-pro/go-common/server/healthcheck"
 	"github.com/webdevelop-pro/go-common/server/middleware"
 	"github.com/webdevelop-pro/go-common/server/validator"
@@ -74,15 +72,6 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool middlewa
 	e.Use(middleware.SetLogger)
 	e.Use(middleware.SetRequestTime)
 	e.Use(middleware.SetIPAddress)
-	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			requestID := c.Request().Header.Get(echo.HeaderXRequestID)
-
-			c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), keys.RequestID, requestID)))
-
-			return next(c)
-		}
-	})
 	e.Use(middleware.LogRequests)
 	// Trace ID middleware generates a unique id for a request.
 	e.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
@@ -90,6 +79,7 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool middlewa
 			c.Set(echo.HeaderXRequestID, requestID)
 		},
 	}))
+	e.Use(middleware.DefaultCTXValues)
 	// Add the healthcheck endpoint
 	e.GET(`/healthcheck`, healthcheck.Healthcheck)
 
@@ -153,13 +143,4 @@ func StartServer(lc fx.Lifecycle, srv *HttpServer) {
 			},
 		},
 	)
-}
-
-func SetDefaultHTTPCtx(ctx context.Context, headers http.Header) context.Context {
-	requestID := headers.Get(echo.HeaderXRequestID)
-	IP := middleware.GetIpAddress(headers)
-
-	ctx = keys.SetCtxValue(ctx, keys.RequestID, requestID)
-	ctx = keys.SetCtxValue(ctx, keys.IPAddress, IP)
-	return ctx
 }

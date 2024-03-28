@@ -31,7 +31,6 @@ type Validator struct {
 }
 
 func New() Validator {
-
 	v := validator.New()
 	v.RegisterTagNameFunc(ParamName)
 

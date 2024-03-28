@@ -5,31 +5,30 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"cloud.google.com/go/pubsub"
 	gpubsub "cloud.google.com/go/pubsub"
 	"github.com/webdevelop-pro/go-common/context/keys"
 )
 
-func (b *Client) getSubscription(ctx context.Context, subscription, topic string) (*pubsub.Subscription, error) {
+func (b *Client) getSubscription(ctx context.Context, subscription, topic string) (*gpubsub.Subscription, error) {
 	var err error
 	if b.client == nil {
 		return nil, ErrNotConnected
 	}
 
-	b_topic := b.client.Topic(topic)
+	bTopic := b.client.Topic(topic)
 
-	if b_topic == nil {
+	if bTopic == nil {
 		return nil, ErrTopicNotSet
 	}
 
-	ok, err := b_topic.Exists(ctx)
+	ok, err := bTopic.Exists(ctx)
 	if !ok {
-		b.log.Fatal().Stack().Err(err).Interface("cfg", b.cfg).Msgf(ErrTopicNotExists.Error())
-		return nil, fmt.Errorf("%w: %s", ErrTopicNotExists, b_topic.ID())
+		b.log.Fatal().Stack().Err(err).Str("topic", topic).Msgf(ErrTopicNotExists.Error())
+		return nil, fmt.Errorf("%w: %s", ErrTopicNotExists, bTopic.ID())
 	}
 
 	if err != nil {
-		b.log.Fatal().Stack().Err(err).Interface("cfg", b.cfg).Msgf(ErrTopicConnect.Error())
+		b.log.Fatal().Stack().Err(err).Str("topic", topic).Msgf(ErrTopicConnect.Error())
 		return nil, fmt.Errorf("%w: %w", ErrTopicConnect, err)
 	}
 
@@ -47,7 +46,6 @@ func (b *Client) getSubscription(ctx context.Context, subscription, topic string
 }
 
 func (b *Client) ListenRawMsgs(ctx context.Context, subscription, topic string, callback func(ctx context.Context, msg Message) error) error {
-
 	sub, err := b.getSubscription(ctx, subscription, topic)
 	if err != nil {
 		return err
@@ -66,8 +64,7 @@ func (b *Client) listenRawGoroutine(ctx context.Context, callback func(ctx conte
 		m.ID = msg.ID
 
 		ctx = keys.SetCtxValue(ctx, keys.MSGID, msg.ID)
-
-		b.log.Debug().Str("msg", string(m.Data)).Msgf("received message")
+		b.log.Trace().Str("msg", string(m.Data)).Msgf("received message")
 		err := callback(ctx, m)
 		if err != nil {
 			b.log.Error().Err(err).Msgf(ErrReceiveCallback.Error())
@@ -86,7 +83,6 @@ func (b *Client) listenRawGoroutine(ctx context.Context, callback func(ctx conte
 }
 
 func (b *Client) ListenWebhooks(ctx context.Context, subscription, topic string, callback func(ctx context.Context, msg Webhook) error) error {
-
 	sub, err := b.getSubscription(ctx, subscription, topic)
 	if err != nil {
 		return err
@@ -100,15 +96,14 @@ func (b *Client) listenWebhookGoroutine(ctx context.Context, callback func(ctx c
 	err := sub.Receive(ctx, func(ctx context.Context, msg *gpubsub.Message) {
 		webhook := Webhook{}
 		if err := json.Unmarshal(msg.Data, &webhook); err != nil {
-			b.log.Error().Err(fmt.Errorf("cannot unmarshal: %s", msg.Data)).Msgf(ErrUnmarshalPubSub.Error())
+			b.log.Error().Err(err).Interface("data", string(msg.Data)).Msgf(ErrUnmarshalPubSub.Error())
 			msg.Nack()
 			return
 		}
 		webhook.ID = msg.ID
 
-		ctx = keys.SetCtxValue(ctx, keys.MSGID, webhook.ID)
-
-		b.log.Debug().Interface("msg", webhook).Msgf("received webhook")
+		ctx = SetDefaultWebhookCtx(ctx, webhook)
+		b.log.Trace().Interface("msg", webhook).Msgf("received webhook")
 		err := callback(ctx, webhook)
 		if err != nil {
 			b.log.Error().Err(err).Msgf(ErrReceiveCallback.Error())
@@ -127,7 +122,6 @@ func (b *Client) listenWebhookGoroutine(ctx context.Context, callback func(ctx c
 }
 
 func (b *Client) ListenEvents(ctx context.Context, subscription, topic string, callback func(ctx context.Context, msg Event) error) error {
-
 	sub, err := b.getSubscription(ctx, subscription, topic)
 	if err != nil {
 		return err
@@ -141,17 +135,15 @@ func (b *Client) listenEventGoroutine(ctx context.Context, callback func(ctx con
 	err := sub.Receive(ctx, func(ctx context.Context, msg *gpubsub.Message) {
 		event := Event{}
 		if err := json.Unmarshal(msg.Data, &event); err != nil {
-			b.log.Error().Err(fmt.Errorf("cannot unmarshal: %s", msg.Data)).Msgf(ErrUnmarshalPubSub.Error())
+			b.log.Error().Err(err).Interface("data", string(msg.Data)).Msgf(ErrUnmarshalPubSub.Error())
 			msg.Nack()
 			return
 		}
 		event.ID = msg.ID
 
-		ctx = keys.SetCtxValue(ctx, keys.RequestID, event.RequestID)
-		ctx = keys.SetCtxValue(ctx, keys.IPAddress, event.IPAddress)
-		ctx = keys.SetCtxValue(ctx, keys.MSGID, event.ID)
+		ctx = SetDefaultEventCtx(ctx, event)
 
-		b.log.Debug().Interface("msg", event).Msgf("received event")
+		b.log.Trace().Interface("msg", event).Msgf("received event")
 		err := callback(ctx, event)
 		if err != nil {
 			b.log.Error().Err(err).Msgf(ErrReceiveCallback.Error())

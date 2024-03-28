@@ -10,7 +10,9 @@ import (
 	"github.com/webdevelop-pro/go-common/server/validator"
 )
 
-func (b *Client) PublishEvent(ctx context.Context, topic string, event Event) (*Message, error) {
+func (b *Client) PublishEvent(
+	ctx context.Context, topic string, event Event,
+) (*Message, error) {
 	valid := validator.New()
 	if err := valid.Verify(event, http.StatusPreconditionFailed); err != nil {
 		return nil, err
@@ -19,7 +21,9 @@ func (b *Client) PublishEvent(ctx context.Context, topic string, event Event) (*
 	return b.PublishToTopic(ctx, topic, event, attr)
 }
 
-func (b *Client) PublishWebhook(ctx context.Context, topic string, webhook Webhook) (*Message, error) {
+func (b *Client) PublishWebhook(
+	ctx context.Context, topic string, webhook Webhook,
+) (*Message, error) {
 	valid := validator.New()
 	if err := valid.Verify(webhook, http.StatusPreconditionFailed); err != nil {
 		return nil, err
@@ -28,11 +32,15 @@ func (b *Client) PublishWebhook(ctx context.Context, topic string, webhook Webho
 	return b.PublishToTopic(ctx, topic, webhook, attr)
 }
 
-func (b *Client) Publish(ctx context.Context, topic string, data any, attr map[string]string) (*Message, error) {
+func (b *Client) Publish(
+	ctx context.Context, topic string, data any, attr map[string]string,
+) (*Message, error) {
 	return b.PublishToTopic(ctx, topic, data, attr)
 }
 
-func (b *Client) PublishToTopic(ctx context.Context, topicID string, data any, attr map[string]string) (*Message, error) {
+func (b *Client) PublishToTopic(
+	ctx context.Context, topicID string, data any, attr map[string]string,
+) (*Message, error) {
 	var (
 		wg    sync.WaitGroup
 		msgID string
@@ -43,7 +51,8 @@ func (b *Client) PublishToTopic(ctx context.Context, topicID string, data any, a
 	ok, err := t.Exists(ctx)
 	if !ok {
 		b.log.Error().Err(err).Interface("topic", topicID).Msgf(ErrTopicNotExists.Error())
-		return nil, fmt.Errorf("topic do not exist: %s", topicID)
+		err := fmt.Errorf("topic do not exist: %s", topicID)
+		return nil, err
 	}
 
 	msg, err := NewMessage(data, attr)
