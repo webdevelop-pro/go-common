@@ -15,6 +15,7 @@ const (
 
 type Message struct {
 	Attributes map[string]string
+	Attempt    *int `json:"attempt"`
 	Data       []byte
 	ID         string `json:"message_id"`
 }
@@ -33,6 +34,7 @@ func NewMessage(data any, attributes map[string]string) (*Message, error) {
 
 type Event struct {
 	ID         string         `json:"id"`
+	Attempt    *int           `json:"attempt"`
 	Action     EventType      `json:"action" validate:"required"`
 	Sender     string         `json:"sender" validate:"required"`
 	ObjectID   int            `json:"object_id" validate:"required"`
@@ -44,6 +46,7 @@ type Event struct {
 
 type Webhook struct {
 	ID      string              `json:"id"`
+	Attempt *int                `json:"attempt"`
 	Action  string              `json:"action" validate:"required"`
 	Object  string              `json:"object" validate:"required"`
 	Service string              `json:"service" validate:"required"`

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -266,20 +267,33 @@ func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 	})
 }
 
-func allowAny(src, dst map[string]interface{}) {
+func allowDictAny(src, dst map[string]interface{}) {
 	for k, v := range dst {
 		switch val := v.(type) {
 		case string:
 			if val == "%any%" {
 				dst[k] = src[k]
 			}
-			/*
-				case int:
-					if val == math.MinInt {
-						dst[k] = src[k]
-					}
-			*/
+		case int:
+			if val == math.MinInt {
+				dst[k] = src[k]
+			}
 		}
+	}
+}
+
+func allowAny(src, dst interface{}) {
+	switch val := dst.(type) {
+	case string:
+		if val == "%any%" {
+			dst = src
+		}
+	case int:
+		if val == math.MinInt {
+			dst = src
+		}
+	default:
+		fmt.Println("not implemented ")
 	}
 }
 
@@ -311,6 +325,6 @@ func CompareJsonBody(t *testing.T, actual, expected []byte) {
 		return
 	}
 
-	allowAny(actualBody, expectedBody)
+	allowDictAny(actualBody, expectedBody)
 	assert.EqualValuesf(t, expectedBody, actualBody, "responses not equal")
 }
