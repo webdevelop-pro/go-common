@@ -134,3 +134,48 @@ func TestListenAck(t *testing.T) {
 	})
 	pubsubClient.Close()
 }
+
+func TestReconnectToNonExistTopic(t *testing.T) {
+	usr, _ := user.Current()
+
+	os.Setenv("PUBSUB_SERVICE_ACCOUNT_CREDENTIALS", usr.HomeDir+"/.config/gcloud/application_default_credentials.json")
+	os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8085")
+
+	ctx, cancel := context.WithCancel(context.TODO())
+	pubsubClient, err := New(ctx)
+	if err != nil {
+		t.Fatalf("cannot connect %s", err)
+	}
+
+	pubsubClient.DeleteTopic(ctx, topic)
+	// pubsub emulator has a bug
+	// we need to delete subscription manually
+	sub := pubsubClient.client.Subscription(topic)
+	sub.Delete(ctx)
+	// pubsubClient.CreateTopic(ctx, topic)
+	// pubsubClient.CreateSubscription(ctx, subscription, topic)
+
+	t.Run("success reconnect", func(t *testing.T) {
+		go func() {
+			err := pubsubClient.ListenEvents(ctx, subscription, topic, func(ctx context.Context, msg Event) error {
+				if msg.ID == "" || msg.Action == "" || msg.ObjectID == 0 || msg.ObjectName == "" {
+					return fmt.Errorf("event is empty, its not correct")
+				}
+				return nil
+			})
+			if err != nil {
+				t.Fatalf("cannot connect: %s", err)
+			}
+		}()
+		time.Sleep(time.Second * 5)
+		pubsubClient.CreateTopic(ctx, topic)
+		pubsubClient.CreateSubscription(ctx, subscription, topic)
+
+		pubsubClient.Publish(ctx, topic, map[string]int{"message": 123}, map[string]string{})
+		pubsubClient.Publish(ctx, topic, map[string]int{"message": 123}, map[string]string{})
+
+		time.Sleep(time.Second * 4)
+		cancel()
+	})
+	pubsubClient.Close()
+}

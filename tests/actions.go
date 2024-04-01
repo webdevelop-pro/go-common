@@ -3,9 +3,11 @@ package tests
 import (
 	"context"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/webdevelop-pro/go-common/db"
 	"github.com/webdevelop-pro/go-common/queue/pclient"
@@ -33,8 +35,10 @@ type TestContext struct {
 	T      *testing.T
 }
 
-type SomeAction func(t TestContext) error
-type ExpectedResult map[string]interface{}
+type (
+	SomeAction     func(t TestContext) error
+	ExpectedResult map[string]interface{}
+)
 
 type Request struct {
 	Scheme, Host, Method, Path string
@@ -76,11 +80,28 @@ func SQL(query string, expected ...ExpectedResult) SomeAction {
 	return func(t TestContext) error {
 		var res map[string]interface{}
 
-		query = "select row_to_json(q)::jsonb from (" + query + ") as q"
+		query = strings.Replace(query, "\t", " ", -1)
+		query = strings.Replace(query, "\n", " ", -1)
+		query = strings.Replace(query, "  ", " ", -1)
+		row_query := "select row_to_json(q)::jsonb from (" + query + ") as q"
 
-		err := t.DB.QueryRow(context.Background(), query).Scan(&res)
+		err := t.DB.QueryRow(context.Background(), row_query).Scan(&res)
+		// Do 15 retries automatically
 		if err != nil {
-			return err
+			maxRetry := 20
+			try := 0
+			ticker := time.NewTicker(500 * time.Millisecond)
+			for range ticker.C {
+				err = t.DB.QueryRow(context.Background(), row_query).Scan(&res)
+				if err != nil {
+					try++
+					if try > maxRetry {
+						return errors.Wrapf(err, "for sql: %s", query)
+					}
+				} else {
+					break
+				}
+			}
 		}
 
 		for _, exp := range expected {
@@ -89,7 +110,8 @@ func SQL(query string, expected ...ExpectedResult) SomeAction {
 				// Find library to have colorful compare for maps
 				expValue, ok := res[key]
 				if assert.True(t.T, ok, fmt.Sprintf("Expected column %s not exist in result", key)) {
-          assert.Equal(t.T, value, expValue)
+					allowAny(expValue, value)
+					assert.Equal(t.T, value, expValue)
 				}
 			}
 		}
@@ -98,35 +120,6 @@ func SQL(query string, expected ...ExpectedResult) SomeAction {
 	}
 }
 
-/*
-ToDo:
-  - client does not have Listen method
-  - Merge broker with client its all client
-  - rename pubsub to queue
-func CheckPubSubEvent(subID string, msg broker.Message) SomeAction {
-	return func(t TestContext) error {
-		var equal bool
-
-		log.Trace().Msg("waiting for 5 seconds to get message")
-
-		timer := time.NewTimer(time.Second * 5)
-		t.Pubsub.Listen(func(ctx context.Context, msg2 broker.Message) error {
-			equal = cmp.Equal(msg, msg2)
-			if !equal {
-				log.Trace().Interface("msg", msg).Msg("Not equal")
-			} else {
-				return nil
-			}
-			return fmt.Errorf("not equal")
-		})
-		<-timer.C
-
-		return nil
-	}
-}
-*/
-
-// Please usage example
 func Sleep(d time.Duration) SomeAction {
 	return func(t TestContext) error {
 		time.Sleep(d)

@@ -11,14 +11,14 @@ import (
 )
 
 const (
-	MsgRequired = "Missing data for required field."
-	MsgEmail    = "Not a valid email address."
-	MsgMin      = "Shorter than minimum length %s."
-	MsgMax      = "Longer than maximum length %s."
-	MsgGte      = "Greater than or equal to %s."
-	MsgGt       = "Greater than %s."
-	MsgOneOf    = "Must be one of: %s."
-	MsgEq       = "Must be equal to: %s."
+	MsgRequired = "missing data for required field"
+	MsgEmail    = "not a valid email address"
+	MsgMin      = "shorter than minimum length %s"
+	MsgMax      = "longer than maximum length %s"
+	MsgGte      = "greater than or equal to %s"
+	MsgGt       = "greater than %s"
+	MsgOneOf    = "must be one of: %s"
+	MsgEq       = "must be equal to: %s"
 )
 
 type FieldError struct {
@@ -72,18 +72,27 @@ func (va Validator) Verify(i interface{}, httpStatus int) error {
 			Message:    make(map[string][]string),
 		}
 		var ve validator.ValidationErrors
+		strErr := "validator error:"
 		if errors.As(err, &ve) {
 			for _, fe := range ve {
-				msg, ok := fieldErrors.Message[fe.Field()]
+				fieldName := fe.Field()
+				_, ok := fieldErrors.Message[fieldName]
 				if ok {
-					msg = append(msg, beautifulMsg(fe))
+					fieldErrors.Message[fieldName] = append(
+						fieldErrors.Message[fieldName],
+						beautifulMsg(fe),
+					)
 				} else {
-					fieldErrors.Message[fe.Field()] = []string{beautifulMsg(fe)}
+					fieldErrors.Message[fieldName] = []string{beautifulMsg(fe)}
+					strErr = fmt.Sprintf("%s %s %s,", strErr, fieldName, beautifulMsg(fe))
 				}
 			}
 		} else {
 			fieldErrors.StatusCode = http.StatusInternalServerError
 		}
+		strErr = strErr[0 : len(strErr)-1]
+		// We change default validator error message cause it does not provide details we need
+		fieldErrors.Err = errors.Errorf(strErr)
 		return fieldErrors
 	}
 	return nil

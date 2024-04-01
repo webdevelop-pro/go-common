@@ -8,5 +8,4 @@
 - dont forget to create topic using by using [CreateTopic](./client.go) client method
 
 ## ToDo
-- [ ] Check if topic is still valid and exist (in case if someone delete it)
-- [ ] Check if subscription is still valid and exist (in case if someone delete it)
+- [ ] Do not parse config file all the time use configurator
