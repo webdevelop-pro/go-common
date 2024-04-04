@@ -16,13 +16,30 @@ import (
 	"github.com/pkg/errors"
 )
 
+func (f FixturesManager) updateSeqNum(fixture Fixture) error {
+	query := fmt.Sprintf(
+		"select setval('%s_id_seq',(select max(id)+1 from %s));",
+		fixture.table, fixture.table,
+	)
+
+	_, err := f.db.Exec(context.Background(), query)
+
+	return err
+}
+
 func (f FixturesManager) LoadFixtures(fixtures []Fixture) error {
 	for _, fixture := range fixtures {
 		err := f.LoadFixture(fixture.table, fixture.filePath)
 		if err != nil {
 			return err
 		}
+
+		err = f.updateSeqNum(fixture)
+		if err != nil {
+			return err
+		}
 	}
+
 	// fmt.Printf("applied %d fixtures", len(fixtures))
 	return nil
 }
