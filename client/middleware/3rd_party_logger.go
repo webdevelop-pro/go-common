@@ -58,13 +58,14 @@ func logRequest(log logger.Logger, serviceName string, pgPool DB) func(req *http
 			reqID, _     = req.Context().Value(keys.RequestID).(string)
 			modelType, _ = req.Context().Value(keys.LogObjectType).(string)
 			objectID, _  = req.Context().Value(keys.LogObjectID).(int)
+			msgID, _     = req.Context().Value(keys.MSGID).(string)
 		)
 
 		sql := `
 			INSERT INTO log_logs(
-				service, "type", content_type_id, object_id, path, request_created_at, request_id, request_headers, request_data
+				service, "type", content_type_id, object_id, path, request_created_at, request_id, request_headers, request_data, msg_id
 			) VALUES (
-				$1, $2, $3, $4, $5, $6, $7, $8, $9
+				$1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 			) RETURNING id
 		`
 
@@ -95,6 +96,7 @@ func logRequest(log logger.Logger, serviceName string, pgPool DB) func(req *http
 			reqID,
 			req.Header,
 			rawBody,
+			msgID,
 		).Scan(&logID)
 		if err != nil {
 			log.Warn().Err(err).Msg("can't save log in database")
