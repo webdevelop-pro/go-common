@@ -33,7 +33,7 @@ func CreateHttpClient(serviceName string, pgPool DB) *http.Client {
 }
 
 func getContentID(ctx context.Context, log logger.Logger, model string, pgPool DB) (int, error) {
-	contentID := 0
+	contentID := 1
 
 	sql, args, err := sq.Select("id").
 		From("django_content_type").Where(sq.And{sq.Eq{"model": model}}).PlaceholderFormat(sq.Dollar).ToSql()
@@ -58,6 +58,10 @@ func logRequest(log logger.Logger, serviceName string, pgPool DB) func(req *http
 			modelType, _ = req.Context().Value(keys.LogObjectType).(string)
 			objectID, _  = req.Context().Value(keys.LogObjectID).(string)
 		)
+
+		if objectID == "" {
+			objectID = "0"
+		}
 
 		sql := `
 			INSERT INTO log_logs(
