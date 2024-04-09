@@ -27,3 +27,11 @@ func SetCtxValue(ctx context.Context, key ContextKey, value any) context.Context
 
 	return ctx
 }
+
+func SetCtxValues(ctx context.Context, values map[ContextKey]any) context.Context {
+	for key, value := range values {
+		ctx = context.WithValue(ctx, key, value)
+	}
+
+	return ctx
+}

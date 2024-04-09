@@ -5,6 +5,7 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -56,12 +57,8 @@ func logRequest(log logger.Logger, serviceName string, pgPool DB) func(req *http
 			logID        int
 			reqID, _     = req.Context().Value(keys.RequestID).(string)
 			modelType, _ = req.Context().Value(keys.LogObjectType).(string)
-			objectID, _  = req.Context().Value(keys.LogObjectID).(string)
+			objectID, _  = req.Context().Value(keys.LogObjectID).(int)
 		)
-
-		if objectID == "" {
-			objectID = "0"
-		}
 
 		sql := `
 			INSERT INTO log_logs(
@@ -92,7 +89,7 @@ func logRequest(log logger.Logger, serviceName string, pgPool DB) func(req *http
 			"outcoming",
 			// TODO: я сейчас не знаю как легко связать эти поля, не совсем понимаю для ччего они, нужно обсудить
 			contentID,
-			objectID,
+			strconv.Itoa(objectID),
 			req.URL.Path,
 			time.Now(),
 			reqID,
