@@ -282,19 +282,23 @@ func allowDictAny(src, dst map[string]interface{}) {
 	}
 }
 
-func allowAny(src, dst interface{}) {
+func allowAny(src, dst interface{}) interface{} {
+	res := dst
+
 	switch val := dst.(type) {
 	case string:
-		if val == "%any%" {
-			dst = src
+		if val == "%any%" && !reflect.ValueOf(src).IsZero() {
+			res = src
 		}
 	case int:
 		if val == math.MinInt {
-			dst = src
+			res = src
 		}
 	default:
 		fmt.Println("not implemented ")
 	}
+
+	return res
 }
 
 // ToDo

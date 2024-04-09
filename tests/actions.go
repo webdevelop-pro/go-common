@@ -110,7 +110,7 @@ func SQL(query string, expected ...ExpectedResult) SomeAction {
 				// Find library to have colorful compare for maps
 				expValue, ok := res[key]
 				if assert.True(t.T, ok, fmt.Sprintf("Expected column %s not exist in result", key)) {
-					allowAny(expValue, value)
+					value = allowAny(expValue, value)
 					assert.Equal(t.T, value, expValue)
 				}
 			}
