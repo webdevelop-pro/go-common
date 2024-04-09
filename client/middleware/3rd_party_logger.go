@@ -12,6 +12,8 @@ import (
 	"github.com/motemen/go-loghttp"
 	"github.com/webdevelop-pro/go-common/context/keys"
 	"github.com/webdevelop-pro/go-logger"
+
+	sq "github.com/Masterminds/squirrel"
 )
 
 type DB interface {
@@ -30,9 +32,33 @@ func CreateHttpClient(serviceName string, pgPool DB) *http.Client {
 	}
 }
 
+func getContentID(ctx context.Context, log logger.Logger, model string, pgPool DB) (int, error) {
+	contentID := 0
+
+	sql, args, err := sq.Select("id").
+		From("django_content_type").Where(sq.And{sq.Eq{"model": model}}).PlaceholderFormat(sq.Dollar).ToSql()
+	if err != nil {
+		return err
+	}
+
+	log.Trace().Msgf("query: %s, %v", sql, args)
+	err = pgPool.QueryRow(ctx, sql, args...).Scan(&contentID)
+	if err != nil {
+		return err
+	}
+
+	return contentID, nil
+}
+
 func logRequest(log logger.Logger, serviceName string, pgPool DB) func(req *http.Request) {
 	return func(req *http.Request) {
-		var logID int
+		var (
+			logID        int
+			reqID, _     = req.Context().Value(keys.RequestID).(string)
+			modelType, _ = req.Context().Value(keys.LogObjectType).(string)
+			objectID, _  = req.Context().Value(keys.LogObjectID).(string)
+		)
+
 		sql := `
 			INSERT INTO log_logs(
 				service, "type", content_type_id, object_id, path, request_created_at, request_id, request_headers, request_data
@@ -40,6 +66,11 @@ func logRequest(log logger.Logger, serviceName string, pgPool DB) func(req *http
 				$1, $2, $3, $4, $5, $6, $7, $8, $9
 			) RETURNING id
 		`
+
+		contentID, err := getContentID(req.Context(), log, modelType, pgPool)
+		if err != nil {
+			log.Warn().Err(err).Msg("can't save log in database")
+		}
 
 		rawBody := []byte("{}")
 		if req.Body != nil {
@@ -50,17 +81,17 @@ func logRequest(log logger.Logger, serviceName string, pgPool DB) func(req *http
 		// TODO: Use the same format for incoming logs
 		log.Info().Str("path", req.RequestURI).Str("service", serviceName).Msg("Send request to 3rd party")
 
-		err := pgPool.QueryRow(
+		err = pgPool.QueryRow(
 			req.Context(),
 			sql,
 			serviceName,
 			"outcoming",
 			// TODO: я сейчас не знаю как легко связать эти поля, не совсем понимаю для ччего они, нужно обсудить
-			1,
-			"1",
+			contentID,
+			objectID,
 			req.URL.Path,
 			time.Now(),
-			req.Context().Value(keys.RequestID).(string),
+			reqID,
 			req.Header,
 			rawBody,
 		).Scan(&logID)
@@ -75,6 +106,7 @@ func logRequest(log logger.Logger, serviceName string, pgPool DB) func(req *http
 func logResponse(log logger.Logger, serviceName string, pgPool DB) func(req *http.Response) {
 	return func(resp *http.Response) {
 		logID := resp.Request.Context().Value(keys.RequestLogID).(int)
+
 		sql := `
 			UPDATE log_logs
 			SET status_code=$2, response_headers=$3, response_data=$4
