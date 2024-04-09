@@ -43,7 +43,7 @@ func logRequest(log logger.Logger, serviceName string, pgPool DB) func(req *http
 
 		rawBody := []byte("{}")
 		if req.Body != nil {
-			rawBody, _ := io.ReadAll(req.Body)
+			rawBody, _ = io.ReadAll(req.Body)
 			req.Body = io.NopCloser(bytes.NewReader(rawBody))
 		}
 
@@ -83,7 +83,7 @@ func logResponse(log logger.Logger, serviceName string, pgPool DB) func(req *htt
 
 		rawBody := []byte("{}")
 		if resp.Body != nil {
-			rawBody, _ := io.ReadAll(resp.Body)
+			rawBody, _ = io.ReadAll(resp.Body)
 			resp.Body = io.NopCloser(bytes.NewReader(rawBody))
 		}
 
