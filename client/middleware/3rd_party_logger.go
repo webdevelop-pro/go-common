@@ -38,13 +38,13 @@ func getContentID(ctx context.Context, log logger.Logger, model string, pgPool D
 	sql, args, err := sq.Select("id").
 		From("django_content_type").Where(sq.And{sq.Eq{"model": model}}).PlaceholderFormat(sq.Dollar).ToSql()
 	if err != nil {
-		return err
+		return contentID, err
 	}
 
 	log.Trace().Msgf("query: %s, %v", sql, args)
 	err = pgPool.QueryRow(ctx, sql, args...).Scan(&contentID)
 	if err != nil {
-		return err
+		return contentID, err
 	}
 
 	return contentID, nil

@@ -14,6 +14,8 @@ const (
 	IdentityID
 	LogInfo
 	RequestLogID
+	LogObjectType
+	LogObjectID
 )
 
 func GetCtxValue(ctx context.Context, key ContextKey) any {
