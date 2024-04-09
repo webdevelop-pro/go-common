@@ -86,9 +86,10 @@ func (b *Client) CreateSubscription(ctx context.Context, name, topic string) (*g
 	// Add RetryPolicy
 	sub, err := b.client.CreateSubscription(ctx, name, gpubsub.SubscriptionConfig{
 		Topic: pTopic,
+		EnableExactlyOnceDelivery: true,
 		RetryPolicy: &gpubsub.RetryPolicy{
-			MinimumBackoff: time.Duration(2),
-			MaximumBackoff: time.Duration(120),
+			MinimumBackoff: time.Minute * 5,
+			MaximumBackoff: time.Minute * 10,
 		},
 	})
 	if err != nil {
