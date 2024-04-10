@@ -122,6 +122,10 @@ func logResponse(log logger.Logger, serviceName string, pgPool DB) func(req *htt
 			resp.Body = io.NopCloser(bytes.NewReader(rawBody))
 		}
 
+		if len(string(rawBody)) == 0 {
+			rawBody = []byte("{}")
+		}
+
 		// TODO: Use the same format for incoming logs
 		log.Debug().Str("path", resp.Request.RequestURI).Int("logID", logID).Str("service", serviceName).Msg("3rd party request finished")
 
