@@ -123,7 +123,7 @@ func logResponse(log logger.Logger, serviceName string, pgPool DB) func(req *htt
 		}
 
 		// TODO: Use the same format for incoming logs
-		log.Trace().Str("path", resp.Request.RequestURI).Str("service", serviceName).Msg("3rd party request finished")
+		log.Debug().Str("path", resp.Request.RequestURI).Int("logID", logID).Str("service", serviceName).Msg("3rd party request finished")
 
 		_, err := pgPool.Exec(
 			resp.Request.Context(),
