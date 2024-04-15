@@ -29,5 +29,6 @@ In this example, we are using custom dto structure with requirements for the str
 
 ## ToDo
 - [ ] add object references in json response. I.e. `{"profile": {"name": ["msg"]}}` instead of `{"name": ["msg"]}`
+- [ ] add empty tag similar to required
 - [ ] create tag to validate file size
 - [ ] create tag to validate file mimetype

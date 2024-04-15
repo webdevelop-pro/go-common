@@ -240,7 +240,7 @@ func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 	pubsubFixtures := NewPubSubFixturesManager(&pubsubClient)
 	dbClient := db.New(configurator.NewConfigurator())
 
-	t.Run(scenario.Description, func(t *testing.T) {
+	t.Run(Description+": "+scenario.Description, func(t *testing.T) {
 		testContext := TestContext{
 			Pubsub: pubsubClient,
 			DB:     dbClient,
