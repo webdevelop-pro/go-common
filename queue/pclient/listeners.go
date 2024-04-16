@@ -10,7 +10,21 @@ import (
 	"github.com/webdevelop-pro/go-common/context/keys"
 )
 
-const maxRetries = 100
+const (
+	maxRetries         = 100
+	maxDeliveryAttempt = 10
+)
+
+func verifyDeliveryAttempt(msg *gpubsub.Message) {
+	// ToDo
+	// For some reason right now message does not goes in dead letter queue
+	// Fix dead letter queue settings in GCP
+	// For now we just ask message to stop working with it
+	if msg.DeliveryAttempt != nil && *msg.DeliveryAttempt > maxDeliveryAttempt {
+		msg.Ack()
+		return
+	}
+}
 
 func (b *Client) getSubscriptionRetry(ctx context.Context, subscription, topic string) (*gpubsub.Subscription, error) {
 	sub, err := backoff.RetryWithData(
@@ -78,6 +92,8 @@ func (b *Client) listenRawGoroutine(ctx context.Context, callback func(ctx conte
 	// Start consuming messages from the subscription
 	b.log.Trace().Msgf("connected to subscription %s listen messages", sub.ID())
 	err := sub.Receive(ctx, func(ctx context.Context, msg *gpubsub.Message) {
+		verifyDeliveryAttempt(msg)
+
 		// Unmarshal the message data into a struct
 		m := Message{}
 		m.Data = msg.Data
@@ -114,6 +130,8 @@ func (b *Client) listenWebhookGoroutine(ctx context.Context, callback func(ctx c
 	// Start consuming messages from the subscription
 	b.log.Trace().Msgf("connected to subscription %s listen for webhooks", sub.ID())
 	err := sub.Receive(ctx, func(ctx context.Context, msg *gpubsub.Message) {
+		verifyDeliveryAttempt(msg)
+
 		webhook := Webhook{}
 		if err := json.Unmarshal(msg.Data, &webhook); err != nil {
 			b.log.Error().Err(err).Interface("data", string(msg.Data)).Msgf(ErrUnmarshalPubSub.Error())
@@ -151,6 +169,8 @@ func (b *Client) listenEventGoroutine(ctx context.Context, callback func(ctx con
 	// Start consuming messages from the subscription
 	b.log.Trace().Msgf("connected to subscription %s listen for events", sub.ID())
 	err := sub.Receive(ctx, func(ctx context.Context, msg *gpubsub.Message) {
+		verifyDeliveryAttempt(msg)
+
 		event := Event{}
 		if err := json.Unmarshal(msg.Data, &event); err != nil {
 			b.log.Error().Err(err).Interface("data", string(msg.Data)).Msgf(ErrUnmarshalPubSub.Error())
