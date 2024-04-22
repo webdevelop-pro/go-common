@@ -16,6 +16,8 @@ func SetLogger(next echo.HandlerFunc) echo.HandlerFunc {
 		ctx := c.Request().Context()
 		ipAddress, _ := c.Get(IpAddressContextKey).(string)
 		identityID, _ := keys.GetCtxValue(ctx, keys.IdentityID).(string)
+		requestID, _ := keys.GetCtxValue(ctx, keys.RequestID).(string)
+		msgID, _ := keys.GetCtxValue(ctx, keys.MSGID).(string)
 
 		logInfo := logger.ServiceContext{
 			Service: verser.GetService(),
@@ -24,7 +26,9 @@ func SetLogger(next echo.HandlerFunc) echo.HandlerFunc {
 				Repository: verser.GetRepository(),
 				RevisionID: verser.GetRevisionID(),
 			},
-			User: identityID,
+			User:      identityID,
+			RequestID: requestID,
+			MSGID:     msgID,
 			HttpRequest: &logger.HttpRequestContext{
 				Method:    c.Request().Method,
 				RemoteIp:  ipAddress,
