@@ -34,7 +34,7 @@ func SetLogger(next echo.HandlerFunc) echo.HandlerFunc {
 			},
 		}
 
-		ctx = context.WithValue(ctx, "logInfo", logInfo)
+		ctx = context.WithValue(ctx, logger.ServiceContextInfo, logInfo)
 
 		// create sub logger
 		log := logger.NewComponentLogger("echo", c)
