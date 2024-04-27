@@ -80,19 +80,19 @@ func SQL(query string, expected ...ExpectedResult) SomeAction {
 	return func(t TestContext) error {
 		var res map[string]interface{}
 
-		query = strings.Replace(query, "\t", " ", -1)
-		query = strings.Replace(query, "\n", " ", -1)
-		query = strings.Replace(query, "  ", " ", -1)
-		row_query := "select row_to_json(q)::jsonb from (" + query + ") as q"
+		query = strings.ReplaceAll(query, "\t", " ")
+		query = strings.ReplaceAll(query, "\n", " ")
+		query = strings.ReplaceAll(query, "  ", " ")
+		rowQuery := "select row_to_json(q)::jsonb from (" + query + ") as q"
 
-		err := t.DB.QueryRow(context.Background(), row_query).Scan(&res)
+		err := t.DB.QueryRow(context.Background(), rowQuery).Scan(&res)
 		// Do 15 retries automatically
 		if err != nil {
 			maxRetry := 20
 			try := 0
 			ticker := time.NewTicker(500 * time.Millisecond)
 			for range ticker.C {
-				err = t.DB.QueryRow(context.Background(), row_query).Scan(&res)
+				err = t.DB.QueryRow(context.Background(), rowQuery).Scan(&res)
 				if err != nil {
 					try++
 					if try > maxRetry {

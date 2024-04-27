@@ -9,7 +9,6 @@ import (
 )
 
 type PubSubListener struct {
-	cfg    *Config
 	log    logger.Logger
 	routes []PubSubRoute
 	client pclient.Client

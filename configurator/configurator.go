@@ -14,6 +14,7 @@ import (
 )
 
 const (
+	//nolint: lll
 	defaultTableFormatSplit = `{{range .}}{{usage_key .}},{{usage_type .}},{{usage_default .}},{{usage_required .}},{{usage_description .}}
 {{end}}`
 

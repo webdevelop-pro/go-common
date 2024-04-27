@@ -36,6 +36,7 @@ func (l *Logger) Log(ctx context.Context, level tracelog.LogLevel, msg string, d
 	}
 
 	switch level {
+	case tracelog.LogLevelNone:
 	case tracelog.LogLevelTrace:
 		l.log.Trace().Ctx(ctx).Interface("data", data).Msg(msg)
 	case tracelog.LogLevelDebug:

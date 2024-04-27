@@ -9,7 +9,7 @@ import (
 )
 
 // Writes down every request to the log file
-// Usefull for debagging
+// Useful for debagging
 func LogRequests(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// ignore healthcheck requests
