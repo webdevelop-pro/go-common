@@ -2,8 +2,10 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/tracelog"
 	comLogger "github.com/webdevelop-pro/go-logger"
 )
@@ -20,6 +22,19 @@ func NewDBLogger(log comLogger.Logger) *Logger {
 
 // Log prints a message
 func (l *Logger) Log(ctx context.Context, level tracelog.LogLevel, msg string, data map[string]interface{}) {
+	var err error
+	errMsg, ok := data["err"]
+	if ok {
+		switch val := errMsg.(type) {
+		case *pgconn.PgError:
+			msg = val.Message
+			err = val
+		default:
+			msg = fmt.Sprintf("%s", val)
+			err = errMsg.(error)
+		}
+	}
+
 	switch level {
 	case tracelog.LogLevelTrace:
 		l.log.Trace().Ctx(ctx).Interface("data", data).Msg(msg)
@@ -30,7 +45,7 @@ func (l *Logger) Log(ctx context.Context, level tracelog.LogLevel, msg string, d
 	case tracelog.LogLevelWarn:
 		l.log.Warn().Ctx(ctx).Interface("data", data).Msg(msg)
 	case tracelog.LogLevelError:
-		l.log.Error().Ctx(ctx).Interface("data", data).Msg(msg)
+		l.log.Error().Ctx(ctx).Err(err).Interface("data", data).Msg(msg)
 	}
 }
 
