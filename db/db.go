@@ -10,7 +10,7 @@ import (
 	comLogger "github.com/webdevelop-pro/go-logger"
 )
 
-const ErrNotUpdated = errors.Errorf("UPDATE 0")
+var ErrNotUpdated = errors.Errorf("UPDATE 0")
 
 // DB is a layer to simplify interact with DB
 type DB struct {
