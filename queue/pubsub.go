@@ -2,7 +2,6 @@ package queue
 
 import (
 	"context"
-	"time"
 
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/queue/pclient"
@@ -41,7 +40,6 @@ func New(c *configurator.Configurator, routes []PubSubRoute) PubSubListener {
 	}
 
 	p.AddRoutes(routes)
-
 	return p
 }
 
@@ -52,39 +50,28 @@ func (p PubSubListener) Start() {
 
 		if br.Name == "webhooks" {
 			go func() {
-			CONNECT_WEBHOOKS:
-				err := p.client.ListenWebhooks(ctx, br.Subscription, br.Topic, br.WebhooksListener)
-				if err != nil {
-					time.Sleep(2 * time.Second)
-					goto CONNECT_WEBHOOKS
+				for {
+					err := p.client.ListenWebhooks(ctx, br.Subscription, br.Topic, br.WebhooksListener)
+					p.log.Error().Err(err).Msg("ListenWebhooks error")
 				}
 			}()
-			continue
-		}
-		if br.Name == "events" {
+		} else if br.Name == "events" {
 			go func() {
-			CONNECT_EVENTS:
-				err := p.client.ListenEvents(ctx, br.Subscription, br.Topic, br.EventsListener)
-				if err != nil {
-					time.Sleep(2 * time.Second)
-					goto CONNECT_EVENTS
+				for {
+					err := p.client.ListenEvents(ctx, br.Subscription, br.Topic, br.EventsListener)
+					p.log.Error().Err(err).Msg("ListenWebhooks error")
 				}
 			}()
-			continue
-		}
-		if br.Name == "messages" {
+		} else if br.Name == "messages" {
 			go func() {
-			CONNECT_RAW:
-				err := p.client.ListenRawMsgs(ctx, br.Subscription, br.Topic, br.MsgsListener)
-				if err != nil {
-					time.Sleep(2 * time.Second)
-					goto CONNECT_RAW
+				for {
+					err := p.client.ListenRawMsgs(ctx, br.Subscription, br.Topic, br.MsgsListener)
+					p.log.Error().Err(err).Msg("ListenWebhooks error")
 				}
 			}()
-			continue
+		} else {
+			p.log.Fatal().Stack().Msgf("topic name %s incorrect", br.Name)
 		}
-		log := logger.NewComponentLogger("pubsub", nil)
-		log.Fatal().Stack().Msgf("topic name %s incorrect", br.Name)
 	}
 }
 
