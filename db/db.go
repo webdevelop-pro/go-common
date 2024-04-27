@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/pkg/errors" // Error with stack trace
@@ -9,7 +10,7 @@ import (
 	comLogger "github.com/webdevelop-pro/go-logger"
 )
 
-var ErrNotUpdated = errors.Errorf("UPDATE 0")
+const ErrNotUpdated = errors.Errorf("UPDATE 0")
 
 // DB is a layer to simplify interact with DB
 type DB struct {
@@ -73,4 +74,18 @@ func (db *DB) Subscribe(ctx context.Context, topicName string) (<-chan *[]byte, 
 	}()
 
 	return out, nil
+}
+
+func (db *DB) LogQuery(ctx context.Context, query string, args interface{}) {
+	// ToDo
+	// Replace $1,$2 with values
+	q := strings.ReplaceAll(
+		strings.ReplaceAll(
+			strings.ReplaceAll(
+				strings.ReplaceAll(query, "\t", " "),
+				"  ", " "),
+			"  ", " "),
+		"\n", " ")
+
+	db.Log.Trace().Ctx(ctx).Msgf("query: %s, %v", q, args)
 }
