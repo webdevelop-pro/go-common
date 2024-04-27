@@ -2,16 +2,20 @@ package db
 
 import (
 	"context"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/pkg/errors" // Error with stack trace
 	"github.com/webdevelop-pro/go-common/configurator"
 	comLogger "github.com/webdevelop-pro/go-logger"
 )
 
+const ErrNotUpdated = errors.Errorf("UPDATE 0")
+
 // DB is a layer to simplify interact with DB
 type DB struct {
 	*pgxpool.Pool
-	log comLogger.Logger
+	Log comLogger.Logger
 }
 
 // New returns new DB instance.
@@ -23,7 +27,7 @@ func New(c *configurator.Configurator) *DB {
 func NewDB(pool *pgxpool.Pool, log comLogger.Logger) *DB {
 	d := &DB{
 		Pool: pool,
-		log:  log,
+		Log:  log,
 	}
 
 	return d
@@ -53,10 +57,10 @@ func (db *DB) Subscribe(ctx context.Context, topicName string) (<-chan *[]byte, 
 			default:
 				n, err := conn.Conn().WaitForNotification(ctx)
 				if err != nil {
-					db.log.Error().Err(err).Msg("Can't receive notification, continuing")
+					db.Log.Error().Err(err).Msg("Can't receive notification, continuing")
 
 					if conn.Conn().IsClosed() {
-						db.log.Error().Err(err).Msg("Lost connection")
+						db.Log.Error().Err(err).Msg("Lost connection")
 						return
 					}
 
@@ -70,4 +74,18 @@ func (db *DB) Subscribe(ctx context.Context, topicName string) (<-chan *[]byte, 
 	}()
 
 	return out, nil
+}
+
+func (db *DB) LogQuery(ctx context.Context, query string, args interface{}) {
+	// ToDo
+	// Replace $1,$2 with values
+	q := strings.ReplaceAll(
+		strings.ReplaceAll(
+			strings.ReplaceAll(
+				strings.ReplaceAll(query, "\t", " "),
+				"  ", " "),
+			"  ", " "),
+		"\n", " ")
+
+	db.Log.Trace().Ctx(ctx).Msgf("query: %s, %v", q, args)
 }
