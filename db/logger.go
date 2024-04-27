@@ -46,7 +46,7 @@ func (l *Logger) Log(ctx context.Context, level tracelog.LogLevel, msg string, d
 	case tracelog.LogLevelWarn:
 		l.log.Warn().Ctx(ctx).Interface("data", data).Msg(msg)
 	case tracelog.LogLevelError:
-		l.log.Error().Ctx(ctx).Interface("data", data).Msg(msg)
+		l.log.Error().Ctx(ctx).Err(err).Interface("data", data).Msg(msg)
 	}
 }
 
