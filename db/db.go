@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/pkg/errors" // Error with stack trace
@@ -74,18 +73,4 @@ func (db *DB) Subscribe(ctx context.Context, topicName string) (<-chan *[]byte, 
 	}()
 
 	return out, nil
-}
-
-func (db *DB) LogQuery(ctx context.Context, query string, args interface{}) {
-	// ToDo
-	// Replace $1,$2 with values
-	q := strings.ReplaceAll(
-		strings.ReplaceAll(
-			strings.ReplaceAll(
-				strings.ReplaceAll(query, "\t", " "),
-				"  ", " "),
-			"  ", " "),
-		"\n", " ")
-
-	db.Log.Trace().Ctx(ctx).Msgf("query: %s, %v", q, args)
 }

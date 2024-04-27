@@ -8,6 +8,7 @@ import (
 	backoff "github.com/cenkalti/backoff/v4"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/tracelog"
+	"github.com/pkg/errors"
 	"github.com/webdevelop-pro/go-common/configurator"
 	comLogger "github.com/webdevelop-pro/go-logger"
 )
@@ -32,6 +33,7 @@ func GetConfigPool(c *configurator.Configurator) *pgxpool.Config {
 
 	pgxLogLevel, err := tracelog.LogLevelFromString(cfg.LogLevel)
 	if err != nil {
+		logger.Warn().Err(errors.Wrapf(err, "wrong level: %s", cfg.LogLevel)).Msgf("cannot parse pgxLogLevel")
 		pgxLogLevel = tracelog.LogLevelNone
 	}
 

@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"strings"
 
 	"github.com/jackc/pgx/v5/tracelog"
 	comLogger "github.com/webdevelop-pro/go-logger"
@@ -21,14 +22,29 @@ func NewDBLogger(log comLogger.Logger) *Logger {
 func (l *Logger) Log(ctx context.Context, level tracelog.LogLevel, msg string, data map[string]interface{}) {
 	switch level {
 	case tracelog.LogLevelTrace:
-		l.log.Trace().Interface("data", data).Msg(msg)
+		l.log.Trace().Ctx(ctx).Interface("data", data).Msg(msg)
 	case tracelog.LogLevelDebug:
-		l.log.Debug().Interface("data", data).Msg(msg)
+		l.log.Debug().Ctx(ctx).Interface("data", data).Msg(msg)
 	case tracelog.LogLevelInfo:
-		l.log.Info().Interface("data", data).Msg(msg)
+		l.log.Info().Ctx(ctx).Interface("data", data).Msg(msg)
 	case tracelog.LogLevelWarn:
-		l.log.Warn().Interface("data", data).Msg(msg)
+		l.log.Warn().Ctx(ctx).Interface("data", data).Msg(msg)
 	case tracelog.LogLevelError:
-		l.log.Error().Interface("data", data).Msg(msg)
+		l.log.Error().Ctx(ctx).Interface("data", data).Msg(msg)
 	}
+}
+
+// LogQuery custom method to log SQL, for future use in Log
+func (db *DB) LogQuery(ctx context.Context, query string, args interface{}) {
+	// ToDo
+	// Replace $1,$2 with values
+	q := strings.ReplaceAll(
+		strings.ReplaceAll(
+			strings.ReplaceAll(
+				strings.ReplaceAll(query, "\t", " "),
+				"  ", " "),
+			"  ", " "),
+		"\n", " ")
+
+	db.Log.Trace().Ctx(ctx).Msgf("query: %s, %v", q, args)
 }
