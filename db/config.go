@@ -1,13 +1,15 @@
 package db
 
 // Type represent storage engine type
-type Type string
-type Active string
+type (
+	Type   string
+	Active string
+)
 
 var (
 	Postgres Type   = "postgres"
 	MySQL    Type   = "mysql"
-	SqlLite  Type   = "sqllite"
+	SQLLite  Type   = "sqllite"
 	Enable   Active = "enable"
 	Disable  Active = "disable"
 )

@@ -42,7 +42,6 @@ func (PubSubF PubSubFixturesManager) CleanAndApply(fixtures []PubSubFixture) err
 	// Push data to the subscriptions
 	// return PubSubF.LoadFixtures(fixtures)
 	return nil
-
 }
 
 func (PubSubF PubSubFixturesManager) Clean(topic string, subscription string) error {

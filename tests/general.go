@@ -203,9 +203,9 @@ func GetPointer(str string) *string {
 	return &str
 }
 
-func RunApiTest(t *testing.T, Description string, fixtures FixturesManager, scenarios []ApiTestCase) {
+func RunApiTest(t *testing.T, description string, fixtures FixturesManager, scenarios []ApiTestCase) {
 	for _, scenario := range scenarios {
-		t.Run(scenario.Description, func(t *testing.T) {
+		t.Run(description+": "+scenario.Description, func(t *testing.T) {
 			err := fixtures.CleanAndApply(scenario.Fixtures)
 			if err != nil {
 				assert.Fail(t, "Failed apply fixtures", err)
