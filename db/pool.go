@@ -1,3 +1,4 @@
+//nolint:gochecknoglobals
 package db
 
 import (
@@ -10,18 +11,22 @@ import (
 	"github.com/jackc/pgx/v5/tracelog"
 	"github.com/pkg/errors"
 	"github.com/webdevelop-pro/go-common/configurator"
-	comLogger "github.com/webdevelop-pro/go-logger"
+	"github.com/webdevelop-pro/go-logger"
 )
 
 var (
 	pkgName    = "db"
-	logger     = comLogger.NewComponentLogger(pkgName, nil)
-	maxRetries = uint64(100)
+	maxRetries = 100
 )
 
-func GetConfigPool(c *configurator.Configurator) *pgxpool.Config {
-	cfg := c.New(pkgName, &Config{}, pkgName).(*Config)
-	pgConfig, err := pgxpool.ParseConfig(GetConnString(cfg))
+func GetConfigPool(logger logger.Logger) *pgxpool.Config {
+	cfg := Config{}
+
+	err := configurator.NewConfiguration(&cfg, pkgName)
+	if err != nil {
+		logger.Fatal().Stack().Err(err).Msg("Cannot parse config")
+	}
+	pgConfig, err := pgxpool.ParseConfig(GetConnString(&cfg))
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed to parse config")
 	}
@@ -59,16 +64,18 @@ func GetConnString(cfg *Config) string {
 }
 
 // NewPool is constructor for pgxpool.Pool
-func NewPool(c *configurator.Configurator) *pgxpool.Pool {
-	return newPool(GetConfigPool(c))
+func NewPool() *pgxpool.Pool {
+	logger := logger.NewComponentLogger(pkgName, nil)
+
+	return newPool(GetConfigPool(logger), logger)
 }
 
 // NewPoolFromConfig is constructor for pgxpool.Pool
-func NewPoolFromConfig(pgConfig *pgxpool.Config) *pgxpool.Pool {
-	return newPool(pgConfig)
+func NewPoolFromConfig(pgConfig *pgxpool.Config, logger logger.Logger) *pgxpool.Pool {
+	return newPool(pgConfig, logger)
 }
 
-func newPool(pgConfig *pgxpool.Config) *pgxpool.Pool {
+func newPool(pgConfig *pgxpool.Config, logger logger.Logger) *pgxpool.Pool {
 	var pg *pgxpool.Pool
 	var err error
 	ctx := context.TODO()
@@ -79,7 +86,7 @@ func newPool(pgConfig *pgxpool.Config) *pgxpool.Pool {
 			return pgxpool.NewWithConfig(ctx, pgConfig)
 		},
 		backoff.WithContext(
-			backoff.WithMaxRetries(backoff.NewExponentialBackOff(), maxRetries),
+			backoff.WithMaxRetries(backoff.NewExponentialBackOff(), uint64(maxRetries)),
 			ctx,
 		),
 	)

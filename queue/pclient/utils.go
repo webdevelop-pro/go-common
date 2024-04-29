@@ -9,7 +9,7 @@ import (
 	"github.com/webdevelop-pro/go-common/context/keys"
 )
 
-func GetIpAddress(headers http.Header) string {
+func GetIPAddress(headers http.Header) string {
 	ip := "127.0.0.1"
 	if xOFF := headers.Get("X-Original-Forwarded-For"); xOFF != "" {
 		i := strings.Index(xOFF, ", ")
@@ -41,7 +41,7 @@ func SetDefaultWebhookCtx(ctx context.Context, webhook Webhook) context.Context 
 	headers := http.Header(webhook.Headers)
 
 	requestID := headers.Get(echo.HeaderXRequestID)
-	IP := GetIpAddress(headers)
+	IP := GetIPAddress(headers)
 
 	ctx = keys.SetCtxValue(ctx, keys.RequestID, requestID)
 	ctx = keys.SetCtxValue(ctx, keys.IPAddress, IP)

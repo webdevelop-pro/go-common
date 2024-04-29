@@ -1,5 +1,5 @@
 //nolint:paralleltest,thelper
-package test
+package tests
 
 import (
 	"os"
@@ -11,25 +11,10 @@ import (
 	. "github.com/webdevelop-pro/go-common/tests"
 )
 
-/*
-PROBLEM:
-
-- this line set up INCORRECT envs for me
-- so I cannot run test with it
-
-func TestMain(m *testing.M) {
-	LoadEnv(".env.tests")
-
-	// go start.Server()
-
-	os.Exit(m.Run())
-}
-*/
-
 func TestExample(t *testing.T) {
-	RunApiTestV2(t,
+	RunAPITestV2(t,
 		"",
-		ApiTestCaseV2{
+		APITestCaseV2{
 			Description: "HTTP & PubSub example",
 			Fixtures:    []Fixture{},
 			PubSubFixtures: []PubSubFixture{
@@ -65,7 +50,7 @@ func TestExample(t *testing.T) {
 					},
 					map[string]string{},
 				),
-				SendHttpRequst(
+				SendHTTPRequst(
 					Request{
 						Scheme: "https",
 						Host:   "google.com",
@@ -95,7 +80,7 @@ func TestExample(t *testing.T) {
 
 // TestAny word %any% allow to have any string
 func TestAny(t *testing.T) {
-	CompareJsonBody(
+	CompareJSONBody(
 		t,
 		[]byte(`{"nc_issuer_id":"10010949", "nc_issuer_status":"Pending"}`),
 		[]byte(`{"nc_issuer_id":"%any%", "nc_issuer_status":"Pending"}`),

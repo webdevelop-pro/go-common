@@ -42,7 +42,7 @@ func TestLoggerCtx(t *testing.T) {
 	middleware.SetLogger(func(c echo.Context) error {
 		ctx := c.Request().Context()
 
-		logInfo, _ = ctx.Value(logger.ServiceContextInfo).(logger.ServiceContext)
+		logInfo, _ = keys.GetCtxValue(ctx, keys.LogInfo).(logger.ServiceContext)
 
 		return nil
 	})(echoCtx)

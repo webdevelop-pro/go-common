@@ -5,7 +5,6 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/pkg/errors" // Error with stack trace
-	"github.com/webdevelop-pro/go-common/configurator"
 	comLogger "github.com/webdevelop-pro/go-logger"
 )
 
@@ -18,8 +17,10 @@ type DB struct {
 }
 
 // New returns new DB instance.
-func New(c *configurator.Configurator) *DB {
-	return NewDB(NewPool(c), logger)
+func New() *DB {
+	logger := comLogger.NewComponentLogger(pkgName, nil)
+
+	return NewDB(NewPool(), logger)
 }
 
 // NewDB returns new DB instance.

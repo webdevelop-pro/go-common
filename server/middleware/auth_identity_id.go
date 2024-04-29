@@ -11,19 +11,19 @@ import (
 	logger "github.com/webdevelop-pro/go-logger"
 )
 
-type authIdentityHeaderMiddleware struct {
+type AuthIdentityHeaderMiddleware struct {
 	log logger.Logger
 }
 
-func NewAuthIdentityHeaderMW() AuthMiddleware {
+func NewAuthIdentityHeaderMW() *AuthIdentityHeaderMiddleware {
 	l := logger.NewComponentLogger("auth_tool", nil)
 
-	return &authIdentityHeaderMiddleware{
+	return &AuthIdentityHeaderMiddleware{
 		log: l,
 	}
 }
 
-func (m *authIdentityHeaderMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
+func (m *AuthIdentityHeaderMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		identityID := c.Request().Header.Get("Authorization")
 

@@ -31,9 +31,9 @@ func NewPubSubFixturesManager(client *pclient.Client) PubSubFixturesManager {
 	}
 }
 
-func (PubSubF PubSubFixturesManager) CleanAndApply(fixtures []PubSubFixture) error {
+func (pubSubF PubSubFixturesManager) CleanAndApply(fixtures []PubSubFixture) error {
 	for _, fixture := range fixtures {
-		err := PubSubF.Clean(fixture.topic, fixture.subscription)
+		err := pubSubF.Clean(fixture.topic, fixture.subscription)
 		if err != nil {
 			return err
 		}
@@ -44,35 +44,35 @@ func (PubSubF PubSubFixturesManager) CleanAndApply(fixtures []PubSubFixture) err
 	return nil
 }
 
-func (PubSubF PubSubFixturesManager) Clean(topic string, subscription string) error {
+func (pubSubF PubSubFixturesManager) Clean(topic string, subscription string) error {
 	ctx := context.Background()
-	ok, err := PubSubF.client.SubscriptionExist(ctx, subscription)
+	ok, err := pubSubF.client.SubscriptionExist(ctx, subscription)
 	if err != nil {
 		return fmt.Errorf("failed check subscription: %w", err)
 	}
 	if ok {
-		err := PubSubF.client.DeleteSubscription(ctx, subscription)
+		err := pubSubF.client.DeleteSubscription(ctx, subscription)
 		if err != nil {
 			return fmt.Errorf("failed delete subscription: %w", err)
 		}
 	}
-	ok, err = PubSubF.client.TopicExist(ctx, topic)
+	ok, err = pubSubF.client.TopicExist(ctx, topic)
 	if err != nil {
 		return fmt.Errorf("failed check topic: %w", err)
 	}
 	if ok {
-		err = PubSubF.client.DeleteTopic(ctx, topic)
+		err = pubSubF.client.DeleteTopic(ctx, topic)
 		if err != nil {
 			return fmt.Errorf("failed delete topic: %w", err)
 		}
 	}
 
-	_, err = PubSubF.client.CreateTopic(ctx, topic)
+	_, err = pubSubF.client.CreateTopic(ctx, topic)
 	if err != nil {
 		return fmt.Errorf("failed create topic: %w", err)
 	}
 
-	_, err = PubSubF.client.CreateSubscription(ctx, subscription, topic)
+	_, err = pubSubF.client.CreateSubscription(ctx, subscription, topic)
 	if err != nil {
 		return fmt.Errorf("failed create subscription: %w", err)
 	}

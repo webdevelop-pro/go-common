@@ -16,7 +16,7 @@ import (
 	"go.uber.org/fx"
 )
 
-type HttpServer struct {
+type HTTPServer struct {
 	Echo     *echo.Echo
 	log      logger.Logger
 	config   *Config
@@ -36,7 +36,7 @@ type Route struct {
 }
 
 // AddRoute adds route to the router.
-func (h *HttpServer) AddRoute(route Route) {
+func (h *HTTPServer) AddRoute(route Route) {
 	handle := route.Handle
 
 	if h.authTool != nil && !route.NoAuth {
@@ -47,12 +47,12 @@ func (h *HttpServer) AddRoute(route Route) {
 }
 
 // SetAuthMiddleware sets auth middleware to the router.
-func (h *HttpServer) SetAuthMiddleware(authTool middleware.AuthMiddleware) {
+func (h *HTTPServer) SetAuthMiddleware(authTool middleware.AuthMiddleware) {
 	h.authTool = authTool
 }
 
-// NewHttpServer returns new API instance.
-func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool middleware.AuthMiddleware) *HttpServer {
+// NewHTTPServer returns new API instance.
+func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool middleware.AuthMiddleware) *HTTPServer {
 	// sets CORS headers if Origin is present
 	e.Use(
 		echoMW.CORSWithConfig(echoMW.CORSConfig{
@@ -98,7 +98,7 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool middlewa
 	e.HidePort = true          // hide log about port server started on
 	e.Logger.SetLevel(log.OFF) // disable echo#Logger
 
-	return &HttpServer{
+	return &HTTPServer{
 		Echo:     e,
 		config:   cfg,
 		log:      l,
@@ -106,7 +106,7 @@ func NewHttpServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool middlewa
 	}
 }
 
-func New(authTool middleware.AuthMiddleware) *HttpServer {
+func New(authTool middleware.AuthMiddleware) *HTTPServer {
 	cfg := &Config{}
 	l := logger.NewComponentLogger("http_server", nil)
 
@@ -114,11 +114,11 @@ func New(authTool middleware.AuthMiddleware) *HttpServer {
 		l.Fatal().Err(err).Msg("failed to get configuration of server")
 	}
 
-	return NewHttpServer(echo.New(), l, cfg, authTool)
+	return NewHTTPServer(echo.New(), l, cfg, authTool)
 }
 
 // StartServer is function that registers start of http server in lifecycle
-func StartServer(lc fx.Lifecycle, srv *HttpServer) {
+func StartServer(lc fx.Lifecycle, srv *HTTPServer) {
 	lc.Append(
 		fx.Hook{
 			OnStart: func(ctx context.Context) error {

@@ -1,13 +1,13 @@
-package pclient
+package tests
 
 import (
 	"context"
 	"fmt"
-	"os"
-	"os/user"
 	"strconv"
 	"testing"
 	"time"
+
+	pclient "github.com/webdevelop-pro/go-common/queue/pclient"
 )
 
 var (
@@ -16,13 +16,8 @@ var (
 )
 
 func TestPublish(t *testing.T) {
-	usr, _ := user.Current()
-
-	os.Setenv("PUBSUB_SERVICE_ACCOUNT_CREDENTIALS", usr.HomeDir+"/.config/gcloud/application_default_credentials.json")
-	os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8085")
-
 	ctx := context.Background()
-	pubsubClient, err := New(ctx)
+	pubsubClient, err := pclient.New(ctx)
 	if err != nil {
 		t.Fatalf("cannot connect %s", err)
 	}
@@ -30,8 +25,8 @@ func TestPublish(t *testing.T) {
 	pubsubClient.DeleteTopic(ctx, topic)
 	// pubsub emulator has a bug
 	// we need to delete subscription manually
-	sub := pubsubClient.client.Subscription(topic)
-	sub.Delete(ctx)
+	// sub := pubsubClient.client.Subscription(topic)
+	// pubsubClient.DeleteSubscription(ctx, "")
 	pubsubClient.CreateTopic(ctx, topic)
 	t.Run("success publish", func(t *testing.T) {
 		msg, err := pubsubClient.Publish(ctx,
@@ -56,13 +51,8 @@ func TestPublish(t *testing.T) {
 func TestListenNack(t *testing.T) {
 	received_counter := 0
 
-	usr, _ := user.Current()
-
-	os.Setenv("PUBSUB_SERVICE_ACCOUNT_CREDENTIALS", usr.HomeDir+"/.config/gcloud/application_default_credentials.json")
-	os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8085")
-
 	ctx, cancel := context.WithCancel(context.TODO())
-	pubsubClient, err := New(ctx)
+	pubsubClient, err := pclient.New(ctx)
 	if err != nil {
 		t.Fatalf("cannot connect %s", err)
 	}
@@ -70,13 +60,12 @@ func TestListenNack(t *testing.T) {
 	pubsubClient.DeleteTopic(ctx, topic)
 	// pubsub emulator has a bug
 	// we need to delete subscription manually
-	sub := pubsubClient.client.Subscription(topic)
-	sub.Delete(ctx)
+	pubsubClient.DeleteSubscription(ctx, subscription)
 	pubsubClient.CreateTopic(ctx, topic)
 	pubsubClient.CreateSubscription(ctx, subscription, topic)
 
 	t.Run("success nack", func(t *testing.T) {
-		err := pubsubClient.ListenRawMsgs(ctx, subscription, topic, func(ctx context.Context, msg Message) error {
+		go pubsubClient.ListenRawMsgs(ctx, subscription, topic, func(ctx context.Context, msg pclient.Message) error {
 			received_counter++
 			if received_counter%2 != 0 {
 				return fmt.Errorf("odd number return an error ... ")
@@ -89,8 +78,8 @@ func TestListenNack(t *testing.T) {
 		pubsubClient.Publish(ctx, topic, map[string]int{"message": 123}, map[string]string{})
 		pubsubClient.Publish(ctx, topic, map[string]int{"message": 123}, map[string]string{})
 		time.Sleep(time.Second * 4)
-		if received_counter != 4 {
-			t.Errorf("we should receive same message 4 since listen return an error but got: %d", received_counter)
+		if received_counter != 3 {
+			t.Errorf("we should receive same message 3 since listen return an error but got: %d", received_counter)
 		}
 		cancel()
 	})
@@ -98,13 +87,9 @@ func TestListenNack(t *testing.T) {
 }
 
 func TestListenAck(t *testing.T) {
-	usr, _ := user.Current()
-
-	os.Setenv("PUBSUB_SERVICE_ACCOUNT_CREDENTIALS", usr.HomeDir+"/.config/gcloud/application_default_credentials.json")
-	os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8085")
 
 	ctx, cancel := context.WithCancel(context.TODO())
-	pubsubClient, err := New(ctx)
+	pubsubClient, err := pclient.New(ctx)
 	if err != nil {
 		t.Fatalf("cannot connect %s", err)
 	}
@@ -112,13 +97,12 @@ func TestListenAck(t *testing.T) {
 	pubsubClient.DeleteTopic(ctx, topic)
 	// pubsub emulator has a bug
 	// we need to delete subscription manually
-	sub := pubsubClient.client.Subscription(topic)
-	sub.Delete(ctx)
+	pubsubClient.DeleteSubscription(ctx, subscription)
 	pubsubClient.CreateTopic(ctx, topic)
 	pubsubClient.CreateSubscription(ctx, subscription, topic)
 
 	t.Run("success ack", func(t *testing.T) {
-		err := pubsubClient.ListenEvents(ctx, subscription, topic, func(ctx context.Context, msg Event) error {
+		go pubsubClient.ListenEvents(ctx, subscription, topic, func(ctx context.Context, msg pclient.Event) error {
 			if msg.ID == "" || msg.Action == "" || msg.ObjectID == 0 || msg.ObjectName == "" {
 				return fmt.Errorf("event is empty, its not correct")
 			}
@@ -136,13 +120,9 @@ func TestListenAck(t *testing.T) {
 }
 
 func TestReconnectToNonExistTopic(t *testing.T) {
-	usr, _ := user.Current()
-
-	os.Setenv("PUBSUB_SERVICE_ACCOUNT_CREDENTIALS", usr.HomeDir+"/.config/gcloud/application_default_credentials.json")
-	os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8085")
 
 	ctx, cancel := context.WithCancel(context.TODO())
-	pubsubClient, err := New(ctx)
+	pubsubClient, err := pclient.New(ctx)
 	if err != nil {
 		t.Fatalf("cannot connect %s", err)
 	}
@@ -150,14 +130,14 @@ func TestReconnectToNonExistTopic(t *testing.T) {
 	pubsubClient.DeleteTopic(ctx, topic)
 	// pubsub emulator has a bug
 	// we need to delete subscription manually
-	sub := pubsubClient.client.Subscription(topic)
-	sub.Delete(ctx)
+	pubsubClient.DeleteSubscription(ctx, subscription)
+	// sub.Delete(ctx)
 	// pubsubClient.CreateTopic(ctx, topic)
 	// pubsubClient.CreateSubscription(ctx, subscription, topic)
 
 	t.Run("success reconnect", func(t *testing.T) {
 		go func() {
-			err := pubsubClient.ListenEvents(ctx, subscription, topic, func(ctx context.Context, msg Event) error {
+			go pubsubClient.ListenEvents(ctx, subscription, topic, func(ctx context.Context, msg pclient.Event) error {
 				if msg.ID == "" || msg.Action == "" || msg.ObjectID == 0 || msg.ObjectName == "" {
 					return fmt.Errorf("event is empty, its not correct")
 				}

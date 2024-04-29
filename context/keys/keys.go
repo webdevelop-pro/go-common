@@ -12,6 +12,7 @@ const (
 	IPAddress
 	MSGID
 	IdentityID
+	LogInfo
 )
 
 func GetCtxValue(ctx context.Context, key ContextKey) any {

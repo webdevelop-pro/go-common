@@ -5,19 +5,19 @@ import (
 	logger "github.com/webdevelop-pro/go-logger"
 )
 
-type fakeIdentityHeaderMiddleware struct {
+type FakeIdentityHeaderMiddleware struct {
 	log logger.Logger
 }
 
-func NewFakeIdentityHeaderMW() AuthMiddleware {
+func NewFakeIdentityHeaderMW() *FakeIdentityHeaderMiddleware {
 	l := logger.NewComponentLogger("auth_tool", nil)
 
-	return &fakeIdentityHeaderMiddleware{
+	return &FakeIdentityHeaderMiddleware{
 		log: l,
 	}
 }
 
-func (m *fakeIdentityHeaderMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
+func (m *FakeIdentityHeaderMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		return next(c)
 	}

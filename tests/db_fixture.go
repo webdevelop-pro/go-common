@@ -42,7 +42,7 @@ func NewFixturesManager() FixturesManager {
 
 	configurator.New("postgres", &cfg, "db")
 
-	db := db.New(configurator)
+	db := db.New()
 
 	return FixturesManager{
 		db:  db,

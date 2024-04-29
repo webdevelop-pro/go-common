@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/pkg/errors"
-
 	"github.com/go-playground/validator/v10"
+	"github.com/pkg/errors"
 	"github.com/webdevelop-pro/go-common/server/response"
 )
 

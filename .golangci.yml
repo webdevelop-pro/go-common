@@ -24,6 +24,12 @@ linters:
     - wsl
     - tagalign
     - varnamelen
+    - godox
+    - funlen
+    - gocognit
+    - interfacebloat
+    - cyclop
+    - dupl
 
 linters-settings:
   cyclop:

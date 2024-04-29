@@ -5,19 +5,19 @@ import (
 	logger "github.com/webdevelop-pro/go-logger"
 )
 
-type authNoneMiddleware struct {
+type AuthNoneMiddleware struct {
 	log logger.Logger
 }
 
-func NewAuthNoneMW() AuthMiddleware {
+func NewAuthNoneMW() *AuthNoneMiddleware {
 	l := logger.NewComponentLogger("auth_tool", nil)
 
-	return &authNoneMiddleware{
+	return &AuthNoneMiddleware{
 		log: l,
 	}
 }
 
-func (m *authNoneMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
+func (m *AuthNoneMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		return next(c)
 	}

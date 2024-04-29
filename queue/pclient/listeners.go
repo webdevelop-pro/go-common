@@ -80,7 +80,11 @@ func (b *Client) getSubscription(ctx context.Context, subscription, topic string
 	return sub, nil
 }
 
-func (b *Client) ListenRawMsgs(ctx context.Context, subscription, topic string, callback func(ctx context.Context, msg Message) error) error {
+func (b *Client) ListenRawMsgs(
+	ctx context.Context,
+	subscription, topic string,
+	callback func(ctx context.Context, msg Message) error,
+) error {
 	sub, err := b.getSubscriptionRetry(ctx, subscription, topic)
 	if err != nil {
 		return err
@@ -88,7 +92,11 @@ func (b *Client) ListenRawMsgs(ctx context.Context, subscription, topic string, 
 	return b.listenRawGoroutine(ctx, callback, sub)
 }
 
-func (b *Client) listenRawGoroutine(ctx context.Context, callback func(ctx context.Context, msg Message) error, sub *gpubsub.Subscription) error {
+func (b *Client) listenRawGoroutine(
+	ctx context.Context,
+	callback func(ctx context.Context, msg Message) error,
+	sub *gpubsub.Subscription,
+) error {
 	// Start consuming messages from the subscription
 	b.log.Trace().Msgf("connected to subscription %s listen messages", sub.ID())
 	err := sub.Receive(ctx, func(ctx context.Context, msg *gpubsub.Message) {
@@ -117,7 +125,11 @@ func (b *Client) listenRawGoroutine(ctx context.Context, callback func(ctx conte
 	return err
 }
 
-func (b *Client) ListenWebhooks(ctx context.Context, subscription, topic string, callback func(ctx context.Context, msg Webhook) error) error {
+func (b *Client) ListenWebhooks(
+	ctx context.Context, subscription,
+	topic string,
+	callback func(ctx context.Context, msg Webhook) error,
+) error {
 	sub, err := b.getSubscriptionRetry(ctx, subscription, topic)
 	if err != nil {
 		return err
@@ -126,7 +138,11 @@ func (b *Client) ListenWebhooks(ctx context.Context, subscription, topic string,
 	return b.listenWebhookGoroutine(ctx, callback, sub)
 }
 
-func (b *Client) listenWebhookGoroutine(ctx context.Context, callback func(ctx context.Context, msg Webhook) error, sub *gpubsub.Subscription) error {
+func (b *Client) listenWebhookGoroutine(
+	ctx context.Context,
+	callback func(ctx context.Context, msg Webhook) error,
+	sub *gpubsub.Subscription,
+) error {
 	// Start consuming messages from the subscription
 	b.log.Trace().Msgf("connected to subscription %s listen for webhooks", sub.ID())
 	err := sub.Receive(ctx, func(ctx context.Context, msg *gpubsub.Message) {
@@ -157,7 +173,12 @@ func (b *Client) listenWebhookGoroutine(ctx context.Context, callback func(ctx c
 	return err
 }
 
-func (b *Client) ListenEvents(ctx context.Context, subscription, topic string, callback func(ctx context.Context, msg Event) error) error {
+func (b *Client) ListenEvents(
+	ctx context.Context,
+	subscription,
+	topic string,
+	callback func(ctx context.Context, msg Event) error,
+) error {
 	sub, err := b.getSubscriptionRetry(ctx, subscription, topic)
 	if err != nil {
 		return err
@@ -165,7 +186,11 @@ func (b *Client) ListenEvents(ctx context.Context, subscription, topic string, c
 	return b.listenEventGoroutine(ctx, callback, sub)
 }
 
-func (b *Client) listenEventGoroutine(ctx context.Context, callback func(ctx context.Context, msg Event) error, sub *gpubsub.Subscription) error {
+func (b *Client) listenEventGoroutine(
+	ctx context.Context,
+	callback func(ctx context.Context, msg Event) error,
+	sub *gpubsub.Subscription,
+) error {
 	// Start consuming messages from the subscription
 	b.log.Trace().Msgf("connected to subscription %s listen for events", sub.ID())
 	err := sub.Receive(ctx, func(ctx context.Context, msg *gpubsub.Message) {

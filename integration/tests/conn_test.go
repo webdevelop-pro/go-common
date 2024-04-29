@@ -1,21 +1,19 @@
-package db
+package tests
 
 import (
 	"context"
 	"testing"
 
-	"github.com/webdevelop-pro/go-common/configurator"
+	"github.com/webdevelop-pro/go-common/db"
 )
 
 func TestNewConn(t *testing.T) {
-	c := configurator.NewConfigurator()
-
 	// ToDo
 	// NewConn should accept context
 	// ToDo
 	// NewConn should return an error
 	// ctx := metadata.NewContext(context.Background(), meta)
-	conn := NewConn(c)
+	conn := db.NewConn()
 	var name string
 	err := conn.QueryRow(context.Background(), "select 'test'").Scan(&name)
 	if err != nil {
