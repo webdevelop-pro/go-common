@@ -18,7 +18,7 @@ type DB struct {
 
 // New returns new DB instance.
 func New() *DB {
-	logger := comLogger.NewComponentLogger(nil, pkgName)
+	logger := comLogger.NewComponentLogger(context.TODO(), pkgName)
 
 	return NewDB(NewPool(), logger)
 }

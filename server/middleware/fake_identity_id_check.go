@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"context"
+
 	"github.com/labstack/echo/v4"
 	logger "github.com/webdevelop-pro/go-logger"
 )
@@ -10,7 +12,7 @@ type FakeIdentityHeaderMiddleware struct {
 }
 
 func NewFakeIdentityHeaderMW() *FakeIdentityHeaderMiddleware {
-	l := logger.NewComponentLogger(nil, "auth_tool")
+	l := logger.NewComponentLogger(context.TODO(), "auth_tool")
 
 	return &FakeIdentityHeaderMiddleware{
 		log: l,

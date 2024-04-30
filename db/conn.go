@@ -39,14 +39,14 @@ func GetConfigConn(logger logger.Logger) *pgx.ConnConfig {
 
 // NewConn is constructor for *pgx.Conn
 func NewConn() *pgx.Conn {
-	logger := logger.NewComponentLogger(nil, pkgName)
+	logger := logger.NewComponentLogger(context.TODO(), pkgName)
 
 	return newConn(GetConfigConn(logger), logger)
 }
 
 // NewConnFromConfig is constructor for *pgx.Conn
 func NewConnFromConfig(pgConfig *pgx.ConnConfig) *pgx.Conn {
-	logger := logger.NewComponentLogger(nil, pkgName)
+	logger := logger.NewComponentLogger(context.TODO(), pkgName)
 
 	return newConn(pgConfig, logger)
 }

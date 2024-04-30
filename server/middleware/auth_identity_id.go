@@ -16,7 +16,7 @@ type AuthIdentityHeaderMiddleware struct {
 }
 
 func NewAuthIdentityHeaderMW() *AuthIdentityHeaderMiddleware {
-	l := logger.NewComponentLogger(nil, "auth_tool")
+	l := logger.NewComponentLogger(context.TODO(), "auth_tool")
 
 	return &AuthIdentityHeaderMiddleware{
 		log: l,

@@ -108,7 +108,7 @@ func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool middlewa
 
 func New(authTool middleware.AuthMiddleware) *HTTPServer {
 	cfg := &Config{}
-	l := logger.NewComponentLogger(nil, "http_server")
+	l := logger.NewComponentLogger(context.TODO(), "http_server")
 
 	if err := configurator.NewConfiguration(cfg); err != nil {
 		l.Fatal().Err(err).Msg("failed to get configuration of server")

@@ -65,7 +65,7 @@ func GetConnString(cfg *Config) string {
 
 // NewPool is constructor for pgxpool.Pool
 func NewPool() *pgxpool.Pool {
-	logger := logger.NewComponentLogger(nil, pkgName)
+	logger := logger.NewComponentLogger(context.TODO(), pkgName)
 
 	return newPool(GetConfigPool(logger), logger)
 }
