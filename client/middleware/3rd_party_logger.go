@@ -1,4 +1,4 @@
-package client_middleware
+package clientmiddleware
 
 import (
 	"bytes"
@@ -8,13 +8,12 @@ import (
 	"strconv"
 	"time"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/motemen/go-loghttp"
 	"github.com/webdevelop-pro/go-common/context/keys"
 	"github.com/webdevelop-pro/go-logger"
-
-	sq "github.com/Masterminds/squirrel"
 )
 
 type DB interface {
@@ -22,13 +21,13 @@ type DB interface {
 	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 }
 
-func CreateHttpClient(serviceName string, pgPool DB) *http.Client {
-	log := logger.NewComponentLogger(nil, serviceName)
+func CreateHTTPClient(serviceName string, pgPool DB) *http.Client {
+	log := logger.NewComponentLogger(context.TODO(), serviceName)
 
 	return &http.Client{
 		Transport: &loghttp.Transport{
 			LogRequest:  logRequest(log, serviceName, pgPool),
-			LogResponse: logResponse(log, serviceName, pgPool),
+			LogResponse: logResponse(log, serviceName, pgPool), //nolint:bodyclose
 		},
 	}
 }
@@ -63,7 +62,8 @@ func logRequest(log logger.Logger, serviceName string, pgPool DB) func(req *http
 
 		sql := `
 			INSERT INTO log_logs(
-				service, "type", content_type_id, object_id, path, request_created_at, request_id, request_headers, request_data, msg_id
+				service, "type", content_type_id, object_id, path,
+				request_created_at, request_id, request_headers, request_data, msg_id
 			) VALUES (
 				$1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 			) RETURNING id
@@ -108,7 +108,7 @@ func logRequest(log logger.Logger, serviceName string, pgPool DB) func(req *http
 
 func logResponse(log logger.Logger, serviceName string, pgPool DB) func(req *http.Response) {
 	return func(resp *http.Response) {
-		logID := resp.Request.Context().Value(keys.RequestLogID).(int)
+		logID, _ := resp.Request.Context().Value(keys.RequestLogID).(int)
 
 		sql := `
 			UPDATE log_logs
@@ -127,7 +127,8 @@ func logResponse(log logger.Logger, serviceName string, pgPool DB) func(req *htt
 		}
 
 		// TODO: Use the same format for incoming logs
-		log.Debug().Str("path", resp.Request.RequestURI).Int("logID", logID).Str("service", serviceName).Msg("3rd party request finished")
+		log.Debug().Str("path", resp.Request.RequestURI).
+			Int("logID", logID).Str("service", serviceName).Msg("3rd party request finished")
 
 		_, err := pgPool.Exec(
 			resp.Request.Context(),
