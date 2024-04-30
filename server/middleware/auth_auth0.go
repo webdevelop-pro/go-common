@@ -29,14 +29,14 @@ type Config struct {
 func NewAuth0MW(cfg *Config) *Auth0Middleware {
 	return &Auth0Middleware{
 		validateURI: cfg.AuthValidateURI,
-		log:         logger.NewComponentLogger("auth_tool", nil),
+		log:         logger.NewComponentLogger(nil, "auth_tool"),
 	}
 }
 
 // NewAuthMiddleware returns a new instance of AuthMiddleware
 func NewAuthMiddleware() *Auth0Middleware {
 	cfg := &Config{}
-	l := logger.NewComponentLogger("auth_tool", nil)
+	l := logger.NewComponentLogger(nil, "auth_tool")
 
 	if err := configurator.NewConfiguration(cfg); err != nil {
 		l.Fatal().Err(err).Msg("failed to get configuration of db")

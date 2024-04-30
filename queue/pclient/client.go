@@ -25,7 +25,7 @@ type Client struct {
 
 func New(ctx context.Context) (Client, error) {
 	cfg := Config{}
-	log := logger.NewComponentLogger(pkgName, ctx)
+	log := logger.NewComponentLogger(ctx, pkgName)
 
 	err := configurator.NewConfiguration(&cfg, "pubsub")
 	if err != nil {

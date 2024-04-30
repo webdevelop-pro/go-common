@@ -10,7 +10,7 @@ type AuthNoneMiddleware struct {
 }
 
 func NewAuthNoneMW() *AuthNoneMiddleware {
-	l := logger.NewComponentLogger("auth_tool", nil)
+	l := logger.NewComponentLogger(nil, "auth_tool")
 
 	return &AuthNoneMiddleware{
 		log: l,

@@ -15,7 +15,7 @@ func LogRequests(next echo.HandlerFunc) echo.HandlerFunc {
 		// ignore healthcheck requests
 		if c.Request().URL.Path != "/healthcheck" {
 			// create sub logger
-			log := logger.NewComponentLogger("log-requests", c.Request().Context())
+			log := logger.NewComponentLogger(c.Request().Context(), "log-requests")
 			// enrich context
 			raw, _ := io.ReadAll(c.Request().Body)
 			c.Request().Body = io.NopCloser(bytes.NewReader(raw))

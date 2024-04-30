@@ -10,7 +10,7 @@ type FakeIdentityHeaderMiddleware struct {
 }
 
 func NewFakeIdentityHeaderMW() *FakeIdentityHeaderMiddleware {
-	l := logger.NewComponentLogger("auth_tool", nil)
+	l := logger.NewComponentLogger(nil, "auth_tool")
 
 	return &FakeIdentityHeaderMiddleware{
 		log: l,

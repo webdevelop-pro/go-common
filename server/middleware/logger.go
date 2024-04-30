@@ -27,9 +27,9 @@ func SetLogger(next echo.HandlerFunc) echo.HandlerFunc {
 			User:      identityID,
 			RequestID: requestID,
 			MSGID:     msgID,
-			HttpRequest: &logger.HttpRequestContext{
+			HTTPRequest: &logger.HTTPRequestContext{
 				Method:    c.Request().Method,
-				RemoteIp:  ipAddress,
+				RemoteIP:  ipAddress,
 				URL:       c.Request().RequestURI,
 				UserAgent: c.Request().UserAgent(),
 				Referrer:  c.Request().Referer(),
@@ -39,7 +39,7 @@ func SetLogger(next echo.HandlerFunc) echo.HandlerFunc {
 		ctx = keys.SetCtxValue(ctx, keys.LogInfo, logInfo)
 
 		// create sub logger
-		log := logger.NewComponentLogger("echo", c.Request().Context())
+		log := logger.NewComponentLogger(c.Request().Context(), "echo")
 		// add logger to context
 		ctx = log.WithContext(ctx)
 		// enrich context

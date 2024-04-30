@@ -25,7 +25,7 @@ type PubSubRoute struct {
 }
 
 func New(routes []PubSubRoute) PubSubListener {
-	log := logger.NewComponentLogger("pubsub", nil)
+	log := logger.NewComponentLogger(nil, "pubsub")
 
 	client, err := pclient.New(context.Background())
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/webdevelop-pro/go-common/context/keys"
 	"github.com/webdevelop-pro/go-common/tests"
 	"github.com/webdevelop-pro/go-logger"
 
@@ -27,16 +28,16 @@ func CreateTestContext() context.Context {
 		User:      "test-test-test",
 		RequestID: "req-1",
 		MSGID:     "msg-1",
-		HttpRequest: &logger.HttpRequestContext{
+		HTTPRequest: &logger.HTTPRequestContext{
 			Method:    "POST",
-			RemoteIp:  "0.0.0.0",
+			RemoteIP:  "0.0.0.0",
 			URL:       "https://test",
 			UserAgent: "test-agent",
 			Referrer:  "test-Referrer",
 		},
 	}
 
-	return context.WithValue(context.Background(), logger.ServiceContextInfo, logInfo)
+	return keys.SetCtxValue(context.Background(), keys.LogInfo, logInfo)
 }
 
 func TestLogger_DBQuery(t *testing.T) {

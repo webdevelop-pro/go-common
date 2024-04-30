@@ -17,7 +17,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.32.0
 	github.com/stretchr/testify v1.9.0
-	go.uber.org/fx v1.21.0
+	go.uber.org/fx v1.21.1
 )
 
 require (
@@ -71,7 +71,7 @@ require (
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	github.com/webdevelop-pro/go-logger v0.0.0-20240424212831-8b50965ecc9c
+	github.com/webdevelop-pro/go-logger v0.0.0-20240429151913-f53454595854
 	go.uber.org/dig v1.17.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
