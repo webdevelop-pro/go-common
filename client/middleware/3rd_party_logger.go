@@ -23,7 +23,7 @@ type DB interface {
 }
 
 func CreateHttpClient(serviceName string, pgPool DB) *http.Client {
-	log := logger.NewComponentLogger(serviceName, nil)
+	log := logger.NewComponentLogger(nil, serviceName)
 
 	return &http.Client{
 		Transport: &loghttp.Transport{
