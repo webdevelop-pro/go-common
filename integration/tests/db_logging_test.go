@@ -184,7 +184,7 @@ func TestLogger_DBQuery_ERROR(t *testing.T) {
 					"DataTypeName": "",
 					"ConstraintName": "",
 					"File": "parse_relation.c",
-					"Line": 3633,
+					"Line": "%any%",
 					"Routine": "errorMissingColumn"
 				},
 				"pid": "%any%",
