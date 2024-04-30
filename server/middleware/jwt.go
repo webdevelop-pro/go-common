@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -15,25 +15,31 @@ type contextKey int
 
 const jwtKey contextKey = 1
 
+var ErrNotEnoughPartsInToken = errors.New("not enough parts in token")
+
 // JWTPayload is a struct with token claims
 type JWTPayload struct {
 	UserID string `json:"sub"`
 }
 
 // ParseJWTPayload decodes JWT
-func ParseJWTPayload(token string) (pld JWTPayload, err error) {
+func ParseJWTPayload(token string) (JWTPayload, error) {
+	var (
+		pld JWTPayload
+		err error
+	)
 	tokenParts := strings.Split(token, ".")
 
-	if len(tokenParts) != 3 {
-		err = fmt.Errorf("not enough parts in token: %s", token)
-		return
+	if three := 3; len(tokenParts) != three {
+		err = errors.Wrapf(ErrNotEnoughPartsInToken, "token: %s", token)
+		return pld, err
 	}
 
 	err = json.NewDecoder(
 		base64.NewDecoder(base64.RawURLEncoding, strings.NewReader(tokenParts[1])),
 	).Decode(&pld)
 
-	return
+	return pld, err
 }
 
 // SetJWTPayload is a function which set jwt payload to context
@@ -61,7 +67,7 @@ func GetJWTPayload(ctx context.Context) JWTPayload {
 func ExtractTokenFromString(headerAuth string) string {
 	header := strings.Split(headerAuth, " ")
 
-	if len(header) == 2 {
+	if two := 2; len(header) == two {
 		return header[1]
 	}
 

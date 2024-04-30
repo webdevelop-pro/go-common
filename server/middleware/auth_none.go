@@ -1,23 +1,25 @@
 package middleware
 
 import (
+	"context"
+
 	"github.com/labstack/echo/v4"
 	logger "github.com/webdevelop-pro/go-logger"
 )
 
-type authNoneMiddleware struct {
+type AuthNoneMiddleware struct {
 	log logger.Logger
 }
 
-func NewAuthNoneMW() AuthMiddleware {
-	l := logger.NewComponentLogger("auth_tool", nil)
+func NewAuthNoneMW() *AuthNoneMiddleware {
+	l := logger.NewComponentLogger(context.TODO(), "auth_tool")
 
-	return &authNoneMiddleware{
+	return &AuthNoneMiddleware{
 		log: l,
 	}
 }
 
-func (m *authNoneMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
+func (m *AuthNoneMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		return next(c)
 	}

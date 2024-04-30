@@ -1,10 +1,12 @@
 package round
 
 import (
-	"fmt"
+	"errors"
 	"math"
 	"sort"
 )
+
+var ErrRound = errors.New("can't round values to get sum")
 
 type Value interface {
 	GetFloatValue() float64
@@ -109,7 +111,7 @@ func SmartRound(values Values, requiredSum int) error {
 	}
 
 	if diff >= len(values) {
-		return fmt.Errorf("can't round values to get sum = %d", requiredSum)
+		return ErrRound
 	}
 
 	if diff > 0 {

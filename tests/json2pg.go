@@ -11,7 +11,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/pkg/errors"
 )
@@ -49,7 +48,6 @@ func (f FixturesManager) LoadFixture(tableName, fileName string) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
 	var inputData []map[string]interface{}
 	err = json.NewDecoder(file).Decode(&inputData)
 	if err != nil {
@@ -64,7 +62,6 @@ func (f FixturesManager) LoadFixture(tableName, fileName string) error {
 		return err
 	}
 
-	errors := make([]error, 0)
 	var totalInserted int64
 	for rowID, row := range inputData {
 		var valuePlaceholders string
@@ -86,7 +83,9 @@ func (f FixturesManager) LoadFixture(tableName, fileName string) error {
 				switch {
 				// handle number -> timestamp
 				case reflect.TypeOf(v).Kind() == reflect.Float64 && strings.Contains(cols[k], "timestamp"):
-					v = time.Unix(int64(v.(float64)), 0)
+					if fv, ok := v.(float64); ok {
+						v = fv
+					}
 				// handle json/jsonb
 				case reflect.TypeOf(v).Kind() == reflect.Map:
 					b := bytes.NewBuffer(nil)
@@ -95,7 +94,6 @@ func (f FixturesManager) LoadFixture(tableName, fileName string) error {
 						file.Close()
 						e := fmt.Errorf("failed to encode json field %s: %w", k, err)
 						log.Fatal(e.Error())
-						errors = append(errors, e)
 					}
 					v = b.String()
 				}
@@ -105,20 +103,14 @@ func (f FixturesManager) LoadFixture(tableName, fileName string) error {
 		q := fmt.Sprintf(`INSERT INTO %s (%s) VALUES (%s)`, tableName, strings.Join(fields, ","), valuePlaceholders)
 		ct, err := f.db.Exec(context.Background(), q, vals...)
 		if err != nil {
-			e := fmt.Errorf("failed to insert row #%d: %v\n\nquery: %w\n\nvals: %+v", rowID, err, q, vals)
-			errors = append(errors, e)
+			e := fmt.Errorf("failed to insert row #%d: %w\n\nquery: %s\n\nvals: %+v", rowID, err, q, vals)
 			log.Fatal(e.Error())
 		}
 		totalInserted += ct.RowsAffected()
 	}
-	// fmt.Printf("Inserted %d rows into %s\n", totalInserted, tableName)
-	if len(errors) > 0 {
-		fmt.Printf("Errors occured during execution (%d):\n", len(errors))
-		for i, err := range errors {
-			fmt.Printf("#%d\n%s\n", i, err)
-		}
-		os.Exit(1)
-	}
+
+	file.Close()
+
 	return nil
 }
 

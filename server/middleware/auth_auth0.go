@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -15,7 +16,7 @@ type AuthMiddleware interface {
 }
 
 // AuthMiddleware is struct which store instance of auth middleware
-type authMiddleware struct {
+type Auth0Middleware struct {
 	validateURI string
 	log         logger.Logger
 }
@@ -26,23 +27,23 @@ type Config struct {
 }
 
 // NewAuthMW is a constructor of AuthMiddleware
-func NewAuth0MW(cfg *Config) AuthMiddleware {
-	return &authMiddleware{
+func NewAuth0MW(cfg *Config) *Auth0Middleware {
+	return &Auth0Middleware{
 		validateURI: cfg.AuthValidateURI,
-		log:         logger.NewComponentLogger("auth_tool", nil),
+		log:         logger.NewComponentLogger(context.TODO(), "auth_tool"),
 	}
 }
 
 // NewAuthMiddleware returns a new instance of AuthMiddleware
-func NewAuthMiddleware() AuthMiddleware {
+func NewAuthMiddleware() *Auth0Middleware {
 	cfg := &Config{}
-	l := logger.NewComponentLogger("auth_tool", nil)
+	l := logger.NewComponentLogger(context.TODO(), "auth_tool")
 
 	if err := configurator.NewConfiguration(cfg); err != nil {
 		l.Fatal().Err(err).Msg("failed to get configuration of db")
 	}
 
-	return &authMiddleware{
+	return &Auth0Middleware{
 		validateURI: cfg.AuthValidateURI,
 		log:         l,
 	}
@@ -51,7 +52,7 @@ func NewAuthMiddleware() AuthMiddleware {
 // ToDo
 // Transfer headers ..
 // Validate is middleware that extracts data from Authorization header and validates it
-func (m *authMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
+func (m *Auth0Middleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
 			ctx = c.Request().Context()
@@ -66,9 +67,13 @@ func (m *authMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 			l.Error().Err(err).Interface("req", req).Msg("Couldn't form request")
 			return c.JSON(http.StatusForbidden, map[string][]string{"__error__": {"couldn't check authenticity"}})
 		}
+		req = req.WithContext(ctx)
 
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
 		resp, err := http.DefaultClient.Do(req)
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 		if err != nil {
 			l.Error().Err(err).Interface("req", req).Msg("Couldn't do request")
 			return c.JSON(http.StatusForbidden, map[string][]string{"__error__": {"couldn't check authenticity"}})

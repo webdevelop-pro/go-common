@@ -1,28 +1,61 @@
 # This is a basic workflow to help you get started with Actions
 
 name: CICD
-
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
   push:
-    branches:
-    - master
-    - stage
-    - dev
-  pull_request:
-    branches:
-    - master
-    - stage
-    - dev
+
+permissions:
+  contents: read
+  pull-requests: read
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # The "build" workflow
-  build:
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: false
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: v1.54
+          args: -c .golangci.yml
+          only-new-issues: true
+
+  tests:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    services:
+      pubsub_emulator:
+        image: 3apag/pubsub-emulator
+        env:
+          PUBSUB_PROJECT_ID: webdevelop-live
+          PUBSUB_LISTEN_ADDRESS: 0.0.0.0:8232
+        ports:
+          - 8232:8232
+
+      # Label used to access the service container
+      postgres:
+        image: postgres
+        ports:
+          - 5439:5439
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: password
+          PGPORT: 5439
+          POSTGRES_PORT: 5439
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5     
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -32,45 +65,91 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v2
       with:
-        go-version: '1.19' # The Go version to download (if necessary) and use.
+        go-version: '1.22' # The Go version to download (if necessary) and use.
 
-    # Install all the dependencies
-    - name: Install dependencies
-      run: |
-        go version
-        go get -u golang.org/x/lint/golint
-        go get ./...
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        registry: cr.webdevelop.us
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Run the build process with Docker
+      id: django_1
+      uses: addnab/docker-run-action@v3
+      with:
+        registry: cr.webdevelop.us
+        image: cr.webdevelop.us/webdevelop-pro/admin-web:latest-dev
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          export DB_HOST="postgres"
+          export DB_USER="postgres"
+          export DB_PASSWORD="password"
+          export DB_DATABASE="postgres"
+          export DB_PORT="5439"
+          export DOMAIN="webdevelop.com"
+          export PANDADOC_TOKEN="test"
+          export SECRET_KEY="test"
+          export STATIC_URL="/static/"
+          export MEDIA_URL="/media/"
+          export STORAGE="gcp"
+          export GS_PROJECT_ID="test"
+          export GS_BUCKET_NAME="test"
+          export GOOGLE_APPLICATION_CREDENTIALS="test"
+          export MEDIA_THUMBS_URL="test"
+          export FILER_API=http://localhost
+          export EMAIL_API=http://localhost
+          export QUEUE_API=http://localhost
+          export DWOLLA_ADMIN_URL=http://localhost
+          export NORTH_CAPITAL_ADMIN_URL=http://localhost
+          ./admin/manage.py migrate
+
+    - name: Run the build process with Docker
+      uses: addnab/docker-run-action@v3
+      id: migrations_api
+      if: steps.django_1.outcome == 'success'
+      with:
+        registry: cr.webdevelop.us
+        image: cr.webdevelop.us/webdevelop-pro/migration-service:latest-dev
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          export HOST="0.0.0.0"
+          export PORT="8085"
+          export DEBUG="0"
+          export PROFILER="0"
+          export DB_HOST="postgres"
+          export DB_USER="postgres"
+          export DB_APP_NAME="migration_worker"
+          export DB_PASSWORD="password"
+          export DB_DATABASE="postgres"
+          export DB_PORT="5439"
+          export DB_MIN_CONNECTIONS="1"
+          export DB_MAX_CONNECTIONS="5"
+          export DB_TYPE="postgres"
+          export DB_SSL_MODE="false"
+          export DB_LOG_LEVEL="debug"
+          export LOG_CONSOLE="true"
+          export ENV_NAME="dev"
+          export MIGRATION_APPLY_ONLY="true"
+          export MIGRATION_DIR="./migrations/"
+          sleep 3 && ./app --init && while ! (./app --apply-only=true); do echo "retry"; sleep 2; done
 
     # Run build of the application
+    - name: Run make install
+      run: ./make.sh install
+
+    - name: Save secret
+      run: mkdir -p ~/.config/gcloud && echo $GCP_CREDS > ~/.config/gcloud/application_default_credentials.json
+      env:
+        GCP_CREDS : ${{secrets.GCP_PUBSUB_SERVICE_ACCOUNT_CREDENTIALS}}
+
     - name: Run tests
-      run: go test ./...
-
-    # Run vet & lint on the code
-    - name: Run vet & lint
-      run: |
-        go vet ./...
-        # golint ./...
-
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Go
-        if: success()
-        uses: actions/setup-go@v3
-        with:
-          go-version: 1.19
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Calc coverage
-        run: go test -v -covermode=count -coverprofile=coverage.out ./...
-
-      - name: Convert coverage to lcov
-        uses: jandelgado/gcov2lcov-action@v1
-
-      - name: Coveralls
-        uses: coverallsapp/github-action@v1.1.2
-        with:
-          github-token: ${{ secrets.github_token }}
-          path-to-lcov: coverage.lcov
+      run: TEST_APP_START="true" ./make.sh test

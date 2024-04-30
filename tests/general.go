@@ -8,6 +8,7 @@ import (
 	"io"
 	"math"
 	"mime/multipart"
+	"net"
 	"net/http"
 	"os"
 	"os/user"
@@ -18,7 +19,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
-	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/db"
 	pclient "github.com/webdevelop-pro/go-common/queue/pclient"
 )
@@ -26,11 +26,11 @@ import (
 type BodyType string
 
 const (
-	JsonBody BodyType = "json"
+	JSONBody BodyType = "json"
 	FileBody BodyType = "file"
 )
 
-type ApiTestCase struct {
+type APITestCase struct {
 	Description string
 	UserID      string
 	// ToDo
@@ -46,7 +46,7 @@ type ApiTestCase struct {
 	TestFunc func(map[string]interface{})
 }
 
-type ApiTestCaseV2 struct {
+type APITestCaseV2 struct {
 	Description string
 	UserID      string
 	// ToDo
@@ -104,6 +104,7 @@ func CreateDefaultRequest(req Request) *http.Request {
 		log.Fatal().Err(err).Msgf("cannot create new request")
 	}
 
+	r = r.WithContext(context.Background())
 	r.Header.Add("content-type", "application/json")
 
 	for key, value := range req.Headers {
@@ -128,7 +129,9 @@ func CreateRequestWithFiles(method, path string, body map[string]interface{}, fi
 
 	values := map[string]io.Reader{}
 	for k, v := range body {
-		values[k] = strings.NewReader(v.(string))
+		if vs, ok := v.(string); ok {
+			values[k] = strings.NewReader(vs)
+		}
 	}
 
 	for k, v := range files {
@@ -142,23 +145,30 @@ func CreateRequestWithFiles(method, path string, body map[string]interface{}, fi
 	for key, r := range values {
 		var fw io.Writer
 		var err error
-		if x, ok := r.(io.Closer); ok {
-			defer x.Close()
+		x, ok := r.(io.Closer)
+		if !ok {
+			continue
 		}
 		// upload a file
 		if _, ok := r.(*os.File); ok {
 			if fw, err = w.CreateFormFile(key, files[key]); err != nil {
+				w.Close()
+				x.Close()
 				log.Fatal().Err(err).Msgf("cannot CreateFormFile %s, %s", key, err.Error())
 			}
 		} else {
 			// Add other fields
 			if fw, err = w.CreateFormField(key); err != nil {
+				w.Close()
+				x.Close()
 				log.Fatal().Err(err).Msgf("cannot CreateFormField %s, %s", key, err.Error())
 			}
 		}
 		if _, err = io.Copy(fw, r); err != nil {
 			log.Fatal().Err(err).Msgf("cannot io.Copy %s, %s", key, err.Error())
 		}
+
+		x.Close()
 	}
 	// Don't forget to close the multipart writer.
 	// If you don't close it, your request will be missing the terminating boundary.
@@ -167,12 +177,14 @@ func CreateRequestWithFiles(method, path string, body map[string]interface{}, fi
 	// Now that you have a form, you can submit it to your handler.
 	req, err := http.NewRequest(
 		method,
-		fmt.Sprintf("http://%s:%s%s", appHost, appPort, path),
+		fmt.Sprintf("http://%s%s", net.JoinHostPort(appHost, appPort), path),
 		buf,
 	)
 	if err != nil {
 		log.Fatal().Err(err).Msgf("cannot create new request %s", err.Error())
 	}
+
+	req = req.WithContext(context.Background())
 
 	// Don't forget to set the content type, this will contain the boundary.
 	req.Header.Set("Content-Type", w.FormDataContentType())
@@ -203,8 +215,11 @@ func GetPointer(str string) *string {
 	return &str
 }
 
-func RunApiTest(t *testing.T, description string, fixtures FixturesManager, scenarios []ApiTestCase) {
-	for _, scenario := range scenarios {
+func RunAPITest(t *testing.T, description string, fixtures FixturesManager, scenarios []APITestCase) {
+	t.Helper()
+
+	for _, s := range scenarios {
+		scenario := s
 		t.Run(description+": "+scenario.Description, func(t *testing.T) {
 			err := fixtures.CleanAndApply(scenario.Fixtures)
 			if err != nil {
@@ -219,7 +234,7 @@ func RunApiTest(t *testing.T, description string, fixtures FixturesManager, scen
 			assert.Equal(t, scenario.ExpectedResponseCode, code, string(result))
 
 			if scenario.ExpectedResponseBody != nil {
-				CompareJsonBody(t, result, scenario.ExpectedResponseBody)
+				CompareJSONBody(t, result, scenario.ExpectedResponseBody)
 			}
 
 			if scenario.TestFunc != nil {
@@ -235,13 +250,15 @@ func RunApiTest(t *testing.T, description string, fixtures FixturesManager, scen
 	}
 }
 
-func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
+func RunAPITestV2(t *testing.T, description string, scenario APITestCaseV2) {
+	t.Helper()
+
 	fixtures := NewFixturesManager()
 	pubsubClient, _ := pclient.New(context.Background())
 	pubsubFixtures := NewPubSubFixturesManager(&pubsubClient)
-	dbClient := db.New(configurator.NewConfigurator())
+	dbClient := db.New()
 
-	t.Run(Description+": "+scenario.Description, func(t *testing.T) {
+	t.Run(description+": "+scenario.Description, func(t *testing.T) {
 		testContext := TestContext{
 			Pubsub: pubsubClient,
 			DB:     dbClient,
@@ -268,19 +285,27 @@ func RunApiTestV2(t *testing.T, Description string, scenario ApiTestCaseV2) {
 	})
 }
 
-func allowDictAny(src, dst map[string]interface{}) {
+func allowDictAny(src, dst map[string]interface{}) map[string]interface{} {
+	res := dst
+
 	for k, v := range dst {
 		switch val := v.(type) {
 		case string:
-			if val == "%any%" {
-				dst[k] = src[k]
+			if val == "%any%" && !reflect.ValueOf(src[k]).IsZero() {
+				res[k] = src[k]
 			}
 		case int:
 			if val == math.MinInt {
 				dst[k] = src[k]
 			}
+		case map[string]any:
+			if srck, ok := src[k].(map[string]any); ok {
+				res[k] = allowDictAny(srck, val)
+			}
 		}
 	}
+
+	return res
 }
 
 func allowAny(src, dst interface{}) interface{} {
@@ -295,8 +320,6 @@ func allowAny(src, dst interface{}) interface{} {
 		if val == math.MinInt {
 			res = src
 		}
-	default:
-		fmt.Println("not implemented ")
 	}
 
 	return res
@@ -304,7 +327,9 @@ func allowAny(src, dst interface{}) interface{} {
 
 // ToDo
 // use sprew or other library to better show different in maps
-func CompareJsonBody(t *testing.T, actual, expected []byte) {
+func CompareJSONBody(t *testing.T, actual, expected []byte) {
+	t.Helper()
+
 	var actualBody, expectedBody map[string]interface{}
 
 	if len(actual) == 0 {
@@ -330,6 +355,6 @@ func CompareJsonBody(t *testing.T, actual, expected []byte) {
 		return
 	}
 
-	allowDictAny(actualBody, expectedBody)
+	expectedBody = allowDictAny(actualBody, expectedBody)
 	assert.EqualValuesf(t, expectedBody, actualBody, "responses not equal")
 }

@@ -8,12 +8,18 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/tracelog"
 	"github.com/webdevelop-pro/go-common/configurator"
+	"github.com/webdevelop-pro/go-logger"
 )
 
-func GetConfigConn(c *configurator.Configurator) *pgx.ConnConfig {
-	cfg := c.New(pkgName, &Config{}, pkgName).(*Config)
+func GetConfigConn(logger logger.Logger) *pgx.ConnConfig {
+	cfg := Config{}
 
-	pgConfig, err := pgx.ParseConfig(GetConnString(cfg))
+	err := configurator.NewConfiguration(&cfg, pkgName)
+	if err != nil {
+		logger.Fatal().Stack().Err(err).Msg("Cannot parse config")
+	}
+
+	pgConfig, err := pgx.ParseConfig(GetConnString(&cfg))
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed to parse config")
 	}
@@ -32,16 +38,20 @@ func GetConfigConn(c *configurator.Configurator) *pgx.ConnConfig {
 }
 
 // NewConn is constructor for *pgx.Conn
-func NewConn(c *configurator.Configurator) *pgx.Conn {
-	return newConn(GetConfigConn(c))
+func NewConn() *pgx.Conn {
+	logger := logger.NewComponentLogger(context.TODO(), pkgName)
+
+	return newConn(GetConfigConn(logger), logger)
 }
 
 // NewConnFromConfig is constructor for *pgx.Conn
 func NewConnFromConfig(pgConfig *pgx.ConnConfig) *pgx.Conn {
-	return newConn(pgConfig)
+	logger := logger.NewComponentLogger(context.TODO(), pkgName)
+
+	return newConn(pgConfig, logger)
 }
 
-func newConn(pgConfig *pgx.ConnConfig) *pgx.Conn {
+func newConn(pgConfig *pgx.ConnConfig, logger logger.Logger) *pgx.Conn {
 	// ToDo
 	// Accept context as parameter
 	var (

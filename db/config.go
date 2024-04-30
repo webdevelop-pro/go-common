@@ -1,3 +1,4 @@
+//nolint:gochecknoglobals
 package db
 
 // Type represent storage engine type

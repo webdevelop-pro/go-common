@@ -2,11 +2,11 @@ package pclient
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"sync"
 
 	"cloud.google.com/go/pubsub"
+	"github.com/pkg/errors"
 	"github.com/webdevelop-pro/go-common/server/validator"
 )
 
@@ -51,8 +51,7 @@ func (b *Client) PublishToTopic(
 	ok, err := t.Exists(ctx)
 	if !ok {
 		b.log.Error().Err(err).Interface("topic", topicID).Msgf(ErrTopicNotExists.Error())
-		err := fmt.Errorf("topic do not exist: %s", topicID)
-		return nil, err
+		return nil, errors.Wrapf(ErrTopicNotExists, ": %s", topicID)
 	}
 
 	msg, err := NewMessage(data, attr)

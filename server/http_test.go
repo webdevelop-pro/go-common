@@ -42,7 +42,7 @@ func TestLoggerCtx(t *testing.T) {
 	middleware.SetLogger(func(c echo.Context) error {
 		ctx := c.Request().Context()
 
-		logInfo, _ = ctx.Value(logger.ServiceContextInfo).(logger.ServiceContext)
+		logInfo, _ = keys.GetCtxValue(ctx, keys.LogInfo).(logger.ServiceContext)
 
 		return nil
 	})(echoCtx)
@@ -51,8 +51,8 @@ func TestLoggerCtx(t *testing.T) {
 	assert.Equal(t, logInfo.Version, "1.0.0")
 	assert.Equal(t, logInfo.SourceReference.Repository, "gitlab/test/repo")
 	assert.Equal(t, logInfo.SourceReference.RevisionID, "asdxsgdf")
-	assert.Equal(t, logInfo.HttpRequest.Method, http.MethodPost)
-	assert.Equal(t, logInfo.HttpRequest.URL, "/test")
+	assert.Equal(t, logInfo.HTTPRequest.Method, http.MethodPost)
+	assert.Equal(t, logInfo.HTTPRequest.URL, "/test")
 }
 
 // If Request Id header is empty we should automatically generate it

@@ -13,6 +13,10 @@ import (
 	"github.com/webdevelop-pro/go-common/queue/pclient"
 )
 
+const (
+	sqlRetryInterval = 500
+)
+
 // func SendTestRequest(req *http.Request) ([]byte, int, error) {
 // 	httpClient := &http.Client{}
 // 	resp, err := httpClient.Do(req)
@@ -51,7 +55,7 @@ type ExpectedResponse struct {
 	Body []byte
 }
 
-func SendHttpRequst(req Request, checks ...ExpectedResponse) SomeAction {
+func SendHTTPRequst(req Request, checks ...ExpectedResponse) SomeAction {
 	return func(t TestContext) error {
 		result, code, err := SendTestRequest(CreateDefaultRequest(req))
 
@@ -61,7 +65,7 @@ func SendHttpRequst(req Request, checks ...ExpectedResponse) SomeAction {
 			assert.Equal(t.T, expected.Code, code, "Invalid response code")
 
 			if expected.Body != nil {
-				CompareJsonBody(t.T, result, expected.Body)
+				CompareJSONBody(t.T, result, expected.Body)
 			}
 		}
 
@@ -90,7 +94,7 @@ func SQL(query string, expected ...ExpectedResult) SomeAction {
 		if err != nil {
 			maxRetry := 20
 			try := 0
-			ticker := time.NewTicker(500 * time.Millisecond)
+			ticker := time.NewTicker(sqlRetryInterval * time.Millisecond)
 			for range ticker.C {
 				err = t.DB.QueryRow(context.Background(), rowQuery).Scan(&res)
 				if err != nil {

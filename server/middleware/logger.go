@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"context"
-
 	"github.com/labstack/echo/v4"
 	"github.com/webdevelop-pro/go-common/context/keys"
 	"github.com/webdevelop-pro/go-common/verser"
@@ -14,7 +12,7 @@ func SetLogger(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// get request's context
 		ctx := c.Request().Context()
-		ipAddress, _ := c.Get(IpAddressContextKey).(string)
+		ipAddress, _ := c.Get(IPAddressContextKey).(string)
 		identityID, _ := keys.GetCtxValue(ctx, keys.IdentityID).(string)
 		requestID, _ := keys.GetCtxValue(ctx, keys.RequestID).(string)
 		msgID, _ := keys.GetCtxValue(ctx, keys.MSGID).(string)
@@ -29,19 +27,19 @@ func SetLogger(next echo.HandlerFunc) echo.HandlerFunc {
 			User:      identityID,
 			RequestID: requestID,
 			MSGID:     msgID,
-			HttpRequest: &logger.HttpRequestContext{
+			HTTPRequest: &logger.HTTPRequestContext{
 				Method:    c.Request().Method,
-				RemoteIp:  ipAddress,
+				RemoteIP:  ipAddress,
 				URL:       c.Request().RequestURI,
 				UserAgent: c.Request().UserAgent(),
 				Referrer:  c.Request().Referer(),
 			},
 		}
 
-		ctx = context.WithValue(ctx, logger.ServiceContextInfo, logInfo)
+		ctx = keys.SetCtxValue(ctx, keys.LogInfo, logInfo)
 
 		// create sub logger
-		log := logger.NewComponentLogger("echo", c)
+		log := logger.NewComponentLogger(c.Request().Context(), "echo")
 		// add logger to context
 		ctx = log.WithContext(ctx)
 		// enrich context

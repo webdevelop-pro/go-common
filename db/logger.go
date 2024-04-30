@@ -31,7 +31,7 @@ func (l *Logger) Log(ctx context.Context, level tracelog.LogLevel, msg string, d
 			err = val
 		default:
 			msg = fmt.Sprintf("%s", val)
-			err = errMsg.(error)
+			err, _ = errMsg.(error)
 		}
 	}
 

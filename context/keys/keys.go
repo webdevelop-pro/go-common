@@ -4,6 +4,26 @@ import (
 	"context"
 )
 
+const (
+	LogentryObject      = "logentry"
+	PermissionObject    = "permission"
+	GroupObject         = "group"
+	ContentTypeObject   = "contenttype"
+	SessionObject       = "session"
+	AccountObject       = "account"
+	FilerObject         = "filer"
+	OfferFilerObject    = "offerfiler"
+	OfferObject         = "offer"
+	ProfileObject       = "profile"
+	InvestmentObject    = "investment"
+	ApplogObject        = "applog"
+	EmailObject         = "email"
+	CommentObject       = "comment"
+	WalletObject        = "wallet"
+	FundingsourceObject = "fundingsource"
+	TransactionObject   = "transaction"
+)
+
 type ContextKey rune
 
 const (
@@ -12,6 +32,10 @@ const (
 	IPAddress
 	MSGID
 	IdentityID
+	LogInfo
+	RequestLogID
+	LogObjectType
+	LogObjectID
 )
 
 func GetCtxValue(ctx context.Context, key ContextKey) any {
@@ -20,6 +44,14 @@ func GetCtxValue(ctx context.Context, key ContextKey) any {
 
 func SetCtxValue(ctx context.Context, key ContextKey, value any) context.Context {
 	ctx = context.WithValue(ctx, key, value)
+
+	return ctx
+}
+
+func SetCtxValues(ctx context.Context, values map[ContextKey]any) context.Context {
+	for key, value := range values {
+		ctx = context.WithValue(ctx, key, value)
+	}
 
 	return ctx
 }

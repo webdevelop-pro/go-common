@@ -10,10 +10,10 @@ import (
 const (
 	// ContextKey is the key used to lookup ip address
 	// request from the echo.Context.
-	IpAddressContextKey = "ip-address"
+	IPAddressContextKey = "ip-address"
 )
 
-func GetIpAddress(headers http.Header) string {
+func GetIPAddress(headers http.Header) string {
 	// ToDo
 	// Use echo context.RealIP()
 	ip := "127.0.0.1"
@@ -37,8 +37,8 @@ func GetIpAddress(headers http.Header) string {
 
 func SetIPAddress(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		ip := GetIpAddress(c.Request().Header)
-		c.Set(IpAddressContextKey, ip)
+		ip := GetIPAddress(c.Request().Header)
+		c.Set(IPAddressContextKey, ip)
 
 		return next(c)
 	}

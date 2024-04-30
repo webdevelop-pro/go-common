@@ -1,3 +1,4 @@
+//nolint:gochecknoglobals
 package configurator
 
 import (
@@ -20,8 +21,17 @@ const (
 
 	mdFormat = `| KEY	| TYPE	| DEFAULT	| REQUIRED	| DESCRIPTION	|
 | 	| 	| 	| 	| 	|
-{{range .}}| {{ usage_key . }}	| {{usage_type .}}	| {{usage_default .}}	| {{usage_required .}}	| {{usage_description .}}	|
+{{range .}}| {{ usage_key . }}	| {{usage_type .}}	| {{usage_default .}}` +
+		`	| {{usage_required .}}	| {{usage_description .}}	|
 {{end}}`
+)
+
+const (
+	usageKeyIndex         = 0
+	usageTypeIndex        = 1
+	usageDefaultIndex     = 2
+	usageRequiredIndex    = 3
+	usageDescriptionIndex = 4
 )
 
 var copierOption = copier.Option{IgnoreEmpty: true, DeepCopy: true}
@@ -105,18 +115,23 @@ func (c *Configurator) Print() {
 	defer c.mu.Unlock()
 
 	var b bytes.Buffer
-	tabs := tabwriter.NewWriter(&b, 1, 0, 4, ' ', 0)
+	padding := 4
+	tabs := tabwriter.NewWriter(&b, 1, 0, padding, ' ', 0)
 
 	s := ""
 	buf := bytes.NewBufferString(s)
 
 	for _, v := range c.configMap {
-		envconfig.Usagef(v.prefix, v.conf, buf, defaultTableFormatSplit)
+		err := envconfig.Usagef(v.prefix, v.conf, buf, defaultTableFormatSplit)
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	var newSlice [][]string
+	bufLines := strings.Split(buf.String(), "\n")
+	newSlice := make([][]string, 0, len(bufLines))
 
-	for _, line := range strings.Split(buf.String(), "\n") {
+	for _, line := range bufLines {
 		arrays := strings.Split(line, ",")
 		if len(arrays) < 1 {
 			continue
@@ -144,7 +159,9 @@ func (c *Configurator) Print() {
 		}
 	}
 
-	io.Copy(os.Stdout, &b)
+	if _, err := io.Copy(os.Stdout, &b); err != nil {
+		panic(err)
+	}
 }
 
 func findElementByIndex(slice []string, index int) string {
@@ -160,11 +177,11 @@ func findElementByIndex(slice []string, index int) string {
 func prepareTemplate(format string) *template.Template {
 	// Specify the default usage template functions
 	functions := template.FuncMap{
-		"usage_key":         func(v []string) string { return findElementByIndex(v, 0) },
-		"usage_type":        func(v []string) string { return findElementByIndex(v, 1) },
-		"usage_default":     func(v []string) string { return findElementByIndex(v, 2) },
-		"usage_required":    func(v []string) string { return findElementByIndex(v, 3) },
-		"usage_description": func(v []string) string { return findElementByIndex(v, 4) },
+		"usage_key":         func(v []string) string { return findElementByIndex(v, usageKeyIndex) },
+		"usage_type":        func(v []string) string { return findElementByIndex(v, usageTypeIndex) },
+		"usage_default":     func(v []string) string { return findElementByIndex(v, usageDefaultIndex) },
+		"usage_required":    func(v []string) string { return findElementByIndex(v, usageRequiredIndex) },
+		"usage_description": func(v []string) string { return findElementByIndex(v, usageDescriptionIndex) },
 	}
 
 	tmpl, err := template.New("envconfig").Funcs(functions).Parse(format)

@@ -20,12 +20,12 @@ func AssertSQL(t *testing.T, fManager FixturesManager, testCase SQLTestCase) {
 
 	actualResult, err := fManager.SelectQuery(testCase.ExpectedSelectQuery)
 	if err != nil {
-		query := strings.Replace(testCase.ExpectedSelectQuery, "\t", " ", -1)
-		query = strings.Replace(query, "\n", " ", -1)
-		query = strings.Replace(query, "  ", " ", -1)
-		query = strings.Replace(query, "  ", " ", -1)
+		query := strings.ReplaceAll(testCase.ExpectedSelectQuery, "\t", " ")
+		query = strings.ReplaceAll(query, "\n", " ")
+		query = strings.ReplaceAll(query, "  ", " ")
+		query = strings.ReplaceAll(query, "  ", " ")
 		assert.FailNow(t, err.Error()+fmt.Sprintf(" failed sql: %s", query))
 	}
 
-	CompareJsonBody(t, []byte(actualResult), []byte(testCase.ExpectedResult))
+	CompareJSONBody(t, []byte(actualResult), []byte(testCase.ExpectedResult))
 }

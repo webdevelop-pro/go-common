@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"time"
 
+	gpubsub "cloud.google.com/go/pubsub"
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-logger"
 	"google.golang.org/api/option"
-
-	gpubsub "cloud.google.com/go/pubsub"
 )
 
-const pkgName = "pubsub"
+const (
+	pkgName         = "pubsub"
+	minPubsubBackof = 5
+	maxPubsubBackof = 10
+)
 
 type Client struct {
 	client *gpubsub.Client // google cloud pubsub client
@@ -22,7 +25,7 @@ type Client struct {
 
 func New(ctx context.Context) (Client, error) {
 	cfg := Config{}
-	log := logger.NewComponentLogger(pkgName, nil)
+	log := logger.NewComponentLogger(ctx, pkgName)
 
 	err := configurator.NewConfiguration(&cfg, "pubsub")
 	if err != nil {
@@ -85,11 +88,11 @@ func (b *Client) CreateSubscription(ctx context.Context, name, topic string) (*g
 	// FixME
 	// Add RetryPolicy
 	sub, err := b.client.CreateSubscription(ctx, name, gpubsub.SubscriptionConfig{
-		Topic: pTopic,
+		Topic:                     pTopic,
 		EnableExactlyOnceDelivery: true,
 		RetryPolicy: &gpubsub.RetryPolicy{
-			MinimumBackoff: time.Minute * 5,
-			MaximumBackoff: time.Minute * 10,
+			MinimumBackoff: time.Minute * minPubsubBackof,
+			MaximumBackoff: time.Minute * maxPubsubBackof,
 		},
 	})
 	if err != nil {
