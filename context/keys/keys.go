@@ -38,6 +38,14 @@ const (
 	LogObjectID
 )
 
+func GetAsString(ctx context.Context, key ContextKey) string {
+	val, ok := ctx.Value(key).(string)
+	if ok {
+		return val
+	}
+	return ""
+}
+
 func GetCtxValue(ctx context.Context, key ContextKey) any {
 	return ctx.Value(key)
 }
