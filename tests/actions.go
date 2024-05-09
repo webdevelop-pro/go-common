@@ -80,6 +80,17 @@ func SendPubSubEvent(topic string, body any, attr map[string]string) SomeAction 
 	}
 }
 
+func RawSQL(query string) SomeAction {
+	return func(t TestContext) error {
+		query = strings.ReplaceAll(query, "\t", " ")
+		query = strings.ReplaceAll(query, "\n", " ")
+		query = strings.ReplaceAll(query, "  ", " ")
+
+		_, err := t.DB.Exec(context.Background(), query)
+		return err
+	}
+}
+
 func SQL(query string, expected ...ExpectedResult) SomeAction {
 	return func(t TestContext) error {
 		var res map[string]interface{}
