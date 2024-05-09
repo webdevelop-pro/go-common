@@ -43,6 +43,8 @@ func (h *HTTPServer) AddRoute(route Route) {
 		route.Middlewares = append(route.Middlewares, h.authTool.Validate)
 	}
 
+	route.Middlewares = append(route.Middlewares, middleware.SetLogger)
+
 	h.Echo.Add(route.Method, route.Path, handle, route.Middlewares...)
 }
 
