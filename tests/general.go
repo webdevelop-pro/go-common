@@ -291,7 +291,7 @@ func allowDictAny(src, dst map[string]interface{}) map[string]interface{} {
 	for k, v := range dst {
 		switch val := v.(type) {
 		case string:
-			if val == "%any%" && !reflect.ValueOf(src[k]).IsZero() {
+			if val == "%any%" && src != nil && !reflect.ValueOf(src[k]).IsZero() {
 				res[k] = src[k]
 			}
 		case int:
