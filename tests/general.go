@@ -313,7 +313,7 @@ func allowAny(src, dst interface{}) interface{} {
 
 	switch val := dst.(type) {
 	case string:
-		if val == "%any%" && !reflect.ValueOf(src).IsZero() {
+		if val == "%any%" && src != nil && !reflect.ValueOf(src).IsZero() {
 			res = src
 		}
 	case int:
