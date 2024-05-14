@@ -152,4 +152,4 @@ jobs:
         GCP_CREDS : ${{secrets.GCP_PUBSUB_SERVICE_ACCOUNT_CREDENTIALS}}
 
     - name: Run tests
-      run: TEST_APP_START="true" ./make.sh test
+      run: source .env.example TEST_APP_START="true" ./make.sh test

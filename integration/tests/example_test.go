@@ -2,6 +2,7 @@
 package tests
 
 import (
+	"context"
 	"os"
 	"testing"
 	"time"
@@ -12,6 +13,13 @@ import (
 )
 
 func TestExample(t *testing.T) {
+	ctx := context.TODO()
+	pubsub, err := pclient.New(ctx)
+	if err != nil {
+		assert.Fail(t, "Failed to create pubsub client", err)
+	}
+	pubsub.CreateTopic(ctx, os.Getenv("PUBSUB_TOPIC_WEBHOOK"))
+	pubsub.CreateSubscription(ctx, os.Getenv("PUBSUB_TOPIC_WEBHOOK"), os.Getenv("PUBSUB_SUBSCRIPTION_WEBHOOK"))
 	RunAPITestV2(t,
 		"",
 		APITestCaseV2{
@@ -19,14 +27,14 @@ func TestExample(t *testing.T) {
 			Fixtures:    []Fixture{},
 			PubSubFixtures: []PubSubFixture{
 				NewPubSubFixture(
-					os.Getenv("PUBSUB_TOPIC"),
-					os.Getenv("PUBSUB_SUBSCRIPTION"),
+					os.Getenv("PUBSUB_TOPIC_WEBHOOK"),
+					os.Getenv("PUBSUB_SUBSCRIPTION_WEBHOOK"),
 					"",
 				),
 			},
 			TestActions: []SomeAction{
 				// SendHttpRequst("POST", "/events/sendgrid/test_topic?object=email&action=update&auth_type=auto&auth_token=XXXXX", []byte(`{"test": "message"}`)),
-				SendPubSubEvent(os.Getenv("PUBSUB_TOPIC"), "{}", map[string]string{}),
+				SendPubSubEvent(os.Getenv("PUBSUB_TOPIC_WEBHOOK"), "{}", map[string]string{}),
 				Sleep(time.Second * 2),
 				SQL(
 					"select 1 as col_1, 'a' as col_2 limit 1",
@@ -36,7 +44,7 @@ func TestExample(t *testing.T) {
 					},
 				),
 				SendPubSubEvent(
-					os.Getenv("PUBSUB_TOPIC"),
+					os.Getenv("PUBSUB_TOPIC_WEBHOOK"),
 					pclient.Webhook{
 						Object:  "profile",
 						Action:  "update_accr",

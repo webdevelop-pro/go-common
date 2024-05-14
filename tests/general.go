@@ -272,8 +272,8 @@ func RunAPITestV2(t *testing.T, description string, scenario APITestCaseV2) {
 		}
 		err = pubsubFixtures.CleanAndApply(scenario.PubSubFixtures)
 		if err != nil {
+			log.Error().Err(err).Msgf("Failed apply pubsub fixtures")
 			assert.Fail(t, "Failed apply pubsub fixtures", err)
-			log.Fatal().Err(err).Msgf("Failed apply pubsub fixtures")
 		}
 
 		for _, action := range scenario.TestActions {
