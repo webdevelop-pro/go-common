@@ -7,7 +7,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
 	"github.com/webdevelop-pro/go-common/context/keys"
-	"github.com/webdevelop-pro/go-common/server/response"
 	logger "github.com/webdevelop-pro/go-logger"
 )
 
@@ -28,12 +27,10 @@ func (m *AuthIdentityHeaderMiddleware) Validate(next echo.HandlerFunc) echo.Hand
 		identityID := c.Request().Header.Get("Authorization")
 
 		if identityID == "" {
-			return c.JSON(http.StatusUnauthorized, response.Error{
-				StatusCode: http.StatusUnauthorized,
-				Message: map[string][]string{
-					"errors": {"empty identity_id"},
-				},
-			})
+			return c.JSON(http.StatusUnauthorized, map[string][]string{
+				"__error__": {"empty identity_id"},
+			},
+			)
 		}
 
 		ctx := c.Request().Context()
