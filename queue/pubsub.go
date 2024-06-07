@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/webdevelop-pro/go-common/queue/pclient"
-	"github.com/webdevelop-pro/go-logger"
+	logger "github.com/webdevelop-pro/go-logger"
 )
 
 type PubSubListener struct {

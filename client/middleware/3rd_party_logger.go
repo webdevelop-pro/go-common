@@ -13,7 +13,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/motemen/go-loghttp"
 	"github.com/webdevelop-pro/go-common/context/keys"
-	"github.com/webdevelop-pro/go-logger"
+	logger "github.com/webdevelop-pro/go-logger"
 )
 
 type DB interface {

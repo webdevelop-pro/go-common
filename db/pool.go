@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/tracelog"
 	"github.com/pkg/errors"
 	"github.com/webdevelop-pro/go-common/configurator"
-	"github.com/webdevelop-pro/go-logger"
+	logger "github.com/webdevelop-pro/go-logger"
 )
 
 var (

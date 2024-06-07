@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/webdevelop-pro/go-common/context/keys"
 	"github.com/webdevelop-pro/go-common/tests"
-	"github.com/webdevelop-pro/go-logger"
+	logger "github.com/webdevelop-pro/go-logger"
 
 	// . "github.com/webdevelop-pro/go-common/tests"
 

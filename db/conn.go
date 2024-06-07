@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/tracelog"
 	"github.com/webdevelop-pro/go-common/configurator"
-	"github.com/webdevelop-pro/go-logger"
+	logger "github.com/webdevelop-pro/go-logger"
 )
 
 func GetConfigConn(logger logger.Logger) *pgx.ConnConfig {
