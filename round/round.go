@@ -24,7 +24,7 @@ func newSortValues(values []Value) SortValues {
 	indexes := make([]int, len(values))
 	valuesCopy := make([]float64, len(values))
 
-	for i := 0; i < len(values); i++ {
+	for i := range values {
 		indexes[i] = i
 		valuesCopy[i] = values[i].GetFloatValue()
 	}
@@ -131,7 +131,7 @@ func SmartRound(values Values, requiredSum int) error {
 	}
 
 	// restore original order for array
-	for i := 0; i < len(sorted.values); i++ {
+	for i := range sorted.values {
 		originalIndex := sorted.orginalIndexes[i]
 
 		originalValue := sorted.values[i]

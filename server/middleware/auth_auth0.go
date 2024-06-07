@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -69,7 +68,7 @@ func (m *Auth0Middleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 		req = req.WithContext(ctx)
 
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+		req.Header.Add("Authorization", "Bearer "+token)
 		resp, err := http.DefaultClient.Do(req)
 		if resp != nil {
 			defer resp.Body.Close()
