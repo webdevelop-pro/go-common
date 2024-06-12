@@ -43,9 +43,6 @@ jobs:
         image: postgres
         ports:
           - 5439:5439
-        credentials:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }} 
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
