@@ -22,7 +22,7 @@ WORKDIR /app
 
 # Install swagger library
 # RUN go install github.com/go-swagger/go-swagger/cmd/swagger@latest
-# RUN ./build-deploy.sh download
+RUN ./build-deploy.sh download
 
 COPY etc ./etc /app/etc/
 CMD ["/bin/sh"]
