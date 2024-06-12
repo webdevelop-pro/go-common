@@ -15,3 +15,13 @@ ENV GOPATH=/go
 ENV VERSION=${VERSION:-unknown}
 
 RUN apk add --no-cache make gcc musl-dev linux-headers git gettext ca-certificates
+
+ADD . /app
+
+WORKDIR /app
+
+# Install swagger library
+RUN go install github.com/go-swagger/go-swagger/cmd/swagger@latest
+
+COPY etc ./etc /app/etc/
+CMD ["/bin/sh"]
