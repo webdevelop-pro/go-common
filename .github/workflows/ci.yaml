@@ -40,7 +40,7 @@ jobs:
 
       # Label used to access the service container
       postgres:
-        image: cr.webdevelop.us/webdevelop-pro/postgres:latest
+        image: postgres
         ports:
           - 5439:5439
         credentials:

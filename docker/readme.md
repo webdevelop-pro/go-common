@@ -1,6 +1,6 @@
 # Go lang common image
 
-Pre-build docker image for go 1.21.5
+Pre-build docker image for go 1.22
 - Improve docker build up for 10x times
 - Make sure base image is secure with snyk vulnerability scanner
 - Universal make.sh file to help have similar pipelines on different go based repos
