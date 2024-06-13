@@ -11,50 +11,40 @@ import (
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/server/healthcheck"
 	"github.com/webdevelop-pro/go-common/server/middleware"
+	"github.com/webdevelop-pro/go-common/server/route"
 	"github.com/webdevelop-pro/go-common/server/validator"
 	logger "github.com/webdevelop-pro/go-logger"
 	"go.uber.org/fx"
 )
 
 type HTTPServer struct {
-	Echo     *echo.Echo
-	log      logger.Logger
-	config   *Config
-	authTool middleware.AuthMiddleware
+	Echo   *echo.Echo
+	log    logger.Logger
+	config *Config
 }
 
-// Route is a http route.
-type Route struct {
-	Method       string
-	Path         string
-	Handle       echo.HandlerFunc
-	NoCORS       bool
-	NoAuth       bool
-	IdentityAuth bool
-	OptionalAuth bool
-	Middlewares  []echo.MiddlewareFunc
+func InitAllRoutes(srv *HTTPServer, params route.ConfiguratorIn) {
+	for _, rg := range params.Configurators {
+		srv.InitRoutes(rg)
+	}
 }
 
 // AddRoute adds route to the router.
-func (h *HTTPServer) AddRoute(route Route) {
-	handle := route.Handle
-
-	if h.authTool != nil && !route.NoAuth {
-		route.Middlewares = append(route.Middlewares, h.authTool.Validate)
-	}
-
-	route.Middlewares = append(route.Middlewares, middleware.SetLogger)
-
-	h.Echo.Add(route.Method, route.Path, handle, route.Middlewares...)
+func (s *HTTPServer) AddRoute(rte *route.Route) {
+	handle := rte.Handle
+	rte.Middlewares = append(rte.Middlewares, middleware.SetLogger)
+	s.Echo.Add(rte.Method, rte.Path, handle, rte.Middlewares...)
 }
 
-// SetAuthMiddleware sets auth middleware to the router.
-func (h *HTTPServer) SetAuthMiddleware(authTool middleware.AuthMiddleware) {
-	h.authTool = authTool
+func (s *HTTPServer) InitRoutes(rg route.Configurator) {
+	for _, rte := range rg.GetRoutes() {
+		//nolint:gosec,scopelint
+		s.AddRoute(&rte)
+	}
 }
 
 // NewHTTPServer returns new API instance.
-func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool middleware.AuthMiddleware) *HTTPServer {
+func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config) *HTTPServer {
 	// sets CORS headers if Origin is present
 	e.Use(
 		echoMW.CORSWithConfig(echoMW.CORSConfig{
@@ -101,14 +91,13 @@ func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool middlewa
 	e.Logger.SetLevel(log.OFF) // disable echo#Logger
 
 	return &HTTPServer{
-		Echo:     e,
-		config:   cfg,
-		log:      l,
-		authTool: authTool,
+		Echo:   e,
+		config: cfg,
+		log:    l,
 	}
 }
 
-func New(authTool middleware.AuthMiddleware) *HTTPServer {
+func New() *HTTPServer {
 	cfg := &Config{}
 	l := logger.NewComponentLogger(context.TODO(), "http_server")
 
@@ -116,7 +105,7 @@ func New(authTool middleware.AuthMiddleware) *HTTPServer {
 		l.Fatal().Err(err).Msg("failed to get configuration of server")
 	}
 
-	return NewHTTPServer(echo.New(), l, cfg, authTool)
+	return NewHTTPServer(echo.New(), l, cfg)
 }
 
 // StartServer is function that registers start of http server in lifecycle
