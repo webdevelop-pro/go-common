@@ -40,7 +40,10 @@ func loadDotEnv() error {
 
 	var err error
 	if envPath == "" {
-		_ = godotenv.Load(".env") // ignore error by default
+		// if .env exists
+		if _, err1 := os.Stat(".env"); err1 == nil {
+			err = godotenv.Load(".env")
+		}
 	} else {
 		err = godotenv.Load(envPath) // if path to env file defined, check error
 	}

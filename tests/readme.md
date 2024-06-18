@@ -1,2 +1,2 @@
 # ToDo
-- [ ] add ability to check response onlyo using assertify library
+- [ ] add ability to check response only using assertify library

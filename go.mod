@@ -2,8 +2,6 @@ module github.com/webdevelop-pro/go-common
 
 go 1.22
 
-toolchain go1.22.1
-
 require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/cenkalti/backoff/v4 v4.3.0

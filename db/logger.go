@@ -7,16 +7,16 @@ import (
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/tracelog"
-	comLogger "github.com/webdevelop-pro/go-logger"
+	"github.com/webdevelop-pro/go-common/logger"
 )
 
 // Logger is a struct that represent logger for DB
 type Logger struct {
-	log comLogger.Logger
+	log logger.Logger
 }
 
 // NewDBLogger is a constructor for Logger
-func NewDBLogger(log comLogger.Logger) *Logger {
+func NewDBLogger(log logger.Logger) *Logger {
 	return &Logger{log: log}
 }
 

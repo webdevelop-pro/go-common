@@ -11,13 +11,11 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"os/user"
 	"reflect"
 	"strconv"
 	"strings"
 	"testing"
 
-	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -51,32 +49,12 @@ type APITestCase struct {
 type APITestCaseV2 struct {
 	Description string
 	UserID      string
-	// ToDo
-	// Write down description why its needed
-	OnlyForDebugMode bool
 
-	Fixtures       []Fixture
+	// Move to db package
+	Fixtures []Fixture
+	// Move to pubsub package
 	PubSubFixtures []PubSubFixture
 	TestActions    []SomeAction
-}
-
-// ToDo
-// Create in go-common configuration to load env
-func LoadEnv(envPath string) {
-	usr, err := user.Current()
-	if err != nil {
-		log.Fatal().Err(err).Msg("cannot get user")
-	}
-
-	vars, err := godotenv.Read(envPath)
-	if err != nil {
-		log.Fatal().Err(err).Msgf("cannot read %s", envPath)
-	}
-
-	for key, value := range vars {
-		value = strings.ReplaceAll(value, "~", usr.HomeDir)
-		os.Setenv(key, value)
-	}
 }
 
 // ToDo

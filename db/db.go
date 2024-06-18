@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/pkg/errors" // Error with stack trace
-	comLogger "github.com/webdevelop-pro/go-logger"
+	"github.com/pkg/errors"
+	"github.com/webdevelop-pro/go-common/logger"
 )
 
 var ErrNotUpdated = errors.Errorf("UPDATE 0")
@@ -13,18 +13,18 @@ var ErrNotUpdated = errors.Errorf("UPDATE 0")
 // DB is a layer to simplify interact with DB
 type DB struct {
 	*pgxpool.Pool
-	Log comLogger.Logger
+	Log logger.Logger
 }
 
 // New returns new DB instance.
 func New() *DB {
-	logger := comLogger.NewComponentLogger(context.TODO(), pkgName)
+	logger := logger.NewComponentLogger(context.TODO(), pkgName)
 
 	return NewDB(NewPool(), logger)
 }
 
 // NewDB returns new DB instance.
-func NewDB(pool *pgxpool.Pool, log comLogger.Logger) *DB {
+func NewDB(pool *pgxpool.Pool, log logger.Logger) *DB {
 	d := &DB{
 		Pool: pool,
 		Log:  log,

@@ -3,8 +3,8 @@ package queue
 import (
 	"context"
 
+	"github.com/webdevelop-pro/go-common/logger"
 	"github.com/webdevelop-pro/go-common/queue/pclient"
-	logger "github.com/webdevelop-pro/go-logger"
 )
 
 type PubSubListener struct {

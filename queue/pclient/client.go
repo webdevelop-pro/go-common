@@ -7,7 +7,7 @@ import (
 
 	gpubsub "cloud.google.com/go/pubsub"
 	"github.com/webdevelop-pro/go-common/configurator"
-	logger "github.com/webdevelop-pro/go-logger"
+	"github.com/webdevelop-pro/go-common/logger"
 	"google.golang.org/api/option"
 )
 

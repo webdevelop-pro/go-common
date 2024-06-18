@@ -18,7 +18,7 @@ type Error struct {
 
 - StatusCode used to return StatusCode, usually its visible for the end client
 - Message - user friendly message
-- Err - error structure, which might contain sensetive data or it can be an collection of inheritance of different error messages. Err also contains stack trace if used together with [go-logger](https://github.com/webdevelop-pro/go-logger)
+- Err - error structure, which might contain sensetive data or it can be an collection of inheritance of different error messages. Err also contains stack trace if used together with [logger](https://github.com/webdevelop-pro/go-common/logger)
 
 
 ## Usage

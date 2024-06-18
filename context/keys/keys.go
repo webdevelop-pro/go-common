@@ -4,6 +4,9 @@ import (
 	"context"
 )
 
+// ToDo
+// move to i-models
+/*
 const (
 	LogentryObject      = "logentry"
 	PermissionObject    = "permission"
@@ -23,6 +26,7 @@ const (
 	FundingsourceObject = "fundingsource"
 	TransactionObject   = "transaction"
 )
+*/
 
 type ContextKey rune
 

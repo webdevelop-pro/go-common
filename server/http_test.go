@@ -10,9 +10,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/webdevelop-pro/go-common/context/keys"
+	"github.com/webdevelop-pro/go-common/logger"
 	"github.com/webdevelop-pro/go-common/server/middleware"
 	"github.com/webdevelop-pro/go-common/verser"
-	logger "github.com/webdevelop-pro/go-logger"
 )
 
 func TestHTTPCtx(t *testing.T) {

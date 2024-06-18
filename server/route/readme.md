@@ -1,6 +1,7 @@
 # http routing
 
-Define routing handler and create `GetRoutes` function which should return `route.Route`
+1. Define routing handler and create `GetRoutes` function which should return `route.Route`
+2. Make sure to call `server.InitAllRoutes` in `fx.Invoke` 
 
 ```golang
 type Handler struct {

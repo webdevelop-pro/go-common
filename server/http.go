@@ -9,11 +9,11 @@ import (
 	echoMW "github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/webdevelop-pro/go-common/configurator"
+	"github.com/webdevelop-pro/go-common/logger"
 	"github.com/webdevelop-pro/go-common/server/healthcheck"
 	"github.com/webdevelop-pro/go-common/server/middleware"
 	"github.com/webdevelop-pro/go-common/server/route"
 	"github.com/webdevelop-pro/go-common/server/validator"
-	logger "github.com/webdevelop-pro/go-logger"
 	"go.uber.org/fx"
 )
 
