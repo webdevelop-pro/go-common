@@ -12,7 +12,7 @@ require (
 	github.com/rs/zerolog v1.32.0 // indirect
 	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240618215514-3852cd8111ed // indirect
 	github.com/webdevelop-pro/go-common/context v0.0.0-20240618215514-3852cd8111ed // indirect
-	github.com/webdevelop-pro/go-common/logger v0.0.0-20240618221303-b87fa541df7a // indirect
+	github.com/webdevelop-pro/go-common/logger v0.0.0-20240618221635-84fe56c0a310 // indirect
 	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
 )

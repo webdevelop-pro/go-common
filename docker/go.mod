@@ -4,10 +4,10 @@ go 1.22
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/jackc/pgx/v5 v5.5.5
-	github.com/labstack/echo/v4 v4.11.4
+	github.com/jackc/pgx/v5 v5.6.0
+	github.com/labstack/echo/v4 v4.12
 	github.com/pkg/errors v0.9.1
-	github.com/webdevelop-pro/go-common v0.0.0-20240404141858-11cb0558988b
+	github.com/webdevelop-pro/go-common v0.0.0-20240618221635-84fe56c0a310
 	go.uber.org/fx v1.21.0
 )
 

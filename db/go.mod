@@ -9,7 +9,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240618215514-3852cd8111ed
 	github.com/webdevelop-pro/go-common/context v0.0.0-20240618215514-3852cd8111ed
-	github.com/webdevelop-pro/go-common/logger v0.0.0-20240618221108-ec4a5d0f19fc
+	github.com/webdevelop-pro/go-common/logger v0.0.0-20240618221635-84fe56c0a310
 	github.com/webdevelop-pro/go-common/tests v0.0.0-20240618215514-3852cd8111ed
 )
 

@@ -12,7 +12,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240618220238-079857f66ea4
 	github.com/webdevelop-pro/go-common/context v0.0.0-20240618220238-079857f66ea4
-	github.com/webdevelop-pro/go-common/logger v0.0.0-20240618220238-079857f66ea4
+	github.com/webdevelop-pro/go-common/logger v0.0.0-20240618221635-84fe56c0a310
 	github.com/webdevelop-pro/go-common/verser v0.0.0-20240618220238-079857f66ea4
 	go.uber.org/fx v1.21.1
 )
