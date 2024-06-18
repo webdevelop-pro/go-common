@@ -13,12 +13,14 @@ import (
 	"os"
 	"os/user"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/webdevelop-pro/go-common/db"
 	pclient "github.com/webdevelop-pro/go-common/queue/pclient"
 )
@@ -105,7 +107,7 @@ func CreateDefaultRequest(req Request) *http.Request {
 	}
 
 	r = r.WithContext(context.Background())
-	r.Header.Add("content-type", "application/json")
+	r.Header.Add("Content-Type", "application/json")
 
 	for key, value := range req.Headers {
 		r.Header.Add(key, value)
@@ -189,7 +191,7 @@ func CreateRequestWithFiles(method, path string, body map[string]interface{}, fi
 	// Don't forget to set the content type, this will contain the boundary.
 	req.Header.Set("Content-Type", w.FormDataContentType())
 	// Set up content length
-	req.Header.Set("Content-Length", fmt.Sprint(req.ContentLength))
+	req.Header.Set("Content-Length", strconv.FormatInt(req.ContentLength, 10))
 
 	return req
 }
@@ -229,7 +231,7 @@ func RunAPITest(t *testing.T, description string, fixtures FixturesManager, scen
 
 			result, code, err := SendTestRequest(scenario.Request)
 
-			assert.Nil(t, err)
+			require.NoError(t, err)
 
 			assert.Equal(t, scenario.ExpectedResponseCode, code, string(result))
 

@@ -58,10 +58,10 @@ func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config, authTool middlewa
 	// sets CORS headers if Origin is present
 	e.Use(
 		echoMW.CORSWithConfig(echoMW.CORSConfig{
-			Skipper: func(c echo.Context) bool {
+			Skipper: func(_ echo.Context) bool {
 				return false
 			},
-			AllowOriginFunc: func(origin string) (bool, error) {
+			AllowOriginFunc: func(_ string) (bool, error) {
 				return true, nil
 			},
 			AllowCredentials: true,
@@ -123,7 +123,7 @@ func New(authTool middleware.AuthMiddleware) *HTTPServer {
 func StartServer(lc fx.Lifecycle, srv *HTTPServer) {
 	lc.Append(
 		fx.Hook{
-			OnStart: func(ctx context.Context) error {
+			OnStart: func(_ context.Context) error {
 				on := fmt.Sprintf("%s:%s", srv.config.Host, srv.config.Port)
 				srv.log.Info().Msgf("starting server on %s", on)
 				go func() {

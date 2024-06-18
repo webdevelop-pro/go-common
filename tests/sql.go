@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -24,7 +23,7 @@ func AssertSQL(t *testing.T, fManager FixturesManager, testCase SQLTestCase) {
 		query = strings.ReplaceAll(query, "\n", " ")
 		query = strings.ReplaceAll(query, "  ", " ")
 		query = strings.ReplaceAll(query, "  ", " ")
-		assert.FailNow(t, err.Error()+fmt.Sprintf(" failed sql: %s", query))
+		assert.FailNow(t, err.Error()+" failed sql: "+query)
 	}
 
 	CompareJSONBody(t, []byte(actualResult), []byte(testCase.ExpectedResult))

@@ -14,7 +14,6 @@ skip-files:
 linters:
   enable-all: true
   disable:
-    - fatcontext
     - nlreturn
     - wrapcheck
     - tagliatelle
@@ -25,12 +24,6 @@ linters:
     - wsl
     - tagalign
     - varnamelen
-    - godox
-    - funlen
-    - gocognit
-    - interfacebloat
-    - cyclop
-    - dupl
 
 linters-settings:
   cyclop:

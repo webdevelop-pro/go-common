@@ -59,7 +59,7 @@ func SendHTTPRequst(req Request, checks ...ExpectedResponse) SomeAction {
 	return func(t TestContext) error {
 		result, code, err := SendTestRequest(CreateDefaultRequest(req))
 
-		assert.Nil(t.T, err)
+		assert.NoError(t.T, err)
 
 		for _, expected := range checks {
 			assert.Equal(t.T, expected.Code, code, "Invalid response code")
@@ -126,7 +126,7 @@ func SQL(query string, expected ...ExpectedResult) SomeAction {
 				expValue, ok := res[key]
 				if assert.True(t.T, ok, fmt.Sprintf("Expected column %s not exist in result", key)) {
 					value = allowAny(expValue, value)
-					assert.Equal(t.T, value, expValue)
+					assert.Equal(t.T, expValue, value)
 				}
 			}
 		}
@@ -136,7 +136,7 @@ func SQL(query string, expected ...ExpectedResult) SomeAction {
 }
 
 func Sleep(d time.Duration) SomeAction {
-	return func(t TestContext) error {
+	return func(_ TestContext) error {
 		time.Sleep(d)
 
 		return nil

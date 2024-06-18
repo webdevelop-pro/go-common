@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/webdevelop-pro/go-common/context/keys"
 	"github.com/webdevelop-pro/go-common/tests"
-	"github.com/webdevelop-pro/go-logger"
+	logger "github.com/webdevelop-pro/go-logger"
 
 	// . "github.com/webdevelop-pro/go-common/tests"
 
@@ -103,7 +103,7 @@ func TestLogger_DBExec(t *testing.T) {
 	stdout := ConnectToStdout()
 
 	db := dbDriver.New()
-	_, err := db.Exec(ctx, "update user_users set email='' where id=-1;")
+	_, err := db.Exec(ctx, "SET TIME ZONE 'UTC';")
 	assert.Nil(t, err)
 
 	actualLogs := ReadStdout(stdout)
@@ -113,9 +113,9 @@ func TestLogger_DBExec(t *testing.T) {
 			"component": "db",
 			"data": {
 				"args": [],
-				"commandTag": "UPDATE 0",
+				"commandTag": "SET",
 				"pid": "%any%",
-				"sql": "update user_users set email='' where id=-1;",
+				"sql": "SET TIME ZONE 'UTC';",
 				"time": "%any%"
 			},
 			"severity": "INFO",

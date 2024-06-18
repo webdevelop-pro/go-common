@@ -1,7 +1,7 @@
 package response
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 )
 
@@ -32,7 +32,7 @@ func (r Error) Unwrap() error {
 func BadRequest(err error, msg string) Error {
 	if err == nil {
 		//nolint:goerr113
-		err = fmt.Errorf("")
+		err = errors.New("")
 	}
 	finalMsg := map[string][]string{"__error__": {msg}}
 	if msg == "" {
@@ -49,7 +49,7 @@ func BadRequest(err error, msg string) Error {
 func NotFound(err error, msg string) Error {
 	if err == nil {
 		//nolint:goerr113
-		err = fmt.Errorf("")
+		err = errors.New("")
 	}
 	finalMsg := map[string][]string{"__error__": {msg}}
 	if msg == "" {
@@ -66,7 +66,7 @@ func NotFound(err error, msg string) Error {
 func InternalError(err error, msg string) Error {
 	if err == nil {
 		//nolint:goerr113
-		err = fmt.Errorf("")
+		err = errors.New("")
 	}
 	finalMsg := map[string][]string{"__error__": {msg}}
 	if msg == "" {
