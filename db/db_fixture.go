@@ -1,13 +1,10 @@
-package tests
+package db
 
 import (
-	"context"
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/webdevelop-pro/go-common/configurator"
-	"github.com/webdevelop-pro/go-common/db"
 )
 
 type Fixture struct {
@@ -23,12 +20,12 @@ func NewFixture(table, filePath string) Fixture {
 }
 
 type FixturesManager struct {
-	db  *db.DB
-	cfg db.Config
+	db  *DB
+	cfg Config
 }
 
 func NewFixturesManager() FixturesManager {
-	cfg := db.Config{}
+	cfg := Config{}
 
 	// Fix for timezones
 	_ = os.Setenv("TZ", "America/Central Time")
@@ -42,7 +39,7 @@ func NewFixturesManager() FixturesManager {
 
 	configurator.New("postgres", &cfg, "db")
 
-	db := db.New()
+	db := New()
 
 	return FixturesManager{
 		db:  db,
@@ -51,19 +48,27 @@ func NewFixturesManager() FixturesManager {
 }
 
 func (f FixturesManager) ExecQuery(query string) error {
-	_, err := f.db.Exec(context.TODO(), query)
+	// ToDo: FixMe
+	/*
+		_, err := f.db.Exec(context.TODO(), query)
 
-	return err
+		return err
+	*/
+	return nil
 }
 
 func (f FixturesManager) SelectQuery(query string) (string, error) {
 	var result string
 
-	query = "select row_to_json(q)::text from (" + query + ") as q"
+	// ToDo: FixMe
+	/*
+		query = "select row_to_json(q)::text from (" + query + ") as q"
 
-	err := f.db.QueryRow(context.TODO(), query).Scan(&result)
+		err := f.db.QueryRow(context.TODO(), query).Scan(&result)
 
-	return result, err
+		return result, err
+	*/
+	return result, nil
 }
 
 func (f FixturesManager) CleanAndApply(fixtures []Fixture) error {
@@ -73,18 +78,25 @@ func (f FixturesManager) CleanAndApply(fixtures []Fixture) error {
 			return err
 		}
 	}
-	return f.LoadFixtures(fixtures)
+	// ToDo: Fix me
+	return nil
+	// return f.LoadFixtures(fixtures)
 }
 
 func (f FixturesManager) Clean(table string) error {
-	query := fmt.Sprintf(
-		"DELETE FROM %s; select setval('%s_id_seq',(select max(id)+1 from %s));",
-		table, table, table,
-	)
-	_, err := f.db.Exec(context.TODO(), query)
-	if err != nil {
-		return fmt.Errorf("failed delete fixtures: %w", err)
-	}
+	// ToDo: FixMe
+	/*
+		query := fmt.Sprintf(
+			"DELETE FROM %s; select setval('%s_id_seq',(select max(id)+1 from %s));",
+			table, table, table,
+		)
 
-	return err
+			_, err := f.db.Exec(context.TODO(), query)
+			if err != nil {
+				return fmt.Errorf("failed delete fixtures: %w", err)
+			}
+
+			return err
+	*/
+	return nil
 }

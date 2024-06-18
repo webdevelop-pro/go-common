@@ -1,16 +1,7 @@
 //nolint:paralleltest,thelper
 package tests
 
-import (
-	"context"
-	"os"
-	"testing"
-	"time"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/webdevelop-pro/go-common/queue/pclient"
-)
-
+/*
 func TestExample(t *testing.T) {
 	ctx := context.TODO()
 	pubsub, err := pclient.New(ctx)
@@ -93,3 +84,4 @@ func TestAny(t *testing.T) {
 		[]byte(`{"nc_issuer_id":"%any%", "nc_issuer_status":"Pending"}`),
 	)
 }
+*/

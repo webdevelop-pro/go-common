@@ -244,12 +244,6 @@ github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6Kllzaw
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
 github.com/valyala/fasttemplate v1.2.2 h1:lxLXG0uE3Qnshl9QyaK6XJxMXlQZELvChBOCmQD0Loo=
 github.com/valyala/fasttemplate v1.2.2/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
-github.com/webdevelop-pro/go-common v0.0.0-20240401151940-28291466f298 h1:rrW/40/SgalNhbXfdo0DpH7IZCs2kbAhE1sOu6q474A=
-github.com/webdevelop-pro/go-common v0.0.0-20240401151940-28291466f298/go.mod h1:8Buy1OiUCVFjgWw5ec0tUmybiDzu92p8O9M2wLsO/Wg=
-github.com/webdevelop-pro/go-common v0.0.0-20240404141858-11cb0558988b h1:WAbJUrcGEMpvoulDvK1HKIy3co3ALAB4H85VAif4EfY=
-github.com/webdevelop-pro/go-common v0.0.0-20240404141858-11cb0558988b/go.mod h1:8Buy1OiUCVFjgWw5ec0tUmybiDzu92p8O9M2wLsO/Wg=
-github.com/webdevelop-pro/go-logger v0.0.0-20240114181856-5dd3039ec7f0 h1:fwJ8b8ahEDUpMbJ4QKy0W7shfAElL13eT67ysZf556g=
-github.com/webdevelop-pro/go-logger v0.0.0-20240114181856-5dd3039ec7f0/go.mod h1:TZ+vcOSxu9NfIT6rdgfLTymGr7vq8TVlccGFFedLrWY=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 go.einride.tech/aip v0.66.0 h1:XfV+NQX6L7EOYK11yoHHFtndeaWh3KbD9/cN/6iWEt8=

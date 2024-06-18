@@ -6,7 +6,7 @@ require (
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.32.0
-	github.com/webdevelop-pro/go-common v0.0.0-20240430094328-aab9e524b9eb
+	github.com/webdevelop-pro/go-common v0.0.0-20240618212457-db6578f715ef
 	go.uber.org/fx v1.21.1
 )
 
@@ -62,10 +62,9 @@ require (
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/crypto v0.22.0 // indirect

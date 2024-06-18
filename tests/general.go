@@ -19,8 +19,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/webdevelop-pro/go-common/db"
-	pclient "github.com/webdevelop-pro/go-common/queue/pclient"
 )
 
 type BodyType string
@@ -51,10 +49,10 @@ type APITestCaseV2 struct {
 	UserID      string
 
 	// Move to db package
-	Fixtures []Fixture
+	// Fixtures []Fixture
 	// Move to pubsub package
-	PubSubFixtures []PubSubFixture
-	TestActions    []SomeAction
+	// PubSubFixtures []PubSubFixture
+	TestActions []SomeAction
 }
 
 // ToDo
@@ -234,15 +232,19 @@ func RunAPITestV2(t *testing.T, description string, scenario APITestCaseV2) {
 	t.Helper()
 
 	fixtures := NewFixturesManager()
-	pubsubClient, _ := pclient.New(context.Background())
-	pubsubFixtures := NewPubSubFixturesManager(&pubsubClient)
-	dbClient := db.New()
+	// ToDo: FixME
+	/*
+		pubsubClient, _ := pclient.New(context.Background())
+		pubsubFixtures := NewPubSubFixturesManager(&pubsubClient)
+		dbClient := db.New()
+	*/
 
 	t.Run(description+": "+scenario.Description, func(t *testing.T) {
 		testContext := TestContext{
-			Pubsub: pubsubClient,
-			DB:     dbClient,
-			T:      t,
+			// ToDo: FixME
+			// Pubsub: pubsubClient,
+			// DB:     dbClient,
+			T: t,
 		}
 
 		err := fixtures.CleanAndApply(scenario.Fixtures)

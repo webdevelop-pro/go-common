@@ -8,7 +8,6 @@ require (
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/pkg/errors v0.9.1
 	github.com/webdevelop-pro/go-common v0.0.0-20240404141858-11cb0558988b
-	github.com/webdevelop-pro/go-logger v0.0.0-20240114181856-5dd3039ec7f0
 	go.uber.org/fx v1.21.0
 )
 

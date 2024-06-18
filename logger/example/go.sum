@@ -5,3 +5,5 @@ github.com/webdevelop-pro/go-common v0.0.0-20240618212457-db6578f715ef/go.mod h1
 github.com/webdevelop-pro/go-common/logger v0.0.0-20240618212457-db6578f715ef/go.mod h1:GQUkN01Rql5TYMLZ5kRGdfGwO+L/U4WsvyXjGDPXlmw=
 github.com/webdevelop-pro/go-common/verser v0.0.0-20240618212457-db6578f715ef h1:FKbP+NHcy9Ic5FcWYsJb3Ju5BYe/djr3JVMC3oXRrnM=
 github.com/webdevelop-pro/go-common/verser v0.0.0-20240618212457-db6578f715ef/go.mod h1:j5LN7GvWAj91nQcvo+4wjtopHAhvSn6K4y+ObXP7dYU=
+github.com/webdevelop-pro/go-common/verser v0.0.0-20240618213627-6ba2fd0e1ad5 h1:Y8bRfCAS387SyBw6zIqsh6vgPLq/+s49wgMjt3COwMo=
+github.com/webdevelop-pro/go-common/verser v0.0.0-20240618213627-6ba2fd0e1ad5/go.mod h1:j5LN7GvWAj91nQcvo+4wjtopHAhvSn6K4y+ObXP7dYU=

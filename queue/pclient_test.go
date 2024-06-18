@@ -1,4 +1,4 @@
-package tests
+package queue
 
 import (
 	"context"
@@ -87,7 +87,6 @@ func TestListenNack(t *testing.T) {
 }
 
 func TestListenAck(t *testing.T) {
-
 	ctx, cancel := context.WithCancel(context.TODO())
 	pubsubClient, err := pclient.New(ctx)
 	if err != nil {
@@ -120,7 +119,6 @@ func TestListenAck(t *testing.T) {
 }
 
 func TestReconnectToNonExistTopic(t *testing.T) {
-
 	ctx, cancel := context.WithCancel(context.TODO())
 	pubsubClient, err := pclient.New(ctx)
 	if err != nil {

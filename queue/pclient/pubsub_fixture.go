@@ -1,10 +1,8 @@
-package tests
+package pclient
 
 import (
 	"context"
 	"fmt"
-
-	"github.com/webdevelop-pro/go-common/queue/pclient"
 )
 
 type PubSubFixture struct {
@@ -22,10 +20,10 @@ func NewPubSubFixture(topic, subscription, initData string) PubSubFixture {
 }
 
 type PubSubFixturesManager struct {
-	client *pclient.Client
+	client *Client
 }
 
-func NewPubSubFixturesManager(client *pclient.Client) PubSubFixturesManager {
+func NewPubSubFixturesManager(client *Client) PubSubFixturesManager {
 	return PubSubFixturesManager{
 		client: client,
 	}
