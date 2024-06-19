@@ -65,8 +65,8 @@ func (pubSubF FixturesManager) CleanAndApply() error {
 	return nil
 }
 
-func (pubSubF FixturesManager) GetCTX() context.Context {
-	return context.WithValue(context.Background(), "pubsub", pubSubF.client)
+func (pubSubF FixturesManager) SetCTX(ctx context.Context) context.Context {
+	return context.WithValue(ctx, "pubsub", pubSubF.client)
 }
 
 func (pubSubF FixturesManager) Clean(topic string, subscription string) error {

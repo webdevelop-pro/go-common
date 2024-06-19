@@ -33,7 +33,8 @@ func RunTableTest(t *testing.T, FixtureMngrs []FixturesManager, tableTest TableT
 
 	for _, fixtures := range FixtureMngrs {
 		err := fixtures.CleanAndApply()
-		assert.Fail(t, "Failed apply fixtures", err)
+		assert.NoError(t, err, "Failed apply fixtures")
+		tableTest.Context.Ctx = fixtures.SetCTX(tableTest.Context.Ctx)
 	}
 
 	// ToDo
@@ -43,7 +44,7 @@ func RunTableTest(t *testing.T, FixtureMngrs []FixturesManager, tableTest TableT
 		t.Run(tableTest.Description+": "+scenario.Description, func(t *testing.T) {
 			for _, action := range scenario.TestActions {
 				err := action(tableTest.Context)
-				assert.NoError(t, err)
+				assert.NoError(t, err, "test failed")
 			}
 		})
 	}

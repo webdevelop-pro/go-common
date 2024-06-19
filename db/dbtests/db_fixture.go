@@ -60,18 +60,18 @@ func (f FixturesManager) SelectQuery(query string) (string, error) {
 	return result, err
 }
 
-func (f FixturesManager) CleanAndApply(fixtures []Fixture) error {
-	for _, fixture := range fixtures {
+func (f FixturesManager) CleanAndApply() error {
+	for _, fixture := range f.fixtures {
 		err := f.Clean(fixture.table)
 		if err != nil {
 			return err
 		}
 	}
-	return f.LoadFixtures(fixtures)
+	return f.LoadFixtures(f.fixtures)
 }
 
-func (f FixturesManager) GetCTX() context.Context {
-	return context.WithValue(context.Background(), "db", f.db)
+func (f FixturesManager) SetCTX(ctx context.Context) context.Context {
+	return context.WithValue(ctx, "db", f.db)
 }
 
 func (f FixturesManager) Clean(table string) error {

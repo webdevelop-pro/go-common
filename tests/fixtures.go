@@ -4,5 +4,5 @@ import "context"
 
 type FixturesManager interface {
 	CleanAndApply() error
-	GetCTX() context.Context
+	SetCTX(context.Context) context.Context
 }
