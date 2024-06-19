@@ -17,3 +17,7 @@ type FixturesManager struct{}
 func (fm *FixturesManager) CleanAndApply(f []Fixture) error {
 	return nil
 }
+
+func NewFixturesManager() FixturesManager {
+	return FixturesManager{}
+}

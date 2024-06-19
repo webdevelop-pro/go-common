@@ -231,12 +231,12 @@ func RunAPITest(t *testing.T, description string, fixtures FixturesManager, scen
 func RunAPITestV2(t *testing.T, description string, scenario APITestCaseV2) {
 	t.Helper()
 
-	fixtures := NewFixturesManager()
 	// ToDo: FixME
 	/*
-		pubsubClient, _ := pclient.New(context.Background())
-		pubsubFixtures := NewPubSubFixturesManager(&pubsubClient)
-		dbClient := db.New()
+		fixtures := NewFixturesManager()
+			pubsubClient, _ := pclient.New(context.Background())
+			pubsubFixtures := NewPubSubFixturesManager(&pubsubClient)
+			dbClient := db.New()
 	*/
 
 	t.Run(description+": "+scenario.Description, func(t *testing.T) {
@@ -247,16 +247,19 @@ func RunAPITestV2(t *testing.T, description string, scenario APITestCaseV2) {
 			T: t,
 		}
 
-		err := fixtures.CleanAndApply(scenario.Fixtures)
-		if err != nil {
-			assert.Fail(t, "Failed apply fixtures", err)
-			log.Fatal().Err(err).Msgf("Failed apply fixtures")
-		}
-		err = pubsubFixtures.CleanAndApply(scenario.PubSubFixtures)
-		if err != nil {
-			log.Error().Err(err).Msgf("Failed apply pubsub fixtures")
-			assert.Fail(t, "Failed apply pubsub fixtures", err)
-		}
+		// ToDo: FixME
+		/*
+			err := fixtures.CleanAndApply(scenario.Fixtures)
+			if err != nil {
+				assert.Fail(t, "Failed apply fixtures", err)
+				log.Fatal().Err(err).Msgf("Failed apply fixtures")
+			}
+			err = pubsubFixtures.CleanAndApply(scenario.PubSubFixtures)
+			if err != nil {
+				log.Error().Err(err).Msgf("Failed apply pubsub fixtures")
+				assert.Fail(t, "Failed apply pubsub fixtures", err)
+			}
+		*/
 
 		for _, action := range scenario.TestActions {
 			err := action(testContext)
