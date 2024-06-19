@@ -16,10 +16,10 @@ type TestScenario struct {
 }
 
 type TableTest struct {
-	Description string
-	FixtureMngr FixturesManager
-	Scenarios   []TestScenario
-	Context     TestContext
+	Description  string
+	FixtureMngrs []FixturesManager
+	Scenarios    []TestScenario
+	Context      TestContext
 }
 
 /*
@@ -31,8 +31,10 @@ func GetPointer(str string) *string {
 func RunTableTest(t *testing.T, tableTest TableTest) {
 	t.Helper()
 
-	err := tableTest.FixtureMngr.CleanAndApply()
-	assert.Fail(t, "Failed apply fixtures", err)
+	for _, fixtures := range tableTest.FixtureMngrs {
+		err := fixtures.CleanAndApply()
+		assert.Fail(t, "Failed apply fixtures", err)
+	}
 
 	// ToDo
 	// Run in parallel

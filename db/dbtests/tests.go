@@ -1,4 +1,4 @@
-package db
+package dbtests
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/webdevelop-pro/go-common/db"
 	"github.com/webdevelop-pro/go-common/tests"
 )
 
@@ -16,8 +17,8 @@ const (
 	maxQueryRetries  = 25
 )
 
-func getDBPool(t tests.TestContext) *DB {
-	return t.Ctx.GetValues(pkgName).(*DB)
+func getDBPool(t tests.TestContext) *db.DB {
+	return t.Ctx.GetValues("dbtests").(*db.DB)
 }
 
 func RawSQL(query string) tests.SomeAction {

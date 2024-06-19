@@ -7,9 +7,9 @@ require (
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
-	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240619001515-b35cd6f0dddc
-	github.com/webdevelop-pro/go-common/context v0.0.0-20240619001515-b35cd6f0dddc
-	github.com/webdevelop-pro/go-common/logger v0.0.0-20240619001515-b35cd6f0dddc
+	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240619182916-a587fd544dc2
+	github.com/webdevelop-pro/go-common/context v0.0.0-20240619182916-a587fd544dc2
+	github.com/webdevelop-pro/go-common/logger v0.0.0-20240619182916-a587fd544dc2
 	github.com/webdevelop-pro/go-common/tests v0.0.0-20240619001515-b35cd6f0dddc
 )
 

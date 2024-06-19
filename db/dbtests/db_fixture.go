@@ -1,4 +1,4 @@
-package db
+package dbtests
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/webdevelop-pro/go-common/configurator"
+	"github.com/webdevelop-pro/go-common/db"
 )
 
 type Fixture struct {
@@ -22,12 +23,12 @@ func NewFixture(table, filePath string) Fixture {
 }
 
 type FixturesManager struct {
-	db  *DB
-	cfg Config
+	db  *db.DB
+	cfg db.Config
 }
 
 func NewFixturesManager(ctx context.Context) FixturesManager {
-	cfg := Config{}
+	cfg := db.Config{}
 
 	// Fix for timezones
 	_ = os.Setenv("TZ", "UTC")
@@ -41,7 +42,7 @@ func NewFixturesManager(ctx context.Context) FixturesManager {
 
 	configurator.New("postgres", &cfg, "db")
 
-	db := New(ctx)
+	db := db.New(ctx)
 
 	return FixturesManager{
 		db:  db,
