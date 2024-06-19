@@ -7,7 +7,7 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/pkg/errors"
-	"github.com/webdevelop-pro/go-common/server/validator"
+	"github.com/webdevelop-pro/go-common/validator"
 )
 
 func (b *Client) PublishEvent(

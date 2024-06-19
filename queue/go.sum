@@ -129,10 +129,16 @@ github.com/webdevelop-pro/go-common/context v0.0.0-20240619001515-b35cd6f0dddc h
 github.com/webdevelop-pro/go-common/context v0.0.0-20240619001515-b35cd6f0dddc/go.mod h1:sTPN4cFn9lkQqBr15rMVrSUbgiLGU0ygpVJw/KmanyU=
 github.com/webdevelop-pro/go-common/logger v0.0.0-20240619001515-b35cd6f0dddc h1:gp7CxsCXX9un2vmVUdO7ffkYTVHnkO51vIE8NBSbfpU=
 github.com/webdevelop-pro/go-common/logger v0.0.0-20240619001515-b35cd6f0dddc/go.mod h1:dXcfR9fuiwOY79G3GteXKsohxWrCor6iZ6cJwSX3zMA=
+github.com/webdevelop-pro/go-common/misc v0.0.0-20240619182916-a587fd544dc2 h1:8mStnwkkxA/R0Jbv6Y4v/aruzAcvdrhCNzrpUhzzUw8=
+github.com/webdevelop-pro/go-common/misc v0.0.0-20240619182916-a587fd544dc2/go.mod h1:rWON4xXHLd2YPtk0dsR1mpscY88LJDr+UawAV0fU2n8=
 github.com/webdevelop-pro/go-common/server v0.0.0-20240619001515-b35cd6f0dddc h1:UbuRgC7+HhklD2NEbYHsuTPwRDuP5jhpc/j5ZgY0c9U=
 github.com/webdevelop-pro/go-common/server v0.0.0-20240619001515-b35cd6f0dddc/go.mod h1:38CJfGdpy/u69sLIyqcfCmUKps0AzrcMJa3i9u/ci5Y=
+github.com/webdevelop-pro/go-common/tests v0.0.0-20240619195436-418274092983 h1:idYYqK81tS247jvz90Ezop5QEGS8TAz5e4/QgNiIksI=
+github.com/webdevelop-pro/go-common/tests v0.0.0-20240619195436-418274092983/go.mod h1:mqA3BUTm7LKNXe59+y9ly6J0uvhIaI/4J2/Zq7w5Mf0=
 github.com/webdevelop-pro/go-common/verser v0.0.0-20240618220238-079857f66ea4 h1:3ISZm2gAy4hoog9aym1ep/RbTl5ivJfPt/I0j3GFZPA=
 github.com/webdevelop-pro/go-common/verser v0.0.0-20240618220238-079857f66ea4/go.mod h1:j5LN7GvWAj91nQcvo+4wjtopHAhvSn6K4y+ObXP7dYU=
+github.com/webdevelop-pro/go-common/verser v0.0.0-20240619195436-418274092983 h1:mL0Q+3PAUyCBcYFu0t3uqtGu18sYf1vPxnAeAtBbXPM=
+github.com/webdevelop-pro/go-common/verser v0.0.0-20240619195436-418274092983/go.mod h1:j5LN7GvWAj91nQcvo+4wjtopHAhvSn6K4y+ObXP7dYU=
 go.einride.tech/aip v0.67.1 h1:d/4TW92OxXBngkSOwWS2CH5rez869KpKMaN44mdxkFI=
 go.einride.tech/aip v0.67.1/go.mod h1:ZGX4/zKw8dcgzdLsrvpOOGxfxI2QSk12SlP7d6c0/XI=
 go.opencensus.io v0.24.0 h1:y73uSU6J157QMP2kn2r30vwW1A2W2WFwSCGnAVxeaD0=
