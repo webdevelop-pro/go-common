@@ -27,14 +27,16 @@ func New(ctx context.Context) (Client, error) {
 	cfg := Config{}
 	log := logger.NewComponentLogger(ctx, pkgName)
 
-	err := configurator.NewConfiguration(&cfg, "pubsub")
+	err := configurator.NewConfiguration(&cfg, pkgName)
 	if err != nil {
 		log.Fatal().Stack().Err(err).Msg(ErrConfigParse.Error())
+		return Client{}, err
 	}
 
 	bclient, err := gpubsub.NewClient(ctx, cfg.ProjectID, option.WithCredentialsFile(cfg.ServiceAccountCredentials))
 	if err != nil {
 		log.Fatal().Stack().Err(err).Msg(err.Error())
+		return Client{}, err
 	}
 
 	b := Client{

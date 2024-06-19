@@ -3,7 +3,6 @@ package dbtests
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/webdevelop-pro/go-common/configurator"
@@ -23,11 +22,12 @@ func NewFixture(table, filePath string) Fixture {
 }
 
 type FixturesManager struct {
-	db  *db.DB
-	cfg db.Config
+	db       *db.DB
+	cfg      db.Config
+	fixtures []Fixture
 }
 
-func NewFixturesManager(ctx context.Context) FixturesManager {
+func NewFixturesManager(ctx context.Context, fixtures ...Fixture) FixturesManager {
 	cfg := db.Config{}
 
 	// Fix for timezones
@@ -35,18 +35,14 @@ func NewFixturesManager(ctx context.Context) FixturesManager {
 
 	err := configurator.NewConfiguration(&cfg, "DB")
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 
-	configurator := configurator.NewConfigurator()
-
-	configurator.New("postgres", &cfg, "db")
-
 	db := db.New(ctx)
-
 	return FixturesManager{
-		db:  db,
-		cfg: cfg,
+		db:       db,
+		cfg:      cfg,
+		fixtures: fixtures,
 	}
 }
 
@@ -72,6 +68,10 @@ func (f FixturesManager) CleanAndApply(fixtures []Fixture) error {
 		}
 	}
 	return f.LoadFixtures(fixtures)
+}
+
+func (f FixturesManager) GetCTX() context.Context {
+	return context.WithValue(context.Background(), "db", f.db)
 }
 
 func (f FixturesManager) Clean(table string) error {

@@ -8,12 +8,12 @@ import (
 )
 
 func getClient(t tests.TestContext) *Client {
-	return t.Ctx.GetValues(pkgName).(*Client)
+	return t.Ctx.Value(pkgName).(*Client)
 }
 
 func SendPubSubEvent(topic string, body any, attr map[string]string) tests.SomeAction {
 	return func(t tests.TestContext) error {
-		_, err := getClient(t).PublishToTopic(context.Background(), topic, body, attr)
+		_, err := getClient(t).PublishToTopic(t.Ctx, topic, body, attr)
 		return err
 	}
 }
@@ -25,32 +25,35 @@ func CheckIfMsgRead(topic string, body any) tests.SomeAction {
 	}
 }
 
-type PubSubFixture struct {
+type Fixture struct {
 	topic        string
 	subscription string
 	initData     byte
 }
 
-func NewPubSubFixture(topic, subscription string, initData byte) PubSubFixture {
-	return PubSubFixture{
+func NewFixture(topic, subscription string, initData byte) Fixture {
+	return Fixture{
 		topic:        topic,
 		subscription: subscription,
 		initData:     initData,
 	}
 }
 
-type PubSubFixturesManager struct {
-	client *Client
+type FixturesManager struct {
+	client   *Client
+	fixtures []Fixture
 }
 
-func NewPubSubFixturesManager(client *Client) PubSubFixturesManager {
-	return PubSubFixturesManager{
-		client: client,
+func NewFixturesManager(ctx context.Context, fixtures ...Fixture) FixturesManager {
+	client, _ := New(ctx)
+	return FixturesManager{
+		client:   &client,
+		fixtures: fixtures,
 	}
 }
 
-func (pubSubF PubSubFixturesManager) CleanAndApply(fixtures []PubSubFixture) error {
-	for _, fixture := range fixtures {
+func (pubSubF FixturesManager) CleanAndApply() error {
+	for _, fixture := range pubSubF.fixtures {
 		err := pubSubF.Clean(fixture.topic, fixture.subscription)
 		if err != nil {
 			return err
@@ -62,7 +65,11 @@ func (pubSubF PubSubFixturesManager) CleanAndApply(fixtures []PubSubFixture) err
 	return nil
 }
 
-func (pubSubF PubSubFixturesManager) Clean(topic string, subscription string) error {
+func (pubSubF FixturesManager) GetCTX() context.Context {
+	return context.WithValue(context.Background(), "pubsub", pubSubF.client)
+}
+
+func (pubSubF FixturesManager) Clean(topic string, subscription string) error {
 	ctx := context.Background()
 	ok, err := pubSubF.client.SubscriptionExist(ctx, subscription)
 	if err != nil {
