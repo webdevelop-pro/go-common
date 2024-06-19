@@ -5,11 +5,9 @@ import (
 	"testing"
 )
 
-func TestNewConn(t *testing.T) {
-	// ToDo
-	// NewConn should return an error
+func TestNewPool(t *testing.T) {
 	ctx := context.Background()
-	conn := NewConn(ctx)
+	conn := NewPool(ctx)
 	var name string
 	err := conn.QueryRow(ctx, "select 'test'").Scan(&name)
 	if err != nil {

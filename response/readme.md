@@ -4,7 +4,7 @@
 - We want to unify error responses and generic responses accross different microservices.
 - Plus, we want to make `ports/http` as independend from `app/app` itself as possible.
 - Meaning, `app/app` can also be used in cli utilities, or with grcp handler or graphql.
-- So `app/appp` should keep same responses and error codes regardless of the protocol.
+- So `app/app` should keep same responses and error codes regardless of the protocol.
 
 
 At this moment we are heavily using `response.Error` structure:

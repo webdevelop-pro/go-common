@@ -2,6 +2,7 @@
 package db
 
 import (
+	"bufio"
 	"context"
 	"os"
 	"testing"
@@ -12,6 +13,43 @@ import (
 	"github.com/webdevelop-pro/go-common/logger"
 	"github.com/webdevelop-pro/go-common/tests"
 )
+
+type stdOut struct {
+	r *os.File
+	w *os.File
+}
+
+func ConnectToStdout() *stdOut {
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	return &stdOut{
+		r: r,
+		w: w,
+	}
+}
+
+func ReadStdout(stdOut *stdOut) []string {
+	result := make([]string, 0)
+	scanner := bufio.NewScanner(stdOut.r)
+	done := make(chan struct{})
+
+	go func() {
+		// Read line by line and process it
+		for scanner.Scan() {
+			line := scanner.Text()
+			result = append(result, line)
+		}
+
+		// We're all done, unblock the channel
+		done <- struct{}{}
+	}()
+
+	stdOut.w.Close()
+	<-done
+
+	return result
+}
 
 func CreateTestContext() context.Context {
 	logInfo := logger.ServiceContext{
@@ -45,7 +83,7 @@ func TestLogger_DBQuery(t *testing.T) {
 
 	stdout := ConnectToStdout()
 
-	db := New()
+	db := New(ctx)
 	err := db.QueryRow(ctx, "select 1, 'b', now();").Scan(&resultInt, &resultStr, &resultTime)
 	assert.Nil(t, err)
 
@@ -98,7 +136,7 @@ func TestLogger_DBExec(t *testing.T) {
 
 	stdout := ConnectToStdout()
 
-	db := New()
+	db := New(ctx)
 	_, err := db.Exec(ctx, "SET TIME ZONE 'UTC';")
 	assert.Nil(t, err)
 
@@ -152,7 +190,7 @@ func TestLogger_DBQuery_ERROR(t *testing.T) {
 
 	stdout := ConnectToStdout()
 
-	db := New()
+	db := New(ctx)
 	err := db.QueryRow(ctx, "select asd;").Scan(&resultInt, &resultStr, &resultTime)
 	assert.NotNil(t, err)
 

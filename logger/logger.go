@@ -62,7 +62,7 @@ func DefaultStdoutLogger(c context.Context, logLevel string) Logger {
 // NewComponentLogger return default logger instance with custom component
 func NewComponentLogger(c context.Context, component string) Logger {
 	cfg := Config{}
-	err := configurator.NewConfiguration(&cfg, "logger")
+	err := configurator.NewConfiguration(&cfg, "log")
 	if err != nil {
 		panic(err)
 	}

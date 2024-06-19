@@ -4,11 +4,13 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/pkg/errors"
 	"github.com/webdevelop-pro/go-common/logger"
 )
 
-var ErrNotUpdated = errors.Errorf("UPDATE 0")
+var (
+	pkgName    = "db"
+	maxRetries = 100
+)
 
 // DB is a layer to simplify interact with DB
 type DB struct {
@@ -17,10 +19,10 @@ type DB struct {
 }
 
 // New returns new DB instance.
-func New() *DB {
-	logger := logger.NewComponentLogger(context.TODO(), pkgName)
+func New(ctx context.Context) *DB {
+	logger := logger.NewComponentLogger(ctx, pkgName)
 
-	return NewDB(NewPool(), logger)
+	return NewDB(NewPool(ctx), logger)
 }
 
 // NewDB returns new DB instance.

@@ -13,7 +13,7 @@ import (
 	"github.com/webdevelop-pro/go-common/server/healthcheck"
 	"github.com/webdevelop-pro/go-common/server/middleware"
 	"github.com/webdevelop-pro/go-common/server/route"
-	"github.com/webdevelop-pro/go-common/server/validator"
+	"github.com/webdevelop-pro/go-common/validator"
 	"go.uber.org/fx"
 )
 

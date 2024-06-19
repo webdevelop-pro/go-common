@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
-	"github.com/webdevelop-pro/go-common/server/response"
+	"github.com/webdevelop-pro/go-common/response"
 )
 
 const (

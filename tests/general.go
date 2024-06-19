@@ -2,275 +2,52 @@ package tests
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
-	"fmt"
-	"io"
 	"math"
-	"mime/multipart"
-	"net"
-	"net/http"
-	"os"
 	"reflect"
-	"strconv"
-	"strings"
 	"testing"
 
-	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-type BodyType string
-
-const (
-	JSONBody BodyType = "json"
-	FileBody BodyType = "file"
-)
-
-type APITestCase struct {
+type TestScenario struct {
 	Description string
-	UserID      string
-	// ToDo
-	// Write down description why its needed
-	OnlyForDebugMode bool
-	Fixtures         []Fixture
-
-	Request              *http.Request
-	BodyType             BodyType
-	ExpectedResponseBody []byte
-	ExpectedResponseCode int
-
-	TestFunc func(map[string]interface{})
-}
-
-type APITestCaseV2 struct {
-	Description string
-	UserID      string
-
-	// Move to db package
-	// Fixtures []Fixture
-	// Move to pubsub package
-	// PubSubFixtures []PubSubFixture
 	TestActions []SomeAction
 }
 
-// ToDo
-// Create in go-common xserver utils method to make http request
-func CreateDefaultRequest(req Request) *http.Request {
-	if req.Host == "" {
-		appHost := os.Getenv("HOST")
-		appPort := os.Getenv("PORT")
-
-		if appHost == "" || appPort == "" {
-			log.Fatal().Msg("please set HOST and PORT vars")
-		}
-
-		req.Host = appHost + ":" + appPort
-	}
-
-	if req.Scheme == "" {
-		req.Scheme = "http"
-	}
-
-	r, err := http.NewRequest(
-		req.Method,
-		fmt.Sprintf("%s://%s%s", req.Scheme, req.Host, req.Path),
-		bytes.NewBuffer((req.Body)),
-	)
-	if err != nil {
-		log.Fatal().Err(err).Msgf("cannot create new request")
-	}
-
-	r = r.WithContext(context.Background())
-	r.Header.Add("Content-Type", "application/json")
-
-	for key, value := range req.Headers {
-		r.Header.Add(key, value)
-	}
-
-	return r
+type TableTest struct {
+	Description string
+	FixtureMngr FixturesManager
+	Scenarios   []TestScenario
+	Context     TestContext
 }
 
-// ToDo
-// Create in go-common xserver utils method to make request with files
-func CreateRequestWithFiles(method, path string, body map[string]interface{}, files map[string]string) *http.Request {
-	buf := new(bytes.Buffer)
-	w := multipart.NewWriter(buf)
-
-	appHost := os.Getenv("HOST")
-	appPort := os.Getenv("PORT")
-
-	if appHost == "" || appPort == "" {
-		log.Fatal().Msg("please set HOST and PORT vars")
-	}
-
-	values := map[string]io.Reader{}
-	for k, v := range body {
-		if vs, ok := v.(string); ok {
-			values[k] = strings.NewReader(vs)
-		}
-	}
-
-	for k, v := range files {
-		f, err := os.Open(v)
-		if err != nil {
-			log.Fatal().Err(err).Msgf("cannot open file %s", v)
-		}
-		values[k] = f
-	}
-
-	for key, r := range values {
-		var fw io.Writer
-		var err error
-		x, ok := r.(io.Closer)
-		if !ok {
-			continue
-		}
-		// upload a file
-		if _, ok := r.(*os.File); ok {
-			if fw, err = w.CreateFormFile(key, files[key]); err != nil {
-				w.Close()
-				x.Close()
-				log.Fatal().Err(err).Msgf("cannot CreateFormFile %s, %s", key, err.Error())
-			}
-		} else {
-			// Add other fields
-			if fw, err = w.CreateFormField(key); err != nil {
-				w.Close()
-				x.Close()
-				log.Fatal().Err(err).Msgf("cannot CreateFormField %s, %s", key, err.Error())
-			}
-		}
-		if _, err = io.Copy(fw, r); err != nil {
-			log.Fatal().Err(err).Msgf("cannot io.Copy %s, %s", key, err.Error())
-		}
-
-		x.Close()
-	}
-	// Don't forget to close the multipart writer.
-	// If you don't close it, your request will be missing the terminating boundary.
-	w.Close()
-
-	// Now that you have a form, you can submit it to your handler.
-	req, err := http.NewRequest(
-		method,
-		fmt.Sprintf("http://%s%s", net.JoinHostPort(appHost, appPort), path),
-		buf,
-	)
-	if err != nil {
-		log.Fatal().Err(err).Msgf("cannot create new request %s", err.Error())
-	}
-
-	req = req.WithContext(context.Background())
-
-	// Don't forget to set the content type, this will contain the boundary.
-	req.Header.Set("Content-Type", w.FormDataContentType())
-	// Set up content length
-	req.Header.Set("Content-Length", strconv.FormatInt(req.ContentLength, 10))
-
-	return req
-}
-
-func SendTestRequest(req *http.Request) ([]byte, int, error) {
-	httpClient := &http.Client{}
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return nil, 0, err
-	}
-	defer resp.Body.Close()
-
-	bodyBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Error().Err(err).Msgf("cannot read response body %s", err.Error())
-		return nil, 0, nil
-	}
-
-	return bodyBytes, resp.StatusCode, nil
-}
-
+/*
 func GetPointer(str string) *string {
 	return &str
 }
+*/
 
-func RunAPITest(t *testing.T, description string, fixtures FixturesManager, scenarios []APITestCase) {
+func RunTableTest(t *testing.T, tableTest TableTest) {
 	t.Helper()
 
-	for _, s := range scenarios {
+	err := tableTest.FixtureMngr.CleanAndApply()
+	assert.Fail(t, "Failed apply fixtures", err)
+
+	// ToDo
+	// Run in parallel
+	for _, s := range tableTest.Scenarios {
 		scenario := s
-		t.Run(description+": "+scenario.Description, func(t *testing.T) {
-			err := fixtures.CleanAndApply(scenario.Fixtures)
-			if err != nil {
-				assert.Fail(t, "Failed apply fixtures", err)
-				log.Fatal().Err(err).Msgf("Failed apply fixtures")
-			}
-
-			result, code, err := SendTestRequest(scenario.Request)
-
-			require.NoError(t, err)
-
-			assert.Equal(t, scenario.ExpectedResponseCode, code, string(result))
-
-			if scenario.ExpectedResponseBody != nil {
-				CompareJSONBody(t, result, scenario.ExpectedResponseBody)
-			}
-
-			if scenario.TestFunc != nil {
-				bodyMap := make(map[string]interface{})
-				if len(result) > 0 {
-					if err := json.Unmarshal(result, &bodyMap); err != nil {
-						t.Errorf("cannot convert body %s to map[string]interface, %s", result, err.Error())
-					}
-				}
-				scenario.TestFunc(bodyMap)
+		t.Run(tableTest.Description+": "+scenario.Description, func(t *testing.T) {
+			for _, action := range scenario.TestActions {
+				err := action(tableTest.Context)
+				assert.NoError(t, err)
 			}
 		})
 	}
 }
 
-func RunAPITestV2(t *testing.T, description string, scenario APITestCaseV2) {
-	t.Helper()
-
-	// ToDo: FixME
-	/*
-		fixtures := NewFixturesManager()
-			pubsubClient, _ := pclient.New(context.Background())
-			pubsubFixtures := NewPubSubFixturesManager(&pubsubClient)
-			dbClient := db.New()
-	*/
-
-	t.Run(description+": "+scenario.Description, func(t *testing.T) {
-		testContext := TestContext{
-			// ToDo: FixME
-			// Pubsub: pubsubClient,
-			// DB:     dbClient,
-			T: t,
-		}
-
-		// ToDo: FixME
-		/*
-			err := fixtures.CleanAndApply(scenario.Fixtures)
-			if err != nil {
-				assert.Fail(t, "Failed apply fixtures", err)
-				log.Fatal().Err(err).Msgf("Failed apply fixtures")
-			}
-			err = pubsubFixtures.CleanAndApply(scenario.PubSubFixtures)
-			if err != nil {
-				log.Error().Err(err).Msgf("Failed apply pubsub fixtures")
-				assert.Fail(t, "Failed apply pubsub fixtures", err)
-			}
-		*/
-
-		for _, action := range scenario.TestActions {
-			err := action(testContext)
-			if err != nil {
-				log.Fatal().Err(err).Msgf("scenario return an error")
-			}
-		}
-	})
-}
-
-func allowDictAny(src, dst map[string]interface{}) map[string]interface{} {
+func AllowDictAny(src, dst map[string]interface{}) map[string]interface{} {
 	res := dst
 
 	for k, v := range dst {
@@ -285,7 +62,7 @@ func allowDictAny(src, dst map[string]interface{}) map[string]interface{} {
 			}
 		case map[string]any:
 			if srck, ok := src[k].(map[string]any); ok {
-				res[k] = allowDictAny(srck, val)
+				res[k] = AllowDictAny(srck, val)
 			}
 		}
 	}
@@ -293,7 +70,7 @@ func allowDictAny(src, dst map[string]interface{}) map[string]interface{} {
 	return res
 }
 
-func allowAny(src, dst interface{}) interface{} {
+func AllowAny(src, dst interface{}) interface{} {
 	res := dst
 
 	switch val := dst.(type) {
@@ -340,6 +117,6 @@ func CompareJSONBody(t *testing.T, actual, expected []byte) {
 		return
 	}
 
-	expectedBody = allowDictAny(actualBody, expectedBody)
+	expectedBody = AllowDictAny(actualBody, expectedBody)
 	assert.EqualValuesf(t, expectedBody, actualBody, "responses not equal")
 }

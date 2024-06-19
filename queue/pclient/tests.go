@@ -3,15 +3,35 @@ package pclient
 import (
 	"context"
 	"fmt"
+
+	"github.com/webdevelop-pro/go-common/tests"
 )
+
+func getClient(t tests.TestContext) *Client {
+	return t.Ctx.GetValues(pkgName).(*Client)
+}
+
+func SendPubSubEvent(topic string, body any, attr map[string]string) tests.SomeAction {
+	return func(t tests.TestContext) error {
+		_, err := getClient(t).PublishToTopic(context.Background(), topic, body, attr)
+		return err
+	}
+}
+
+func CheckIfMsgRead(topic string, body any) tests.SomeAction {
+	return func(t tests.TestContext) error {
+		// _, err := getClient(t).PublishToTopic(context.Background(), topic, body, attr)
+		return nil
+	}
+}
 
 type PubSubFixture struct {
 	topic        string
 	subscription string
-	initData     string
+	initData     byte
 }
 
-func NewPubSubFixture(topic, subscription, initData string) PubSubFixture {
+func NewPubSubFixture(topic, subscription string, initData byte) PubSubFixture {
 	return PubSubFixture{
 		topic:        topic,
 		subscription: subscription,

@@ -10,7 +10,7 @@ What changes we providing:
 
 - Bind echo framework with validator, `err` is a `response.Error` 
 ```go
-import "github.com/webdevelop-pro/go-common/server/validator"
+import "github.com/webdevelop-pro/go-common/validator"
 
 // get an instance of a validator
 e.Validator = validator.New()

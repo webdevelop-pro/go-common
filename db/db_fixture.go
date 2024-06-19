@@ -1,6 +1,8 @@
 package db
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -24,11 +26,11 @@ type FixturesManager struct {
 	cfg Config
 }
 
-func NewFixturesManager() FixturesManager {
+func NewFixturesManager(ctx context.Context) FixturesManager {
 	cfg := Config{}
 
 	// Fix for timezones
-	_ = os.Setenv("TZ", "America/Central Time")
+	_ = os.Setenv("TZ", "UTC")
 
 	err := configurator.NewConfiguration(&cfg, "DB")
 	if err != nil {
@@ -39,7 +41,7 @@ func NewFixturesManager() FixturesManager {
 
 	configurator.New("postgres", &cfg, "db")
 
-	db := New()
+	db := New(ctx)
 
 	return FixturesManager{
 		db:  db,
@@ -48,27 +50,17 @@ func NewFixturesManager() FixturesManager {
 }
 
 func (f FixturesManager) ExecQuery(query string) error {
-	// ToDo: FixMe
-	/*
-		_, err := f.db.Exec(context.TODO(), query)
-
-		return err
-	*/
-	return nil
+	_, err := f.db.Exec(context.TODO(), query)
+	return err
 }
 
 func (f FixturesManager) SelectQuery(query string) (string, error) {
 	var result string
 
-	// ToDo: FixMe
-	/*
-		query = "select row_to_json(q)::text from (" + query + ") as q"
+	query = "select row_to_json(q)::text from (" + query + ") as q"
+	err := f.db.QueryRow(context.TODO(), query).Scan(&result)
 
-		err := f.db.QueryRow(context.TODO(), query).Scan(&result)
-
-		return result, err
-	*/
-	return result, nil
+	return result, err
 }
 
 func (f FixturesManager) CleanAndApply(fixtures []Fixture) error {
@@ -78,25 +70,19 @@ func (f FixturesManager) CleanAndApply(fixtures []Fixture) error {
 			return err
 		}
 	}
-	// ToDo: Fix me
-	return nil
-	// return f.LoadFixtures(fixtures)
+	return f.LoadFixtures(fixtures)
 }
 
 func (f FixturesManager) Clean(table string) error {
-	// ToDo: FixMe
-	/*
-		query := fmt.Sprintf(
-			"DELETE FROM %s; select setval('%s_id_seq',(select max(id)+1 from %s));",
-			table, table, table,
-		)
+	query := fmt.Sprintf(
+		"DELETE FROM %s; select setval('%s_id_seq',(select max(id)+1 from %s));",
+		table, table, table,
+	)
 
-			_, err := f.db.Exec(context.TODO(), query)
-			if err != nil {
-				return fmt.Errorf("failed delete fixtures: %w", err)
-			}
+	_, err := f.db.Exec(context.TODO(), query)
+	if err != nil {
+		return fmt.Errorf("failed delete fixtures: %w", err)
+	}
 
-			return err
-	*/
-	return nil
+	return err
 }
