@@ -11,9 +11,9 @@ require (
 	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240619195436-418274092983
 	github.com/webdevelop-pro/go-common/context v0.0.0-20240619195436-418274092983
 	github.com/webdevelop-pro/go-common/logger v0.0.0-20240619195436-418274092983
-	github.com/webdevelop-pro/go-common/verser v0.0.0-20240619195436-418274092983
-	github.com/webdevelop-pro/go-common/validator v0.0.0-20240619195436-418274092983
 	github.com/webdevelop-pro/go-common/tests v0.0.0-20240619195436-418274092983
+	github.com/webdevelop-pro/go-common/validator v0.0.0-20240619195436-418274092983
+	github.com/webdevelop-pro/go-common/verser v0.0.0-20240619195436-418274092983
 	google.golang.org/api v0.185.0
 )
 
@@ -45,10 +45,12 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/rs/zerolog v1.33.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/webdevelop-pro/go-common/misc v0.0.0-20240619195436-418274092983 // indirect
+	github.com/webdevelop-pro/go-common/response v0.0.0-20240619195436-418274092983 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0 // indirect
