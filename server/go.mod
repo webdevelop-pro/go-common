@@ -9,13 +9,13 @@ require (
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/labstack/gommon v0.4.2
 	github.com/pkg/errors v0.9.1
-	github.com/rs/zerolog v1.32.0
+	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.9.0
-	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240618220238-079857f66ea4
-	github.com/webdevelop-pro/go-common/context v0.0.0-20240618220238-079857f66ea4
-	github.com/webdevelop-pro/go-common/logger v0.0.0-20240618221635-84fe56c0a310
-	github.com/webdevelop-pro/go-common/verser v0.0.0-20240618220238-079857f66ea4
-	go.uber.org/fx v1.21.1
+	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240619001515-b35cd6f0dddc
+	github.com/webdevelop-pro/go-common/context v0.0.0-20240619001515-b35cd6f0dddc
+	github.com/webdevelop-pro/go-common/logger v0.0.0-20240619001515-b35cd6f0dddc
+	github.com/webdevelop-pro/go-common/verser v0.0.0-20240619001515-b35cd6f0dddc
+	go.uber.org/fx v1.22.0
 )
 
 require (
