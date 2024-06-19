@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
 	"github.com/webdevelop-pro/go-common/configurator"
-	logger "github.com/webdevelop-pro/go-logger"
+	"github.com/webdevelop-pro/go-common/logger"
 )
 
 type AuthMiddleware interface {

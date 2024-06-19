@@ -4,26 +4,6 @@ import (
 	"context"
 )
 
-const (
-	LogentryObject      = "logentry"
-	PermissionObject    = "permission"
-	GroupObject         = "group"
-	ContentTypeObject   = "contenttype"
-	SessionObject       = "session"
-	AccountObject       = "account"
-	FilerObject         = "filer"
-	OfferFilerObject    = "offerfiler"
-	OfferObject         = "offer"
-	ProfileObject       = "profile"
-	InvestmentObject    = "investment"
-	ApplogObject        = "applog"
-	EmailObject         = "email"
-	CommentObject       = "comment"
-	WalletObject        = "wallet"
-	FundingsourceObject = "fundingsource"
-	TransactionObject   = "transaction"
-)
-
 type ContextKey rune
 
 const (
