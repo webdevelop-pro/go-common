@@ -12,6 +12,7 @@ require (
 	github.com/webdevelop-pro/go-common/context v0.0.0-20240619195436-418274092983
 	github.com/webdevelop-pro/go-common/logger v0.0.0-20240619195436-418274092983
 	github.com/webdevelop-pro/go-common/verser v0.0.0-20240619195436-418274092983
+	github.com/webdevelop-pro/go-common/validator v0.0.0-20240619195436-418274092983
 	github.com/webdevelop-pro/go-common/tests v0.0.0-20240619195436-418274092983
 	google.golang.org/api v0.185.0
 )
