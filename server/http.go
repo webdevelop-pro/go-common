@@ -23,24 +23,29 @@ type HTTPServer struct {
 	config *Config
 }
 
-func InitAllRoutes(srv *HTTPServer, params route.ConfiguratorIn) {
-	for _, rg := range params.Configurators {
-		srv.InitRoutes(rg)
+func InitAndRun() fx.Option {
+	return fx.Module("http-server",
+		// Init http server
+		fx.Provide(New),
+		fx.Invoke(
+			// Registration routes and handlers for http server
+			InitHandlerGroups,
+			// Run HTTP server
+			StartServer,
+		),
+	)
+}
+func (s *HTTPServer) InitRoutes(rg route.Configurator) {
+	for _, route := range rg.GetRoutes() {
+		//nolint:gosec,scopelint
+		s.AddRoute(&route)
 	}
 }
 
 // AddRoute adds route to the router.
-func (s *HTTPServer) AddRoute(rte *route.Route) {
-	handle := rte.Handle
-	rte.Middlewares = append(rte.Middlewares, middleware.SetLogger)
-	s.Echo.Add(rte.Method, rte.Path, handle, rte.Middlewares...)
-}
-
-func (s *HTTPServer) InitRoutes(rg route.Configurator) {
-	for _, rte := range rg.GetRoutes() {
-		//nolint:gosec,scopelint
-		s.AddRoute(&rte)
-	}
+func (s *HTTPServer) AddRoute(route *route.Route) {
+	route.Middlewares = append(route.Middlewares, middleware.SetLogger)
+	s.Echo.Add(route.Method, route.Path, route.Handler, route.Middlewares...)
 }
 
 // NewHTTPServer returns new API instance.
