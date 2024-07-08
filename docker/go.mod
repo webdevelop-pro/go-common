@@ -7,7 +7,7 @@ require (
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/labstack/echo/v4 v4.12
 	github.com/pkg/errors v0.9.1
-	github.com/webdevelop-pro/go-common v0.0.0-20240619001515-b35cd6f0dddc
+	github.com/webdevelop-pro/go-common v0.0.0-20240619210102-e76ff65c260d
 	go.uber.org/fx v1.22
 )
 

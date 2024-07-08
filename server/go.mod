@@ -11,10 +11,6 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.9.0
-	github.com/webdevelop-pro/go-common/configurator/v1
-	github.com/webdevelop-pro/go-common/context/v1
-	github.com/webdevelop-pro/go-common/logger/v1
-	github.com/webdevelop-pro/go-common/verser/v1
 	go.uber.org/fx v1.22.0
 )
 
@@ -40,6 +36,11 @@ require (
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
+	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240619210102-e76ff65c260d // indirect
+	github.com/webdevelop-pro/go-common/context v0.0.0-20240619210102-e76ff65c260d // indirect
+	github.com/webdevelop-pro/go-common/logger v0.0.0-20240619210102-e76ff65c260d // indirect
+	github.com/webdevelop-pro/go-common/response v0.0.0-20240619210102-e76ff65c260d // indirect
+	github.com/webdevelop-pro/go-common/validator v0.0.0-20240619210102-e76ff65c260d // indirect
 	go.uber.org/dig v1.17.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
