@@ -4,7 +4,7 @@ go 1.22.2
 
 require (
 	github.com/stretchr/testify v1.9.0
-	github.com/webdevelop-pro/go-common/misc v0.0.0-20240619195436-418274092983
+	github.com/webdevelop-pro/go-common/misc/v1
 )
 
 require (
