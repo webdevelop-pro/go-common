@@ -4,13 +4,17 @@ go 1.22.2
 
 require (
 	github.com/go-playground/assert/v2 v2.2.0
-	github.com/go-playground/validator/v10 v10.22.0
 	github.com/labstack/echo-contrib v0.17.1
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/labstack/gommon v0.4.2
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.9.0
+	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240708135618-3888896d716b
+	github.com/webdevelop-pro/go-common/context v0.0.0-20240708135618-3888896d716b
+	github.com/webdevelop-pro/go-common/logger v0.0.0-20240708135618-3888896d716b
+	github.com/webdevelop-pro/go-common/validator v0.0.0-20240708135618-3888896d716b
+	github.com/webdevelop-pro/go-common/verser v0.0.0-20240708135618-3888896d716b
 	go.uber.org/fx v1.22.0
 )
 
@@ -21,6 +25,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/go-playground/validator/v10 v10.22.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
@@ -36,11 +41,7 @@ require (
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240619210102-e76ff65c260d // indirect
-	github.com/webdevelop-pro/go-common/context v0.0.0-20240619210102-e76ff65c260d // indirect
-	github.com/webdevelop-pro/go-common/logger v0.0.0-20240619210102-e76ff65c260d // indirect
-	github.com/webdevelop-pro/go-common/response v0.0.0-20240619210102-e76ff65c260d // indirect
-	github.com/webdevelop-pro/go-common/validator v0.0.0-20240619210102-e76ff65c260d // indirect
+	github.com/webdevelop-pro/go-common/response v0.0.0-20240708135618-3888896d716b // indirect
 	go.uber.org/dig v1.17.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
