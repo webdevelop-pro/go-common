@@ -4,18 +4,21 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/labstack/echo-contrib/prometheus"
+	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
 	echoMW "github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/logger"
+	"github.com/webdevelop-pro/go-common/validator"
+	"go.uber.org/fx"
+
 	"github.com/webdevelop-pro/go-common/server/healthcheck"
 	"github.com/webdevelop-pro/go-common/server/middleware"
 	"github.com/webdevelop-pro/go-common/server/route"
-	"github.com/webdevelop-pro/go-common/validator"
-	"go.uber.org/fx"
 )
+
+const component = "http-server"
 
 type HTTPServer struct {
 	Echo   *echo.Echo
@@ -24,7 +27,7 @@ type HTTPServer struct {
 }
 
 func InitAndRun() fx.Option {
-	return fx.Module("http-server",
+	return fx.Module(component,
 		// Init http server
 		fx.Provide(New),
 		fx.Invoke(
@@ -44,7 +47,6 @@ func (s *HTTPServer) InitRoutes(rg route.Configurator) {
 
 // AddRoute adds route to the router.
 func (s *HTTPServer) AddRoute(route *route.Route) {
-	route.Middlewares = append(route.Middlewares, middleware.SetLogger)
 	s.Echo.Add(route.Method, route.Path, route.Handler, route.Middlewares...)
 }
 
@@ -84,8 +86,8 @@ func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config) *HTTPServer {
 	e.Validator = validator.New()
 
 	// Add prometheus metrics
-	p := prometheus.NewPrometheus("echo", nil)
-	p.Use(e)
+	e.Use(echoprometheus.NewMiddleware(component))
+	e.GET("/metrics", echoprometheus.NewHandler())
 
 	// Set docs middleware
 	// setDocsMiddleware(e)
@@ -103,8 +105,10 @@ func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config) *HTTPServer {
 }
 
 func New() *HTTPServer {
-	cfg := &Config{}
-	l := logger.NewComponentLogger(context.TODO(), "http_server")
+	var (
+		cfg = &Config{}
+		l   = logger.NewComponentLogger(context.TODO(), component)
+	)
 
 	if err := configurator.NewConfiguration(cfg); err != nil {
 		l.Fatal().Err(err).Msg("failed to get configuration of server")
@@ -119,7 +123,9 @@ func StartServer(lc fx.Lifecycle, srv *HTTPServer) {
 		fx.Hook{
 			OnStart: func(_ context.Context) error {
 				on := fmt.Sprintf("%s:%s", srv.config.Host, srv.config.Port)
+
 				srv.log.Info().Msgf("starting server on %s", on)
+
 				go func() {
 					err := srv.Echo.Start(on)
 					if err != nil {
