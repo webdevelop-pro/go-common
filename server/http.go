@@ -68,17 +68,7 @@ func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config) *HTTPServer {
 	)
 
 	// Set context logger
-	e.Use(middleware.SetIPAddress)
-	e.Use(middleware.DefaultCTXValues)
-	e.Use(middleware.SetRequestTime)
 	e.Use(middleware.SetLogger)
-	e.Use(middleware.LogRequests)
-	// Trace ID middleware generates a unique id for a request.
-	e.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
-		RequestIDHandler: func(c echo.Context, requestID string) {
-			c.Set(echo.HeaderXRequestID, requestID)
-		},
-	}))
 	// Add the healthcheck endpoint
 	e.GET(`/healthcheck`, healthcheck.Healthcheck)
 
