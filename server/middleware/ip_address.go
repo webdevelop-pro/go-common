@@ -10,9 +10,9 @@ import (
 func SetIPAddress(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ip := keys.GetIPAddress(c.Request().Header)
-		c.Set(keys.IPAddress, ip)
+		c.Set(keys.IPAddressStr, ip)
 
-		ctx := context.WithValue(c.Request().Context(), keys.IPAddress, ip)
+		ctx := context.WithValue(c.Request().Context(), keys.IPAddressStr, ip)
 		c.SetRequest(c.Request().WithContext(ctx))
 		return next(c)
 	}

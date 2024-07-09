@@ -18,6 +18,7 @@ const (
 	RequestLogID
 
 	RequestIDStr = "X-Request-Id"
+	IPAddressStr = "IP-Address"
 )
 
 func GetAsString(ctx context.Context, key ContextKey) string {
