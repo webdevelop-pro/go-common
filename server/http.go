@@ -30,7 +30,7 @@ type HTTPServer struct {
 func InitAndRun() fx.Option {
 	return fx.Module(component,
 		// Init http server
-		fx.Provide(New),
+		fx.Provide(NewServerWithMiddlewares),
 		fx.Invoke(
 			// Registration routes and handlers for http server
 			InitHandlerGroups,
@@ -110,6 +110,7 @@ func AddPrometheus(e *echo.Echo) *echo.Echo {
 	// Add prometheus metrics
 	e.Use(echoprometheus.NewMiddleware(component))
 	e.GET("/metrics", echoprometheus.NewHandler())
+	return e
 }
 
 func AddDefaultMiddlewares(e *echo.Echo) *echo.Echo {
@@ -126,6 +127,7 @@ func AddDefaultMiddlewares(e *echo.Echo) *echo.Echo {
 			c.SetRequest(c.Request().WithContext(ctx))
 		},
 	}))
+	return e
 }
 
 // StartServer is function that registers start of http server in lifecycle
