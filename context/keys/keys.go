@@ -21,7 +21,7 @@ const (
 	IPAddressStr = "IP-Address"
 )
 
-func GetAsString(ctx context.Context, key ContextKey) string {
+func GetAsString(ctx context.Context, key any) string {
 	val, ok := ctx.Value(key).(string)
 	if ok {
 		return val
@@ -29,7 +29,7 @@ func GetAsString(ctx context.Context, key ContextKey) string {
 	return ""
 }
 
-func GetCtxValue(ctx context.Context, key ContextKey) any {
+func GetCtxValue(ctx context.Context, key any) any {
 	return ctx.Value(key)
 }
 

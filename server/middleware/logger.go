@@ -12,10 +12,10 @@ func SetLogger(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// get request's context
 		ctx := c.Request().Context()
-		ipAddress, _ := keys.GetAsString(ctx, keys.IPAddressStr)
-		identityID, _ := keys.GetAsString(ctx, keys.IdentityID)
-		requestID, _ := keys.GetAsString(ctx, keys.RequestID)
-		msgID, _ := keys.GetAsString(ctx, keys.MSGID)
+		ipAddress := keys.GetAsString(ctx, keys.IPAddressStr)
+		identityID := keys.GetAsString(ctx, keys.IdentityID)
+		requestID := keys.GetAsString(ctx, keys.RequestID)
+		msgID := keys.GetAsString(ctx, keys.MSGID)
 
 		logInfo := logger.ServiceContext{
 			Service: verser.GetService(),
