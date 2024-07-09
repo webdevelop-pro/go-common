@@ -5,9 +5,9 @@ go 1.22.2
 require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.33.0
-	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240709181103-69f477bc3045
-	github.com/webdevelop-pro/go-common/context v0.0.0-20240709181103-69f477bc3045
-	github.com/webdevelop-pro/go-common/tests v0.0.0-20240709181103-69f477bc3045
+	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240709182751-14cfa4920a4f
+	github.com/webdevelop-pro/go-common/context v0.0.0-20240709182751-14cfa4920a4f
+	github.com/webdevelop-pro/go-common/tests v0.0.0-20240709182751-14cfa4920a4f
 	go.uber.org/fx v1.22.0
 )
 
@@ -25,7 +25,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
-	github.com/webdevelop-pro/go-common/misc v0.0.0-20240709181103-69f477bc3045 // indirect
+	github.com/webdevelop-pro/go-common/misc v0.0.0-20240709182751-14cfa4920a4f // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
