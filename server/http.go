@@ -9,6 +9,7 @@ import (
 	echoMW "github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/webdevelop-pro/go-common/configurator"
+	"github.com/webdevelop-pro/go-common/context/keys"
 	"github.com/webdevelop-pro/go-common/logger"
 	"github.com/webdevelop-pro/go-common/validator"
 	"go.uber.org/fx"
@@ -50,8 +51,18 @@ func (s *HTTPServer) AddRoute(route *route.Route) {
 	s.Echo.Add(route.Method, route.Path, route.Handler, route.Middlewares...)
 }
 
-// NewHTTPServer returns new API instance.
-func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config) *HTTPServer {
+// NewServer returns new API instance.
+func NewServer() *HTTPServer {
+	var (
+		cfg = &Config{}
+		l   = logger.NewComponentLogger(context.TODO(), component)
+	)
+
+	if err := configurator.NewConfiguration(cfg); err != nil {
+		l.Fatal().Err(err).Msg("failed to get configuration of server")
+	}
+
+	e := echo.New()
 	// sets CORS headers if Origin is present
 	e.Use(
 		echoMW.CORSWithConfig(echoMW.CORSConfig{
@@ -75,13 +86,6 @@ func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config) *HTTPServer {
 	// get an instance of a validator
 	e.Validator = validator.New()
 
-	// Add prometheus metrics
-	e.Use(echoprometheus.NewMiddleware(component))
-	e.GET("/metrics", echoprometheus.NewHandler())
-
-	// Set docs middleware
-	// setDocsMiddleware(e)
-
 	// avoid any native logging of echo, because we use custom library for logging
 	e.HideBanner = true        // don't log the banner on startup
 	e.HidePort = true          // hide log about port server started on
@@ -94,17 +98,34 @@ func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config) *HTTPServer {
 	}
 }
 
-func New() *HTTPServer {
-	var (
-		cfg = &Config{}
-		l   = logger.NewComponentLogger(context.TODO(), component)
-	)
+// NewServerWithMiddlewares returns new API instance with default middlewares
+func NewServerWithMiddlewares() *HTTPServer {
+	server := NewServer()
+	AddDefaultMiddlewares(server.Echo)
+	AddPrometheus(server.Echo)
+	return server
+}
 
-	if err := configurator.NewConfiguration(cfg); err != nil {
-		l.Fatal().Err(err).Msg("failed to get configuration of server")
-	}
+func AddPrometheus(e *echo.Echo) *echo.Echo {
+	// Add prometheus metrics
+	e.Use(echoprometheus.NewMiddleware(component))
+	e.GET("/metrics", echoprometheus.NewHandler())
+}
 
-	return NewHTTPServer(echo.New(), l, cfg)
+func AddDefaultMiddlewares(e *echo.Echo) *echo.Echo {
+	// Set context logger
+	e.Use(middleware.SetIPAddress)
+	e.Use(middleware.SetRequestTime)
+	e.Use(middleware.LogRequests)
+	// Trace ID middleware generates a unique id for a request.
+	e.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
+		RequestIDHandler: func(c echo.Context, requestID string) {
+			c.Set(echo.HeaderXRequestID, requestID)
+
+			ctx := context.WithValue(c.Request().Context(), keys.RequestID, requestID)
+			c.SetRequest(c.Request().WithContext(ctx))
+		},
+	}))
 }
 
 // StartServer is function that registers start of http server in lifecycle

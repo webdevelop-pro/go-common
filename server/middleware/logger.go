@@ -12,7 +12,7 @@ func SetLogger(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// get request's context
 		ctx := c.Request().Context()
-		ipAddress, _ := c.Get(IPAddressContextKey).(string)
+		ipAddress, _ := c.Get(keys.IPAddress).(string)
 		identityID, _ := keys.GetCtxValue(ctx, keys.IdentityID).(string)
 		requestID, _ := keys.GetCtxValue(ctx, keys.RequestID).(string)
 		msgID, _ := keys.GetCtxValue(ctx, keys.MSGID).(string)

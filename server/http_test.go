@@ -22,7 +22,7 @@ func TestHTTPCtx(t *testing.T) {
 		"X-Forwarded-For": {"31.6.1.12"},
 	}
 
-	ctx = middleware.SetDefaultHTTPCtx(ctx, headers)
+	ctx = keys.SetDefaultHTTPCtx(ctx, headers)
 
 	assert.Equal(t, headers["X-Request-Id"][0], keys.GetCtxValue(ctx, keys.RequestID))
 	assert.Equal(t, headers["X-Forwarded-For"][0], keys.GetCtxValue(ctx, keys.IPAddress))
