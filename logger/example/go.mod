@@ -5,8 +5,8 @@ go 1.22.2
 require (
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/pkg/errors v0.9.1
-	github.com/webdevelop-pro/go-common/logger v0.0.0-20240709184049-c4cb4e16e5e0
-	github.com/webdevelop-pro/go-common/verser v0.0.0-20240709184049-c4cb4e16e5e0
+	github.com/webdevelop-pro/go-common/logger v0.0.0-20240709190542-6fc8edc6e2da
+	github.com/webdevelop-pro/go-common/verser v0.0.0-20240709190542-6fc8edc6e2da
 )
 
 require (
@@ -19,8 +19,8 @@ require (
 	github.com/rs/zerolog v1.32.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240709184049-c4cb4e16e5e0 // indirect
-	github.com/webdevelop-pro/go-common/context v0.0.0-20240709184049-c4cb4e16e5e0 // indirect
+	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240709190542-6fc8edc6e2da // indirect
+	github.com/webdevelop-pro/go-common/context v0.0.0-20240709190542-6fc8edc6e2da // indirect
 	golang.org/x/crypto v0.22.0 // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
