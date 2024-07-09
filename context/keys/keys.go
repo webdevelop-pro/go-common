@@ -4,9 +4,6 @@ import (
 	"context"
 	"net/http"
 	"strings"
-
-	"github.com/labstack/echo/v4"
-	"github.com/webdevelop-pro/go-common/context/keys"
 )
 
 type ContextKey rune
@@ -19,6 +16,8 @@ const (
 	IdentityID
 	LogInfo
 	RequestLogID
+
+	RequestIDStr = "X-Request-Id"
 )
 
 func GetAsString(ctx context.Context, key ContextKey) string {
@@ -72,10 +71,12 @@ func GetIPAddress(headers http.Header) string {
 // Set values in ctx for
 // RequestID, IPAddress
 func SetDefaultHTTPCtx(ctx context.Context, headers http.Header) context.Context {
-	requestID := headers.Get(echo.HeaderXRequestID)
+	// so we don't need echo here
+	// requestID := headers.Get(echo.HeaderXRequestID)
+	requestID := headers.Get("X-Request-Id")
 	IP := GetIPAddress(headers)
 
-	ctx = keys.SetCtxValue(ctx, keys.RequestID, requestID)
-	ctx = keys.SetCtxValue(ctx, keys.IPAddress, IP)
+	ctx = SetCtxValue(ctx, RequestID, requestID)
+	ctx = SetCtxValue(ctx, IPAddress, IP)
 	return ctx
 }
