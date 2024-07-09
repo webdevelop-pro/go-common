@@ -8,12 +8,12 @@ require (
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
-	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240709182751-14cfa4920a4f
-	github.com/webdevelop-pro/go-common/context v0.0.0-20240709182751-14cfa4920a4f
-	github.com/webdevelop-pro/go-common/logger v0.0.0-20240709182751-14cfa4920a4f
-	github.com/webdevelop-pro/go-common/tests v0.0.0-20240709182751-14cfa4920a4f
-	github.com/webdevelop-pro/go-common/validator v0.0.0-20240709182751-14cfa4920a4f
-	github.com/webdevelop-pro/go-common/verser v0.0.0-20240709182751-14cfa4920a4f
+	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240709184049-c4cb4e16e5e0
+	github.com/webdevelop-pro/go-common/context v0.0.0-20240709184049-c4cb4e16e5e0
+	github.com/webdevelop-pro/go-common/logger v0.0.0-20240709184049-c4cb4e16e5e0
+	github.com/webdevelop-pro/go-common/tests v0.0.0-20240709184049-c4cb4e16e5e0
+	github.com/webdevelop-pro/go-common/validator v0.0.0-20240709184049-c4cb4e16e5e0
+	github.com/webdevelop-pro/go-common/verser v0.0.0-20240709184049-c4cb4e16e5e0
 	google.golang.org/api v0.185.0
 )
 
@@ -49,8 +49,8 @@ require (
 	github.com/rs/zerolog v1.33.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	github.com/webdevelop-pro/go-common/misc v0.0.0-20240709182751-14cfa4920a4f // indirect
-	github.com/webdevelop-pro/go-common/response v0.0.0-20240709182751-14cfa4920a4f // indirect
+	github.com/webdevelop-pro/go-common/misc v0.0.0-20240709184049-c4cb4e16e5e0 // indirect
+	github.com/webdevelop-pro/go-common/response v0.0.0-20240709184049-c4cb4e16e5e0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0 // indirect

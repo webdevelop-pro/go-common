@@ -18,8 +18,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
-github.com/webdevelop-pro/go-common/response v0.0.0-20240709182751-14cfa4920a4f h1:tJO4tYsHiPShWpe+YANZ+S/oTxXYuFNBLPwhFqoLDI0=
-github.com/webdevelop-pro/go-common/response v0.0.0-20240709182751-14cfa4920a4f/go.mod h1:OClsHgTVyGEjiOdxOJ/s3fwmHlLbcFRKM+RzOzHXmpE=
+github.com/webdevelop-pro/go-common/response v0.0.0-20240709184049-c4cb4e16e5e0 h1:+3m+dUAXD0V+RIUXPjUxVOWJqkoc4pYEXtqmZbXFWjw=
+github.com/webdevelop-pro/go-common/response v0.0.0-20240709184049-c4cb4e16e5e0/go.mod h1:OClsHgTVyGEjiOdxOJ/s3fwmHlLbcFRKM+RzOzHXmpE=
 golang.org/x/crypto v0.19.0 h1:ENy+Az/9Y1vSrlrvBSyna3PITt4tiZLf7sgCjZBX7Wo=
 golang.org/x/crypto v0.19.0/go.mod h1:Iy9bg/ha4yyC70EfRS8jz+B6ybOBKMaSxLj6P6oBDfU=
 golang.org/x/net v0.21.0 h1:AQyQV4dYCvJ7vGmJyKki9+PBdyvhkSd8EIx/qb0AYv4=

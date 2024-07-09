@@ -169,6 +169,14 @@ deploy-dev)
   kubectl -n $COMPANY_NAME-dev set image deployment/$SERVICE_NAME $SERVICE_NAME=cr.webdevelop.us/$COMPANY_NAME/$SERVICE_NAME:$GIT_COMMIT
   ;;
 
+update-version)
+  find ./ -name "go.mod" -exec sed -i "s/$2/$3/g" {} \;
+  for d in "db" "logger" "misc" "queue" "response" "server" "tests" "validator"
+  do
+    cd $d; rm go.sum; go mod tidy; cd ..;
+  done
+  ;;
+
 help)
   cat make.sh | grep "^[a-z-]*)"
   ;;
