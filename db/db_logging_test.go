@@ -197,56 +197,57 @@ func TestLogger_DBQuery_ERROR(t *testing.T) {
 	actualLogs := ReadStdout(stdout)
 	expected := `
 		{
-			"level": "error",
 			"component": "db",
-			"error": "ERROR: column \"asd\" does not exist (SQLSTATE 42703)",
 			"data": {
 				"args": [],
 				"err": {
-					"Severity": "ERROR",
 					"Code": "42703",
-					"Message": "column \"asd\" does not exist",
+					"ColumnName": "",
+					"ConstraintName": "",
+					"DataTypeName": "",
 					"Detail": "",
+					"File": "parse_relation.c",
 					"Hint": "",
-					"Position": 8,
 					"InternalPosition": 0,
 					"InternalQuery": "",
-					"Where": "",
+					"Line": 3722,
+					"Message": "column \"asd\" does not exist",
+					"Position": 8,
+					"Routine": "errorMissingColumn",
 					"SchemaName": "",
+					"Severity": "ERROR",
+					"SeverityUnlocalized": "ERROR",
 					"TableName": "",
-					"ColumnName": "",
-					"DataTypeName": "",
-					"ConstraintName": "",
-					"File": "parse_relation.c",
-					"Line": "%any%",
-					"Routine": "errorMissingColumn"
+					"Where": ""
 				},
 				"pid": "%any%",
 				"sql": "select asd;",
 				"time": "%any%"
 			},
-			"severity": "ERROR",
+			"error": "ERROR: column \"asd\" does not exist (SQLSTATE 42703)",
+			"level": "error",
+			"message": "column \"asd\" does not exist",
 			"serviceContext": {
-				"service": "test-db",
-				"version": "v1.0.0",
-				"user": "test-test-test",
-				"request_id": "req-1",
-				"msg_id": "msg-1",
 				"httpRequest": {
 					"method": "POST",
-					"url": "https://test",
-					"userAgent": "test-agent",
 					"referrer": "test-Referrer",
+					"remoteIp": "0.0.0.0",
 					"responseStatusCode": 0,
-					"remoteIp": "0.0.0.0"
+					"url": "https://test",
+					"userAgent": "test-agent"
 				},
+				"msg_id": "msg-1",
+				"request_id": "req-1",
+				"service": "test-db",
 				"sourceReference": {
 					"repository": "https://github",
 					"revisionId": "1111"
-				}
+				},
+				"user": "test-test-test",
+				"version": "v1.0.0"
 			},
-			"time": "%any%",
-			"message": "column \"asd\" does not exist"
+			"severity": "ERROR",
+			"time": "%any%"
 		}
 	`
 	actual := actualLogs[len(actualLogs)-1]
