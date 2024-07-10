@@ -19,7 +19,7 @@ import (
 	"github.com/webdevelop-pro/go-common/server/route"
 )
 
-const component = "http-server"
+const component = "http_server"
 
 type HTTPServer struct {
 	Echo   *echo.Echo
@@ -30,8 +30,10 @@ type HTTPServer struct {
 func InitAndRun() fx.Option {
 	return fx.Module(component,
 		// Init http server
-		fx.Provide(NewServerWithMiddlewares),
+		fx.Provide(NewServer),
 		fx.Invoke(
+			//
+			AddDefaultMiddlewares,
 			// Registration routes and handlers for http server
 			InitHandlerGroups,
 			// Run HTTP server
@@ -40,9 +42,9 @@ func InitAndRun() fx.Option {
 	)
 }
 func (s *HTTPServer) InitRoutes(rg route.Configurator) {
-	for _, route := range rg.GetRoutes() {
+	for _, r := range rg.GetRoutes() {
 		//nolint:gosec,scopelint
-		s.AddRoute(&route)
+		s.AddRoute(&r)
 	}
 }
 
@@ -98,28 +100,18 @@ func NewServer() *HTTPServer {
 	}
 }
 
-// NewServerWithMiddlewares returns new API instance with default middlewares
-func NewServerWithMiddlewares() *HTTPServer {
-	server := NewServer()
-	AddDefaultMiddlewares(server.Echo)
-	AddPrometheus(server.Echo)
-	return server
+func AddPrometheus(srv *HTTPServer) {
+	srv.Echo.Use(echoprometheus.NewMiddleware(component))
+	srv.Echo.GET("/metrics", echoprometheus.NewHandler())
 }
 
-func AddPrometheus(e *echo.Echo) *echo.Echo {
-	// Add prometheus metrics
-	e.Use(echoprometheus.NewMiddleware(component))
-	e.GET("/metrics", echoprometheus.NewHandler())
-	return e
-}
-
-func AddDefaultMiddlewares(e *echo.Echo) *echo.Echo {
+func AddDefaultMiddlewares(srv *HTTPServer) {
 	// Set context logger
-	e.Use(middleware.SetIPAddress)
-	e.Use(middleware.SetRequestTime)
-	e.Use(middleware.LogRequests)
+	srv.Echo.Use(middleware.SetIPAddress)
+	srv.Echo.Use(middleware.SetRequestTime)
+	srv.Echo.Use(middleware.LogRequests)
 	// Trace ID middleware generates a unique id for a request.
-	e.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
+	srv.Echo.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
 		RequestIDHandler: func(c echo.Context, requestID string) {
 			c.Set(echo.HeaderXRequestID, requestID)
 
@@ -127,7 +119,6 @@ func AddDefaultMiddlewares(e *echo.Echo) *echo.Echo {
 			c.SetRequest(c.Request().WithContext(ctx))
 		},
 	}))
-	return e
 }
 
 // StartServer is function that registers start of http server in lifecycle
