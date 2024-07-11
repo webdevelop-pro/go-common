@@ -26,7 +26,6 @@ type HTTPServer struct {
 	config *Config
 }
 
-
 func InitAndRun() fx.Option {
 	return fx.Module(component,
 		// Init http server

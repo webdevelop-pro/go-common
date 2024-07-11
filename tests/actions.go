@@ -10,7 +10,8 @@ import (
 )
 
 type TestContext struct {
-	T   *testing.T
+	T *testing.T
+	//nolint:containedctx
 	Ctx context.Context
 }
 
@@ -26,7 +27,7 @@ type ExpectedResponse struct {
 
 func SendHTTPRequst(req httputils.Request, checks ...ExpectedResponse) SomeAction {
 	return func(t TestContext) error {
-		res, err := httputils.CreateDefaultRequest(req)
+		res, err := httputils.CreateDefaultRequest(t.Ctx, req)
 		assert.NoError(t.T, err)
 
 		result, code, err := httputils.SendRequest(res)

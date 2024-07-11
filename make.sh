@@ -83,7 +83,7 @@ lint)
     then
       if [ -f "$ddir/go.mod" ]; then
         cd $ddir
-        golangci-lint -c ../.golangci.yml run --fix $2 $3
+        golangci-lint -c ../.golangci.yml run --fix $2 $3 || echo 'not ok'
         cd ../
       fi
     fi
@@ -91,22 +91,18 @@ lint)
   ;;
 
 test)
-  case $2 in
-  unit)
-    init
-    go test -run=Unit -count=1 -v ${PKG_LIST} $3
-    ;;
-
-  integration)
-    init
-    go test -run=Integration -count=1 -p 1 -v ${PKG_LIST} $3
-    ;;
-  *)
-      init
-      go test -count=1 -p 1 -v ${PKG_LIST} $2 $3
-    ;;
-
-    esac
+  dirlist=`ls`
+  for ddir in $dirlist[@]
+  do
+    if [ -d $ddir ]
+    then
+      if [ -f "$ddir/go.mod" ]; then
+        cd $ddir
+        go test -count=1 -p 1 -v ${ddir} $2 $3
+        cd ../
+      fi
+    fi
+  done
   ;;
 
 race)

@@ -28,10 +28,10 @@ func GetPointer(str string) *string {
 }
 */
 
-func RunTableTest(t *testing.T, FixtureMngrs []FixturesManager, tableTest TableTest) {
+func RunTableTest(t *testing.T, fixtureMngrs []FixturesManager, tableTest TableTest) {
 	t.Helper()
 
-	for _, fixtures := range FixtureMngrs {
+	for _, fixtures := range fixtureMngrs {
 		err := fixtures.CleanAndApply()
 		assert.NoError(t, err, "Failed apply fixtures")
 		tableTest.Context.Ctx = fixtures.SetCTX(tableTest.Context.Ctx)
