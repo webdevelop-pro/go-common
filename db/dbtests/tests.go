@@ -18,7 +18,8 @@ const (
 )
 
 func getDBPool(t tests.TestContext) *db.DB {
-	return t.Ctx.Value("db").(*db.DB)
+	//nolint:forcetypeassert
+	return t.Ctx.Value(dbKey).(*db.DB)
 }
 
 func RawSQL(query string) tests.SomeAction {

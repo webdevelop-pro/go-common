@@ -21,6 +21,7 @@ func NewConn(ctx context.Context) *pgx.Conn {
 
 // NewConnFromConfig is constructor for *pgx.Conn
 func NewConnFromConfig(ctx context.Context, pgConfig *pgx.ConnConfig) *pgx.Conn {
+	//nolint:contextcheck
 	logger := logger.NewComponentLogger(context.TODO(), pkgName)
 
 	return newConn(ctx, pgConfig, logger)

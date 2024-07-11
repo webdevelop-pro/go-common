@@ -10,8 +10,8 @@ func InitHandlerGroups(srv *HTTPServer, rg route.ConfiguratorIn) {
 		srv.InitRoutes(group)
 	}
 }
-
 func NewHandlerGroups(groups ...any) fx.Option {
+	//nolint:prealloc
 	var annotates []any
 
 	for _, group := range groups {

@@ -9,7 +9,6 @@ import (
 // BadRequest shortcut to return http.StatusBadRequest with custom error and msg
 func BadRequest(err error, msg string) Error {
 	if err == nil {
-		//nolint:goerr113
 		err = errors.New("")
 	}
 	finalMsg := map[string][]string{"__error__": {msg}}
@@ -26,7 +25,6 @@ func BadRequest(err error, msg string) Error {
 // NotFound shortcut to return http.StatusNotFound with custom error and msg
 func NotFound(err error, msg string) Error {
 	if err == nil {
-		//nolint:goerr113
 		err = errors.New("")
 	}
 	finalMsg := map[string][]string{"__error__": {msg}}
@@ -43,7 +41,6 @@ func NotFound(err error, msg string) Error {
 // NotFound shortcut to return http.StatusNotFound with custom error and msg
 func InternalError(err error, msg string) Error {
 	if err == nil {
-		//nolint:goerr113
 		err = errors.New("")
 	}
 	finalMsg := map[string][]string{"__error__": {msg}}

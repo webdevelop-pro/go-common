@@ -7,7 +7,12 @@ import (
 	"github.com/webdevelop-pro/go-common/tests"
 )
 
+type contextKey string
+
+const ctxKey contextKey = "db"
+
 func getClient(t tests.TestContext) *Client {
+	//nolint:forcetypeassert
 	return t.Ctx.Value(pkgName).(*Client)
 }
 
@@ -18,12 +23,14 @@ func SendPubSubEvent(topic string, body any, attr map[string]string) tests.SomeA
 	}
 }
 
+/*
 func CheckIfMsgRead(topic string, body any) tests.SomeAction {
 	return func(t tests.TestContext) error {
 		// _, err := getClient(t).PublishToTopic(context.Background(), topic, body, attr)
 		return nil
 	}
 }
+*/
 
 type Fixture struct {
 	topic        string
@@ -66,7 +73,7 @@ func (pubSubF FixturesManager) CleanAndApply() error {
 }
 
 func (pubSubF FixturesManager) SetCTX(ctx context.Context) context.Context {
-	return context.WithValue(ctx, "pubsub", pubSubF.client)
+	return context.WithValue(ctx, ctxKey, pubSubF.client)
 }
 
 func (pubSubF FixturesManager) Clean(topic string, subscription string) error {

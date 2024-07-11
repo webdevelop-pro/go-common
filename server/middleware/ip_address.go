@@ -12,6 +12,7 @@ func SetIPAddress(next echo.HandlerFunc) echo.HandlerFunc {
 		ip := keys.GetIPAddress(c.Request().Header)
 		c.Set(keys.IPAddressStr, ip)
 
+		//nolint:golint
 		ctx := context.WithValue(c.Request().Context(), keys.IPAddressStr, ip)
 		c.SetRequest(c.Request().WithContext(ctx))
 		return next(c)

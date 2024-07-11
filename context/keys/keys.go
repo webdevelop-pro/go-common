@@ -6,7 +6,10 @@ import (
 	"strings"
 )
 
-type ContextKey rune
+type (
+	ContextKey rune
+	ContextStr string
+)
 
 const (
 	CtxTraceID ContextKey = iota
@@ -17,8 +20,8 @@ const (
 	LogInfo
 	RequestLogID
 
-	RequestIDStr = "X-Request-Id"
-	IPAddressStr = "IP-Address"
+	RequestIDStr ContextStr = "X-Request-Id"
+	IPAddressStr ContextStr = "IP-Address"
 )
 
 func GetAsString(ctx context.Context, key any) string {

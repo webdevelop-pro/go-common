@@ -9,6 +9,10 @@ import (
 	"github.com/webdevelop-pro/go-common/db"
 )
 
+type contextKey string
+
+const dbKey contextKey = "db"
+
 type Fixture struct {
 	table    string
 	filePath string
@@ -71,7 +75,7 @@ func (f FixturesManager) CleanAndApply() error {
 }
 
 func (f FixturesManager) SetCTX(ctx context.Context) context.Context {
-	return context.WithValue(ctx, "db", f.db)
+	return context.WithValue(ctx, dbKey, f.db)
 }
 
 func (f FixturesManager) Clean(table string) error {

@@ -11,12 +11,11 @@ import (
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/context/keys"
 	"github.com/webdevelop-pro/go-common/logger"
-	"github.com/webdevelop-pro/go-common/validator"
-	"go.uber.org/fx"
-
 	"github.com/webdevelop-pro/go-common/server/healthcheck"
 	"github.com/webdevelop-pro/go-common/server/middleware"
 	"github.com/webdevelop-pro/go-common/server/route"
+	"github.com/webdevelop-pro/go-common/validator"
+	"go.uber.org/fx"
 )
 
 const component = "http_server"
@@ -26,6 +25,7 @@ type HTTPServer struct {
 	log    logger.Logger
 	config *Config
 }
+
 
 func InitAndRun() fx.Option {
 	return fx.Module(component,
@@ -41,6 +41,7 @@ func InitAndRun() fx.Option {
 		),
 	)
 }
+
 func (s *HTTPServer) InitRoutes(rg route.Configurator) {
 	for _, r := range rg.GetRoutes() {
 		//nolint:gosec,scopelint

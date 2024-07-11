@@ -76,7 +76,18 @@ install)
   ;;
 
 lint)
-  golangci-lint -c .golangci.yml run $2 $3
+  dirlist=`ls`
+  for ddir in $dirlist[@]
+  do
+    if [ -d $ddir ]
+    then
+      if [ -f "$ddir/go.mod" ]; then
+        cd $ddir
+        golangci-lint -c ../.golangci.yml run --fix $2 $3
+        cd ../
+      fi
+    fi
+  done
   ;;
 
 test)

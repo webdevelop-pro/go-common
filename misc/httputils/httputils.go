@@ -20,11 +20,10 @@ type Request struct {
 	Method, Path       string
 	Body               []byte
 	Headers            map[string]string
-	Ctx                context.Context
 }
 
 // CreateDefaultRequest default json request
-func CreateDefaultRequest(req Request) (*http.Request, error) {
+func CreateDefaultRequest(ctx context.Context, req Request) (*http.Request, error) {
 	if req.Port != "" {
 		req.Host = net.JoinHostPort(req.Host, req.Port)
 	}
@@ -32,7 +31,8 @@ func CreateDefaultRequest(req Request) (*http.Request, error) {
 		req.Scheme = "http"
 	}
 
-	res, err := http.NewRequest(
+	res, err := http.NewRequestWithContext(
+		ctx,
 		req.Method,
 		fmt.Sprintf("%s://%s%s", req.Scheme, req.Host, req.Path),
 		bytes.NewBuffer((req.Body)),
@@ -41,7 +41,6 @@ func CreateDefaultRequest(req Request) (*http.Request, error) {
 		return res, errors.Wrapf(err, "cannot create new request")
 	}
 
-	res = res.WithContext(req.Ctx)
 	res.Header.Add("Content-Type", "application/json")
 
 	for key, value := range req.Headers {

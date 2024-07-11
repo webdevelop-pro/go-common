@@ -14,7 +14,6 @@ skip-files:
 linters:
   enable-all: true
   disable:
-    - fatcontext
     - nlreturn
     - wrapcheck
     - tagliatelle
