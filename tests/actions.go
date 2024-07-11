@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/webdevelop-pro/go-common/misc/httputils"
+	"github.com/webdevelop-pro/go-common/httputils"
 )
 
 type TestContext struct {

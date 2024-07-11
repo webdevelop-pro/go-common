@@ -178,9 +178,14 @@ deploy-dev)
 
 update-version)
   find ./ -name "go.mod" -exec sed -i "s/$2/$3/g" {} \;
-  for d in "db" "logger" "misc" "queue" "response" "server" "tests" "validator"
+  dirlist=`ls`
+  for ddir in $dirlist[@]
   do
-    cd $d; rm go.sum; go mod tidy; cd ..;
+    if [ -d $ddir ] then
+      if [ -f "$ddir/go.mod" ]; then
+        cd $d; rm go.sum; go mod tidy; cd ..;
+      fi
+    fi
   done
   ;;
 

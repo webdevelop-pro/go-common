@@ -6,7 +6,7 @@ require (
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
-	github.com/webdevelop-pro/go-common/response v0.0.0-20240711185712-d454d320efa1
+	github.com/webdevelop-pro/go-common/response v0.0.0-20240711200914-2b3389749493
 )
 
 require (
