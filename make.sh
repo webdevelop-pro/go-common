@@ -181,7 +181,7 @@ update-version)
   dirlist=`ls`
   for ddir in $dirlist[@]
   do
-    if [ -d $ddir ] then
+    if [ -d $ddir ]; then
       if [ -f "$ddir/go.mod" ]; then
         cd $d; rm go.sum; go mod tidy; cd ..;
       fi
