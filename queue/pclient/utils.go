@@ -10,8 +10,6 @@ import (
 	"github.com/webdevelop-pro/go-common/verser"
 )
 
-const HeaderXRequestID = "X-Request-Id"
-
 func SetDefaultEventCtx(ctx context.Context, event Event) context.Context {
 	ctx = keys.SetCtxValue(ctx, keys.RequestID, event.RequestID)
 	ctx = keys.SetCtxValue(ctx, keys.IPAddress, event.IPAddress)
@@ -35,7 +33,7 @@ func SetDefaultEventCtx(ctx context.Context, event Event) context.Context {
 func SetDefaultWebhookCtx(ctx context.Context, webhook Webhook) context.Context {
 	headers := http.Header(webhook.Headers)
 
-	requestID := headers.Get(keys.RequestIDStr)
+	requestID := headers.Get(string(keys.RequestIDStr))
 	IP := httputils.GetIPAddress(headers)
 
 	ctx = keys.SetCtxValue(ctx, keys.RequestID, requestID)
