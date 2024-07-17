@@ -6,10 +6,10 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-github.com/webdevelop-pro/go-common/context v0.0.0-20240717165340-f2d4b34aea00 h1:prG8bylYr+R1bQJNQEP6pjIbrpOK/OejO/ZaDDDYe+I=
-github.com/webdevelop-pro/go-common/context v0.0.0-20240717165340-f2d4b34aea00/go.mod h1:sTPN4cFn9lkQqBr15rMVrSUbgiLGU0ygpVJw/KmanyU=
-github.com/webdevelop-pro/go-common/httputils v0.0.0-20240717170000-53b2e2d17271 h1:UNWBi3p3Q/5EQ5X4tQF96AfeXydZwUrt7g+bTRJrXAs=
-github.com/webdevelop-pro/go-common/httputils v0.0.0-20240717170000-53b2e2d17271/go.mod h1:U+wYGxWmuBk+eTzQaFnKreSaCPWH60Rjz9uj/649jtk=
+github.com/webdevelop-pro/go-common/context v0.0.0-20240717170000-53b2e2d17271 h1:xnJ4LRsDFZxbNDocJU++zoZOG63J+Y+rnq726lzPw5Q=
+github.com/webdevelop-pro/go-common/context v0.0.0-20240717170000-53b2e2d17271/go.mod h1:qt8+lur7xkTiFpyq96I0lEyWg3RPutxMCNGil1mna5w=
+github.com/webdevelop-pro/go-common/httputils v0.0.0-20240717170542-c0346e00472d h1:N8GiPRV5/Um8TMN5B1yCPYljTX/RbVJo0B+CFg4WRcs=
+github.com/webdevelop-pro/go-common/httputils v0.0.0-20240717170542-c0346e00472d/go.mod h1:Nb2zTKzjfMZ1sbK/do5up/cgKSMqeUvOOfCIet6PZ6s=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
