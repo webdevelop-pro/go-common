@@ -20,6 +20,10 @@ const (
 
 	RequestIDStr ContextStr = "X-Request-Id"
 	IPAddressStr ContextStr = "IP-Address"
+
+	XOriginalForwardedFor ContextStr = "X-Original-Forwarded-For"
+	XForwardedFor         ContextStr = "X-Forwarded-For"
+	XRealIP               ContextStr = "X-Real-IP"
 )
 
 func GetAsString(ctx context.Context, key any) string {

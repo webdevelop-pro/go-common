@@ -3,34 +3,14 @@ package pclient
 import (
 	"context"
 	"net/http"
-	"strings"
 
 	"github.com/webdevelop-pro/go-common/context/keys"
+	"github.com/webdevelop-pro/go-common/httputils"
 	"github.com/webdevelop-pro/go-common/logger"
 	"github.com/webdevelop-pro/go-common/verser"
 )
 
 const HeaderXRequestID = "X-Request-Id"
-
-func GetIPAddress(headers http.Header) string {
-	ip := "127.0.0.1"
-	if xOFF := headers.Get("X-Original-Forwarded-For"); xOFF != "" {
-		i := strings.Index(xOFF, ", ")
-		if i == -1 {
-			i = len(xOFF)
-		}
-		ip = xOFF[:i]
-	} else if xFF := headers.Get("X-Forwarded-For"); xFF != "" {
-		i := strings.Index(xFF, ", ")
-		if i == -1 {
-			i = len(xFF)
-		}
-		ip = xFF[:i]
-	} else if xrIP := headers.Get("X-Real-IP"); xrIP != "" {
-		ip = xrIP
-	}
-	return ip
-}
 
 func SetDefaultEventCtx(ctx context.Context, event Event) context.Context {
 	ctx = keys.SetCtxValue(ctx, keys.RequestID, event.RequestID)
@@ -55,8 +35,8 @@ func SetDefaultEventCtx(ctx context.Context, event Event) context.Context {
 func SetDefaultWebhookCtx(ctx context.Context, webhook Webhook) context.Context {
 	headers := http.Header(webhook.Headers)
 
-	requestID := headers.Get(HeaderXRequestID)
-	IP := GetIPAddress(headers)
+	requestID := headers.Get(keys.RequestIDStr)
+	IP := httputils.GetIPAddress(headers)
 
 	ctx = keys.SetCtxValue(ctx, keys.RequestID, requestID)
 	ctx = keys.SetCtxValue(ctx, keys.IPAddress, IP)
