@@ -5,11 +5,12 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/labstack/echo/v4"
 	"github.com/webdevelop-pro/go-common/context/keys"
 	"github.com/webdevelop-pro/go-common/logger"
 	"github.com/webdevelop-pro/go-common/verser"
 )
+
+const HeaderXRequestID = "X-Request-Id"
 
 func GetIPAddress(headers http.Header) string {
 	ip := "127.0.0.1"
@@ -54,7 +55,7 @@ func SetDefaultEventCtx(ctx context.Context, event Event) context.Context {
 func SetDefaultWebhookCtx(ctx context.Context, webhook Webhook) context.Context {
 	headers := http.Header(webhook.Headers)
 
-	requestID := headers.Get(echo.HeaderXRequestID)
+	requestID := headers.Get(HeaderXRequestID)
 	IP := GetIPAddress(headers)
 
 	ctx = keys.SetCtxValue(ctx, keys.RequestID, requestID)
