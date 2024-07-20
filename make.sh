@@ -25,7 +25,13 @@ else
 fi
 
 SERVICE_NAME=$(lstrip $(basename $(pwd)) "i-")
-REPOSITORY=$COMPANY_NAME/i-$SERVICE_NAME
+REPOSITORY=$COMPANY_NAME/$SERVICE_NAME
+
+# FIX SED for macos
+SED=`which gsed`
+if [[ -z "$SED" ]]; then
+  SED=`which sed`
+fi
 
 init() {
   GO_FILES=$(find . -name '*.go' | grep -v _test.go)
@@ -98,7 +104,7 @@ test)
     then
       if [ -f "$ddir/go.mod" ]; then
         cd $ddir
-        go test -count=1 -p 1 -v ${ddir} $2 $3
+        go test -count=1 -p 1 ./... $2 $3
         cd ../
       fi
     fi
@@ -177,7 +183,7 @@ deploy-dev)
   ;;
 
 update-version)
-  find ./ -name "go.mod" -exec sed -i "s/$2/$3/g" {} \;
+  find ./ -name "go.mod" -exec $SED -i "s/$2/$3/g" {} \;
   dirlist=`ls`
   for ddir in $dirlist[@]
   do

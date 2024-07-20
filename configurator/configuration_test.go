@@ -43,8 +43,8 @@ func TestAlternativeEnvPath(t *testing.T) {
 // and check if all required envs are exists
 func TestRequiredEnvs(t *testing.T) {
 	type ServerConfig struct {
-		Host string `required:"true"`
-		Port int16  `required:"true"`
+		MyHost string `required:"true"`
+		Port   int16  `required:"true"`
 	}
 	defer func() {
 		if r := recover(); r != nil {

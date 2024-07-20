@@ -7,10 +7,10 @@ require (
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
-	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240717170542-c0346e00472d
-	github.com/webdevelop-pro/go-common/context v0.0.0-20240717170542-c0346e00472d
-	github.com/webdevelop-pro/go-common/logger v0.0.0-20240717170542-c0346e00472d
-	github.com/webdevelop-pro/go-common/tests v0.0.0-20240717170542-c0346e00472d
+	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240720163630-b4ea9f10773c
+	github.com/webdevelop-pro/go-common/context v0.0.0-20240720163630-b4ea9f10773c
+	github.com/webdevelop-pro/go-common/logger v0.0.0-20240720163630-b4ea9f10773c
+	github.com/webdevelop-pro/go-common/tests v0.0.0-20240720163630-b4ea9f10773c
 )
 
 require (
@@ -27,7 +27,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/rs/zerolog v1.33.0 // indirect
-	github.com/webdevelop-pro/go-common/httputils v0.0.0-20240717170542-c0346e00472d // indirect
+	github.com/webdevelop-pro/go-common/httputils v0.0.0-20240720163630-b4ea9f10773c // indirect
 	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect

@@ -6,4 +6,4 @@ toolchain go1.22.5
 
 require github.com/pkg/errors v0.9.1
 
-require github.com/webdevelop-pro/go-common/context v0.0.0-20240717170542-c0346e00472d
+require github.com/webdevelop-pro/go-common/context v0.0.0-20240720163630-b4ea9f10773c

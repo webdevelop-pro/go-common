@@ -19,8 +19,8 @@ require (
 	github.com/rs/zerolog v1.33.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240717170542-c0346e00472d // indirect
-	github.com/webdevelop-pro/go-common/context v0.0.0-20240717170542-c0346e00472d // indirect
+	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240720163630-b4ea9f10773c // indirect
+	github.com/webdevelop-pro/go-common/context v0.0.0-20240720163630-b4ea9f10773c // indirect
 	golang.org/x/crypto v0.22.0 // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
