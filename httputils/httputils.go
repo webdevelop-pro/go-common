@@ -41,7 +41,10 @@ func CreateDefaultRequest(ctx context.Context, req Request) (*http.Request, erro
 		return res, errors.Wrapf(err, "cannot create new request")
 	}
 
-	res.Header.Add("Content-Type", "application/json")
+	// if no content type set
+	if ok := res.Header.Get("Content-Type"); ok == "" {
+		res.Header.Add("Content-Type", "application/json")
+	}
 
 	for key, value := range req.Headers {
 		res.Header.Add(key, value)

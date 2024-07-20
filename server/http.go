@@ -82,6 +82,8 @@ func NewServer() *HTTPServer {
 
 	// Set context logger
 	e.Use(middleware.SetLogger)
+	// Add Error handlers
+	e.Use(middleware.ErrorHandlers)
 	// Add the healthcheck endpoint
 	e.GET(`/healthcheck`, healthcheck.Healthcheck)
 
@@ -106,10 +108,14 @@ func AddPrometheus(srv *HTTPServer) {
 }
 
 func AddDefaultMiddlewares(srv *HTTPServer) {
-	// Set context logger
+	srv.Echo.Use(echoMW.Recover())
+	srv.Echo.Use(echoMW.BodyLimit("20M"))
 	srv.Echo.Use(middleware.SetIPAddress)
 	srv.Echo.Use(middleware.SetRequestTime)
-	srv.Echo.Use(middleware.LogRequests)
+	srv.Echo.Use(echoMW.BodyDumpWithConfig(echoMW.BodyDumpConfig{
+		Skipper: middleware.FileAndHealtchCheckSkipper,
+		Handler: middleware.BodyDumpHandler,
+	}))
 	// Trace ID middleware generates a unique id for a request.
 	srv.Echo.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
 		RequestIDHandler: func(c echo.Context, requestID string) {

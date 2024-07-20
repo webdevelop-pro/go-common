@@ -5,8 +5,8 @@ go 1.22.2
 require (
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/pkg/errors v0.9.1
-	github.com/webdevelop-pro/go-common/logger v0.0.0-20240717170542-c0346e00472d
-	github.com/webdevelop-pro/go-common/verser v0.0.0-20240717170542-c0346e00472d
+	github.com/webdevelop-pro/go-common/logger v0.0.0-20240717170837-2649392865da
+	github.com/webdevelop-pro/go-common/verser v0.0.0-20240717170837-2649392865da
 )
 
 require (
@@ -16,7 +16,7 @@ require (
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/rs/zerolog v1.32.0 // indirect
+	github.com/rs/zerolog v1.33.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240717170542-c0346e00472d // indirect

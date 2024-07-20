@@ -21,6 +21,8 @@ const (
 	RequestIDStr ContextStr = "X-Request-Id"
 	IPAddressStr ContextStr = "IP-Address"
 
+	RequestTimeContextStr ContextStr = "Request-Created-At"
+
 	XOriginalForwardedFor = "X-Original-Forwarded-For"
 	XForwardedFor         = "X-Forwarded-For"
 	XRealIP               = "X-Real-IP"
