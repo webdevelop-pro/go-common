@@ -52,14 +52,12 @@ func GetConfigPool(logger logger.Logger) *pgxpool.Config {
 
 func GetConnString(cfg *Config) string {
 	return fmt.Sprintf(
-		"%s://%s:%s@%s:%d/%s?application_name=%s",
+		"%s:///%s?host=%s&user=%s&password=%s",
 		cfg.Type,
+		cfg.Database,
+		cfg.Host,
 		cfg.User,
 		cfg.Password,
-		cfg.Host,
-		cfg.Port,
-		cfg.Database,
-		cfg.AppName,
 	)
 }
 
