@@ -8,7 +8,7 @@ import (
 // DefaultSkipper returns false which processes the middleware.
 func FileAndHealtchCheckSkipper(c echo.Context) bool {
 	// skip healthcheck requests
-	if c.Request().URL.Path != "/healthcheck" {
+	if c.Request().URL.Path == "/healthcheck" {
 		return true
 	}
 	// do not dump body for multipart requests
