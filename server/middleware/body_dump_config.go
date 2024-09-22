@@ -12,7 +12,8 @@ func FileAndHealtchCheckSkipper(c echo.Context) bool {
 		return true
 	}
 	// do not dump body for multipart requests
-	if c.Request().Header.Get("Content-Type")[0:10] == "multipart/" {
+	contentType := c.Request().Header.Get("Content-Type")
+	if len(contentType) > 10 && contentType[0:10] == "multipart/" {
 		return true
 	}
 	return false
@@ -25,6 +26,8 @@ func BodyDumpHandler(c echo.Context, incoming []byte, outcoming []byte) {
 	log.Trace().Str("path", c.Request().RequestURI).
 		Interface("headers", c.Request().Header).
 		Interface("body", string(incoming)).Msg("incoming request")
+	// ToDo
+	// headers = Fix error marshaling error: json: unsupported type: func() http.Header
 	log.Trace().Interface("headers", c.Response().Header).
 		Interface("body", string(outcoming)).Msg("outcoming request")
 }

@@ -108,7 +108,7 @@ func AddPrometheus(srv *HTTPServer) {
 }
 
 func AddDefaultMiddlewares(srv *HTTPServer) {
-	srv.Echo.Use(echoMW.Recover())
+	// srv.Echo.Use(echoMW.Recover())
 	srv.Echo.Use(echoMW.BodyLimit("20M"))
 	srv.Echo.Use(middleware.SetIPAddress)
 	srv.Echo.Use(middleware.SetRequestTime)
