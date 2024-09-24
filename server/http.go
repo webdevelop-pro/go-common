@@ -82,8 +82,6 @@ func NewServer() *HTTPServer {
 
 	// Set context logger
 	e.Use(middleware.SetLogger)
-	// Add Error handlers
-	e.Use(middleware.ErrorHandlers)
 	// Add the healthcheck endpoint
 	e.GET(`/healthcheck`, healthcheck.Healthcheck)
 

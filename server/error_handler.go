@@ -1,4 +1,4 @@
-package middleware
+package server
 
 import (
 	"net/http"
@@ -9,12 +9,8 @@ import (
 	"github.com/webdevelop-pro/go-common/response"
 )
 
-type ErrorContext struct {
-	echo.Context
-}
-
-func (c *ErrorContext) ErrorResponse(err error) error {
-	log := zerolog.Ctx(c.Request().Context())
+func ErrorResponse(e echo.Context, err error) error {
+	log := zerolog.Ctx(e.Request().Context())
 	// log := logger.NewComponentLogger("ports-http", c.(logger.Context))
 	respErr := response.Error{}
 	if errors.As(err, &respErr) {
@@ -22,17 +18,17 @@ func (c *ErrorContext) ErrorResponse(err error) error {
 			log.Error().Stack().Err(err).Msgf("system error happen")
 		}
 		log.Debug().Err(err).Msgf("error response")
-		return c.JSON(respErr.StatusCode, respErr.Message)
+		return e.JSON(respErr.StatusCode, respErr.Message)
 	}
 
 	// If we have not an response.Error but something else
 	log.Warn().Stack().Err(err).Msgf("app return invalid error type")
 	resp := map[string]interface{}{"__error__": err.Error()}
-	return c.JSON(http.StatusNotImplemented, resp)
+	return e.JSON(http.StatusNotImplemented, resp)
 }
 
-func (c *ErrorContext) ErrorBadReqestResponse(err error) error {
-	log := zerolog.Ctx(c.Request().Context())
+func ErrorBadReqestResponse(e echo.Context, err error) error {
+	log := zerolog.Ctx(e.Request().Context())
 	log.Debug().Err(err).Msgf("cannot decode request")
 
 	var resp interface{}
@@ -44,12 +40,5 @@ func (c *ErrorContext) ErrorBadReqestResponse(err error) error {
 		resp = map[string]interface{}{"__error__": []string{echoErr.Message.(string)}}
 	}
 
-	return c.JSON(http.StatusBadRequest, resp)
-}
-
-func ErrorHandlers(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		cc := &ErrorContext{c}
-		return next(cc)
-	}
+	return e.JSON(http.StatusBadRequest, resp)
 }

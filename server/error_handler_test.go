@@ -1,4 +1,4 @@
-package middleware
+package server
 
 import (
 	"net/http"
@@ -17,18 +17,17 @@ type User struct {
 
 type handler struct{}
 
-func (h *handler) createUser(c echo.Context) error {
-	сс := c.(*ErrorContext)
+func (h *handler) createUser(e echo.Context) error {
 	req := new(User)
-	if err := c.Bind(req); err != nil {
-		return сс.ErrorBadReqestResponse(err)
+	if err := e.Bind(req); err != nil {
+		return ErrorBadReqestResponse(e, err)
 	}
 
-	err := c.Validate(req)
+	err := e.Validate(req)
 	if err != nil {
-		return сс.ErrorResponse(err)
+		return ErrorResponse(e, err)
 	}
-	return c.JSON(http.StatusCreated, req)
+	return e.JSON(http.StatusCreated, req)
 }
 
 func TestErrorHandler(t *testing.T) {
@@ -42,7 +41,7 @@ func TestErrorHandler(t *testing.T) {
 	c := e.NewContext(req, rec)
 	h := &handler{}
 
-	res := ErrorHandlers(h.createUser)(c)
+	res := h.createUser(c)
 	// Assertions
 	if assert.NoError(t, res) {
 		assert.Equal(t, http.StatusBadRequest, rec.Code)
