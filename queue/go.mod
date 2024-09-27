@@ -2,6 +2,12 @@ module github.com/webdevelop-pro/go-common/queue
 
 go 1.22.2
 
+replace "github.com/webdevelop-pro/go-common/db/dbtests" => "/home/adams/projects/webdevelop-pro/go-common/dbtests"
+replace "github.com/webdevelop-pro/go-common/db/pclient" => "/home/adams/projects/webdevelop-pro/go-common/pclient"
+replace "github.com/webdevelop-pro/go-common/db/tests" => "/home/adams/projects/webdevelop-pro/go-common/db/tests"
+replace "github.com/webdevelop-pro/go-common/tests" => "/home/adams/projects/webdevelop-pro/go-common/tests"
+
+
 require (
 	cloud.google.com/go/pubsub v1.38.0
 	github.com/cenkalti/backoff/v4 v4.3.0

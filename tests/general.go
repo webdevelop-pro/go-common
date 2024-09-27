@@ -2,12 +2,14 @@ package tests
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"math"
 	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/webdevelop-pro/go-common/configurator"
 )
 
 type TestScenario struct {
@@ -22,15 +24,21 @@ type TableTest struct {
 	Context   TestContext
 }
 
+func (tbl *TableTest) SetContext(t *testing.T, ctx context.Context) {
+	tbl.Context = TestContext{t, ctx}
+}
+
 /*
 func GetPointer(str string) *string {
 	return &str
 }
 */
 
-func RunTableTest(t *testing.T, fixtureMngrs []FixturesManager, tableTest TableTest) {
+func RunTableTest(t *testing.T, ctx context.Context, fixtureMngrs []FixturesManager, tableTest TableTest) {
 	t.Helper()
+	configurator.LoadDotEnv()
 
+	tableTest.SetContext(t, ctx)
 	for _, fixtures := range fixtureMngrs {
 		err := fixtures.CleanAndApply()
 		assert.NoError(t, err, "Failed apply fixtures")

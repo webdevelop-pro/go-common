@@ -17,7 +17,7 @@ type Configuration struct {
 func NewConfiguration(conf interface{}, prefixes ...string) error {
 	prefix := ""
 
-	err := loadDotEnv()
+	err := LoadDotEnv()
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func NewConfiguration(conf interface{}, prefixes ...string) error {
 	return nil
 }
 
-func loadDotEnv() error {
+func LoadDotEnv() error {
 	envPath := os.Getenv("ENV_FILE")
 
 	var err error
