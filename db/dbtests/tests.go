@@ -67,7 +67,7 @@ func SQL(query string, expected ...tests.ExpectedResult) tests.SomeAction {
 				expValue, ok := res[key]
 				if assert.True(t.T, ok, fmt.Sprintf("Expected column %s not exist in result", key)) {
 					value = tests.AllowAny(expValue, value)
-					assert.Equal(t.T, expValue, value)
+					assert.Equal(t.T, value, expValue)
 				}
 			}
 		}

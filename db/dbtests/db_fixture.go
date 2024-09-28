@@ -32,6 +32,7 @@ type FixturesManager struct {
 }
 
 func NewFixturesManager(ctx context.Context, fixtures ...Fixture) FixturesManager {
+	configurator.LoadDotEnv()
 	cfg := db.Config{}
 
 	// Fix for timezones
@@ -80,8 +81,9 @@ func (f FixturesManager) SetCTX(ctx context.Context) context.Context {
 
 func (f FixturesManager) Clean(table string) error {
 	query := fmt.Sprintf(
-		"DELETE FROM %s; select setval('%s_id_seq',(select max(id)+1 from %s));",
-		table, table, table,
+		`DELETE FROM %s; select setval('%s_id_seq',(select max(id)+1 from %s));
+		ALTER SEQUENCE %s_id_seq RESTART WITH 1`,
+		table, table, table, table,
 	)
 
 	_, err := f.db.Exec(context.TODO(), query)

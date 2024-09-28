@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/queue/pclient"
 )
 
@@ -32,6 +33,7 @@ type FixturesManager struct {
 }
 
 func NewFixturesManager(ctx context.Context, fixtures ...Fixture) FixturesManager {
+	configurator.LoadDotEnv()
 	cfg := pclient.Config{}
 
 	pclient, err := pclient.New(ctx)

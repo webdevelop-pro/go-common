@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/webdevelop-pro/go-common/configurator"
 )
 
 type TestScenario struct {
@@ -36,7 +35,6 @@ func GetPointer(str string) *string {
 
 func RunTableTest(t *testing.T, ctx context.Context, fixtureMngrs []FixturesManager, tableTest TableTest) {
 	t.Helper()
-	configurator.LoadDotEnv()
 
 	tableTest.SetContext(t, ctx)
 	for _, fixtures := range fixtureMngrs {
