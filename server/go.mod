@@ -10,13 +10,13 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.9.0
-	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240720163630-b4ea9f10773c
-	github.com/webdevelop-pro/go-common/context v0.0.0-20240720163630-b4ea9f10773c
-	github.com/webdevelop-pro/go-common/httputils v0.0.0-20240717170542-c0346e00472d
-	github.com/webdevelop-pro/go-common/logger v0.0.0-20240720163630-b4ea9f10773c
-	github.com/webdevelop-pro/go-common/response v0.0.0-20240720163630-b4ea9f10773c
-	github.com/webdevelop-pro/go-common/validator v0.0.0-20240720163630-b4ea9f10773c
-	github.com/webdevelop-pro/go-common/verser v0.0.0-20240720163630-b4ea9f10773c
+	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240928194423-e378b7eda3d5
+	github.com/webdevelop-pro/go-common/context v0.0.0-20240928194423-e378b7eda3d5
+	github.com/webdevelop-pro/go-common/httputils v0.0.0-20240720163630-b4ea9f10773c
+	github.com/webdevelop-pro/go-common/logger v0.0.0-20240928194423-e378b7eda3d5
+	github.com/webdevelop-pro/go-common/response v0.0.0-20240928194423-e378b7eda3d5
+	github.com/webdevelop-pro/go-common/validator v0.0.0-20240928194423-e378b7eda3d5
+	github.com/webdevelop-pro/go-common/verser v0.0.0-20240928194423-e378b7eda3d5
 	go.uber.org/fx v1.22.1
 )
 

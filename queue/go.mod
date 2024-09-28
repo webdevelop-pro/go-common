@@ -2,24 +2,26 @@ module github.com/webdevelop-pro/go-common/queue
 
 go 1.22.2
 
-replace "github.com/webdevelop-pro/go-common/db/dbtests" => "/home/adams/projects/webdevelop-pro/go-common/dbtests"
-replace "github.com/webdevelop-pro/go-common/db/pclient" => "/home/adams/projects/webdevelop-pro/go-common/pclient"
-replace "github.com/webdevelop-pro/go-common/db/tests" => "/home/adams/projects/webdevelop-pro/go-common/db/tests"
-replace "github.com/webdevelop-pro/go-common/tests" => "/home/adams/projects/webdevelop-pro/go-common/tests"
+replace github.com/webdevelop-pro/go-common/db/dbtests => /home/adams/projects/webdevelop-pro/go-common/dbtests
 
+replace github.com/webdevelop-pro/go-common/db/pclient => /home/adams/projects/webdevelop-pro/go-common/pclient
+
+replace github.com/webdevelop-pro/go-common/db/tests => /home/adams/projects/webdevelop-pro/go-common/db/tests
+
+replace github.com/webdevelop-pro/go-common/tests => /home/adams/projects/webdevelop-pro/go-common/tests
 
 require (
 	cloud.google.com/go/pubsub v1.38.0
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
-	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240720163630-b4ea9f10773c
-	github.com/webdevelop-pro/go-common/context v0.0.0-20240720163630-b4ea9f10773c
-	github.com/webdevelop-pro/go-common/httputils v0.0.0-20240720163630-b4ea9f10773c
-	github.com/webdevelop-pro/go-common/logger v0.0.0-20240720163630-b4ea9f10773c
-	github.com/webdevelop-pro/go-common/tests v0.0.0-20240720163630-b4ea9f10773c
-	github.com/webdevelop-pro/go-common/validator v0.0.0-20240720163630-b4ea9f10773c
-	github.com/webdevelop-pro/go-common/verser v0.0.0-20240720163630-b4ea9f10773c
+	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240927205959-cd97607ae1c8
+	github.com/webdevelop-pro/go-common/context v0.0.0-20240928194423-e378b7eda3d5
+	github.com/webdevelop-pro/go-common/httputils v0.0.0-20240927205959-cd97607ae1c8
+	github.com/webdevelop-pro/go-common/logger v0.0.0-20240928194423-e378b7eda3d5
+	github.com/webdevelop-pro/go-common/tests v0.0.0-20240928194423-e378b7eda3d5
+	github.com/webdevelop-pro/go-common/validator v0.0.0-20240928194423-e378b7eda3d5
+	github.com/webdevelop-pro/go-common/verser v0.0.0-20240928194423-e378b7eda3d5
 	google.golang.org/api v0.185.0
 )
 
@@ -52,7 +54,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/rs/zerolog v1.33.0 // indirect
-	github.com/webdevelop-pro/go-common/response v0.0.0-20240720163630-b4ea9f10773c // indirect
+	github.com/webdevelop-pro/go-common/response v0.0.0-20240928194423-e378b7eda3d5 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0 // indirect

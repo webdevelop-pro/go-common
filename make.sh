@@ -28,8 +28,8 @@ SERVICE_NAME=$(lstrip $(basename $(pwd)) "i-")
 REPOSITORY=$COMPANY_NAME/$SERVICE_NAME
 
 # FIX SED for macos
-SED=`which gsed`
-if [[ -z "$SED" ]]; then
+SED=`which gsed` || true
+if [ -z "$SED" ]; then
   SED=`which sed`
 fi
 
