@@ -41,7 +41,7 @@ func NewFixturesManager(ctx context.Context, fixtures ...Fixture) FixturesManage
 		panic(err)
 	}
 	return FixturesManager{
-		queue:    &pclient,
+		queue:    pclient,
 		cfg:      cfg,
 		fixtures: fixtures,
 	}

@@ -10,7 +10,7 @@ import (
 type PubSubListener struct {
 	log    logger.Logger
 	routes []PubSubRoute
-	client pclient.Client
+	client *pclient.Client
 }
 
 type PubSubRoute struct {

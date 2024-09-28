@@ -54,7 +54,7 @@ type FixturesManager struct {
 func NewFixturesManager(ctx context.Context, fixtures ...Fixture) FixturesManager {
 	client, _ := New(ctx)
 	return FixturesManager{
-		client:   &client,
+		client:   client,
 		fixtures: fixtures,
 	}
 }

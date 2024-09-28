@@ -23,23 +23,23 @@ type Client struct {
 	cfg    *Config         // client config
 }
 
-func New(ctx context.Context) (Client, error) {
+func New(ctx context.Context) (*Client, error) {
 	cfg := Config{}
 	log := logger.NewComponentLogger(ctx, pkgName)
 
 	err := configurator.NewConfiguration(&cfg, pkgName)
 	if err != nil {
 		log.Fatal().Stack().Err(err).Msg(ErrConfigParse.Error())
-		return Client{}, err
+		return &Client{}, err
 	}
 
 	bclient, err := gpubsub.NewClient(ctx, cfg.ProjectID, option.WithCredentialsFile(cfg.ServiceAccountCredentials))
 	if err != nil {
 		log.Fatal().Stack().Err(err).Msg(err.Error())
-		return Client{}, err
+		return &Client{}, err
 	}
 
-	b := Client{
+	b := &Client{
 		log:    log,
 		cfg:    &cfg,
 		client: bclient,
