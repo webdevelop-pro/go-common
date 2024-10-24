@@ -38,7 +38,7 @@ func NotFound(err error, msg string) Error {
 	)
 }
 
-// NotFound shortcut to return http.StatusNotFound with custom error and msg
+// InternalError shortcut to return http.StatusInternalServerError with custom error and msg
 func InternalError(err error, msg string) Error {
 	if err == nil {
 		err = errors.New("")
