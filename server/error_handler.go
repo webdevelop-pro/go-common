@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/friendsofgo/errors"
@@ -34,7 +33,6 @@ func ErrorBadReqestResponse(e echo.Context, err error) error {
 
 	var resp interface{}
 	respErr := response.Error{}
-	fmt.Println(err.Error())
 	if errors.As(err, &respErr) {
 		resp = respErr.Message
 	} else {
