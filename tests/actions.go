@@ -25,7 +25,7 @@ type ExpectedResponse struct {
 	Body []byte
 }
 
-func SendHTTPRequst(req httputils.Request, checks ...ExpectedResponse) SomeAction {
+func SendHTTPRequst(req httputils.Request, expected ExpectedResponse) SomeAction {
 	return func(t TestContext) error {
 		res, err := httputils.CreateDefaultRequest(t.Ctx, req)
 		assert.NoError(t.T, err)
@@ -33,14 +33,10 @@ func SendHTTPRequst(req httputils.Request, checks ...ExpectedResponse) SomeActio
 		result, code, err := httputils.SendRequest(res)
 		assert.NoError(t.T, err)
 
-		for _, expected := range checks {
-			assert.Equal(t.T, expected.Code, code, "Invalid response code")
-
-			if expected.Body != nil {
-				CompareJSONBody(t.T, result, expected.Body)
-			}
+		assert.Equal(t.T, expected.Code, code, "Invalid response code")
+		if expected.Body != nil {
+			CompareJSONBody(t.T, result, expected.Body)
 		}
-
 		return nil
 	}
 }

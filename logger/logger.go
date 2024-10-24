@@ -77,3 +77,12 @@ func NewComponentLogger(c context.Context, component string) Logger {
 
 	return NewLogger(c, component, cfg.LogLevel, output)
 }
+
+// NewComponentLogger return default logger instance with custom component
+func FromCtx(ctx context.Context, component string) *zerolog.Logger {
+	log := zerolog.Ctx(ctx)
+	log.UpdateContext(func(c zerolog.Context) zerolog.Context {
+		return c.Str("component", component)
+	})
+	return log
+}

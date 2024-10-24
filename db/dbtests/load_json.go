@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/friendsofgo/errors"
 )
 
 func (f FixturesManager) updateSeqNum(fixture Fixture) error {

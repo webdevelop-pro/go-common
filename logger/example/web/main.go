@@ -5,8 +5,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/friendsofgo/errors"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/webdevelop-pro/go-common/logger"
 	"github.com/webdevelop-pro/go-common/verser"
 )

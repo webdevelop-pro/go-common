@@ -39,7 +39,9 @@ func RunTableTest(t *testing.T, ctx context.Context, fixtureMngrs []FixturesMana
 	tableTest.SetContext(t, ctx)
 	for _, fixtures := range fixtureMngrs {
 		err := fixtures.CleanAndApply()
-		assert.NoError(t, err, "Failed apply fixtures")
+		if err != nil {
+			panic(err)
+		}
 		tableTest.Context.Ctx = fixtures.SetCTX(tableTest.Context.Ctx)
 	}
 

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/friendsofgo/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/webdevelop-pro/go-common/db"
 	"github.com/webdevelop-pro/go-common/tests"

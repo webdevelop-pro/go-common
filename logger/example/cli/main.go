@@ -4,7 +4,7 @@ package main
 import (
 	"context"
 
-	"github.com/pkg/errors"
+	"github.com/friendsofgo/errors"
 	"github.com/webdevelop-pro/go-common/logger"
 	"github.com/webdevelop-pro/go-common/verser"
 )

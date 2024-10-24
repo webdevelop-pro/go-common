@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/friendsofgo/errors"
 )
 
 type Request struct {

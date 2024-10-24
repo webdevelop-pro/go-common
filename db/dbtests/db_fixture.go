@@ -32,7 +32,6 @@ type FixturesManager struct {
 }
 
 func NewFixturesManager(ctx context.Context, fixtures ...Fixture) FixturesManager {
-	configurator.LoadDotEnv()
 	cfg := db.Config{}
 
 	// Fix for timezones

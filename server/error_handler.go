@@ -1,16 +1,17 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/friendsofgo/errors"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
-	"github.com/rs/zerolog"
+	"github.com/webdevelop-pro/go-common/logger"
 	"github.com/webdevelop-pro/go-common/response"
 )
 
 func ErrorResponse(e echo.Context, err error) error {
-	log := zerolog.Ctx(e.Request().Context())
+	log := logger.FromCtx(e.Request().Context(), "http/ports")
 	// log := logger.NewComponentLogger("ports-http", c.(logger.Context))
 	respErr := response.Error{}
 	if errors.As(err, &respErr) {
@@ -28,16 +29,21 @@ func ErrorResponse(e echo.Context, err error) error {
 }
 
 func ErrorBadReqestResponse(e echo.Context, err error) error {
-	log := zerolog.Ctx(e.Request().Context())
+	log := logger.FromCtx(e.Request().Context(), "http/ports")
 	log.Debug().Err(err).Msgf("cannot decode request")
 
 	var resp interface{}
 	respErr := response.Error{}
-	echoErr := echo.HTTPError{}
+	fmt.Println(err.Error())
 	if errors.As(err, &respErr) {
 		resp = respErr.Message
-	} else if errors.As(err, &echoErr) {
-		resp = map[string]interface{}{"__error__": []string{echoErr.Message.(string)}}
+	} else {
+		switch err.(type) {
+		case *echo.HTTPError:
+			resp = map[string]interface{}{"__error__": []string{err.(*echo.HTTPError).Message.(string)}}
+		default:
+			resp = map[string]interface{}{"__error__": []string{err.Error()}}
+		}
 	}
 
 	return e.JSON(http.StatusBadRequest, resp)

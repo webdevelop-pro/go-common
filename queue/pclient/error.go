@@ -1,6 +1,6 @@
 package pclient
 
-import "github.com/pkg/errors"
+import "github.com/friendsofgo/errors"
 
 var (
 	ErrConfigParse          = errors.New("Cannot parse pubsub config")

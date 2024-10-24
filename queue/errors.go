@@ -1,6 +1,6 @@
 package queue
 
-import "github.com/pkg/errors"
+import "github.com/friendsofgo/errors"
 
 var (
 	ErrNotCorrectTopic = errors.New("Topic name incorrect")

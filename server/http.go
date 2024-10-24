@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
@@ -107,7 +108,11 @@ func AddPrometheus(srv *HTTPServer) {
 
 func AddDefaultMiddlewares(srv *HTTPServer) {
 	// srv.Echo.Use(echoMW.Recover())
-	srv.Echo.Use(echoMW.BodyLimit("20M"))
+	limit := os.Getenv("HTTP_BODY_LIMIT")
+	if limit == "" {
+		limit = "20M"
+	}
+	srv.Echo.Use(echoMW.BodyLimit(limit))
 	srv.Echo.Use(middleware.SetIPAddress)
 	srv.Echo.Use(middleware.SetRequestTime)
 	srv.Echo.Use(echoMW.BodyDumpWithConfig(echoMW.BodyDumpConfig{

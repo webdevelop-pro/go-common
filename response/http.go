@@ -3,7 +3,7 @@ package response
 import (
 	"net/http"
 
-	"github.com/pkg/errors"
+	"github.com/friendsofgo/errors"
 )
 
 // BadRequest shortcut to return http.StatusBadRequest with custom error and msg

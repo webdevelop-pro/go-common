@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/rs/zerolog"
 	"github.com/webdevelop-pro/go-common/context/keys"
 	"github.com/webdevelop-pro/go-common/httputils"
 	"github.com/webdevelop-pro/go-common/logger"
@@ -25,7 +26,14 @@ func SetDefaultEventCtx(ctx context.Context, event Event) context.Context {
 		MSGID: event.ID,
 	}
 
-	ctx = keys.SetCtxValue(ctx, keys.LogInfo, logInfo)
+	// create logger with serviceContext
+	log := logger.NewComponentLogger(ctx, "event")
+	log.UpdateContext(func(c zerolog.Context) zerolog.Context {
+		return c.Interface("serviceContext", logInfo)
+	})
+	// add logger to context
+	ctx = log.WithContext(ctx)
+	// ctx = keys.SetCtxValue(ctx, keys.LogInfo, logInfo)
 
 	return ctx
 }
@@ -50,7 +58,14 @@ func SetDefaultWebhookCtx(ctx context.Context, webhook Webhook) context.Context 
 		MSGID: webhook.ID,
 	}
 
-	ctx = keys.SetCtxValue(ctx, keys.LogInfo, logInfo)
+	// create logger with serviceContext
+	log := logger.NewComponentLogger(ctx, "webhook")
+	log.UpdateContext(func(c zerolog.Context) zerolog.Context {
+		return c.Interface("serviceContext", logInfo)
+	})
+	// ADD logger to context
+	ctx = log.WithContext(ctx)
+	// ctx = keys.SetCtxValue(ctx, keys.LogInfo, logInfo)
 
 	return ctx
 }

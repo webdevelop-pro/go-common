@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/friendsofgo/errors"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 

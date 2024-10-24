@@ -4,7 +4,7 @@ go 1.22.2
 
 require (
 	github.com/go-playground/validator/v10 v10.22.1
-	github.com/pkg/errors v0.9.1
+	github.com/friendsofgo/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
 	github.com/webdevelop-pro/go-common/response v0.0.0-20241024090359-27b7fce771f4
 )

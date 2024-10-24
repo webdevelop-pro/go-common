@@ -1,7 +1,7 @@
 # Golang logging enhancements
 
 
-This project adds enhancements to improve logging in go services. Service based on the [zerolog](https://github.com/rs/zerolog) and [pkg/errors](https://github.com/pkg/errors) with additional improvements:
+This project adds enhancements to improve logging in go services. Service based on the [zerolog](https://github.com/rs/zerolog) and [pkg/errors](https://github.com/friendsofgo/errors) with additional improvements:
 
 - add stack trace for the error, panic and fatal errors
 - add request context to every logging instance
@@ -15,7 +15,7 @@ package main
 import (
   "net/http"
 
-  "github.com/pkg/errors"
+  "github.com/friendsofgo/errors"
   "github.com/labstack/echo/v4"
   "github.com/webdevelop-pro/go-common/logger"
 )
@@ -100,6 +100,9 @@ Will output
 }
 ```
 
+## Guidelines
+- Always log your error twice: right when it happen with stacktrace (`.Stack()`) and in ports handler (http/pubsub/websocket/etc)
+
 #### Notes
 Key error elements:
 - `level` and `severity`: error level
@@ -116,3 +119,4 @@ Key error elements:
     
 ## Contributing
 [TBD]
+
