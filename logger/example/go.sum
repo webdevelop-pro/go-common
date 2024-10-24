@@ -37,10 +37,12 @@ github.com/webdevelop-pro/go-common/configurator v0.0.0-20240709181103-69f477bc3
 github.com/webdevelop-pro/go-common/configurator v0.0.0-20240709181103-69f477bc3045/go.mod h1:AyuPyL015mgYkuv/P1UN+mTNQOWldh8Rk+5e+41+i3o=
 github.com/webdevelop-pro/go-common/configurator v0.0.0-20240717170542-c0346e00472d h1:mipeFvvPtUqSuZ1HMqeR/ageRPFQq7WbJ2+dmr7Yr/0=
 github.com/webdevelop-pro/go-common/configurator v0.0.0-20240717170542-c0346e00472d/go.mod h1:AyuPyL015mgYkuv/P1UN+mTNQOWldh8Rk+5e+41+i3o=
+github.com/webdevelop-pro/go-common/configurator v0.0.0-20241024090359-27b7fce771f4/go.mod h1:AyuPyL015mgYkuv/P1UN+mTNQOWldh8Rk+5e+41+i3o=
 github.com/webdevelop-pro/go-common/context v0.0.0-20240709181103-69f477bc3045 h1:Sto0XvwicPk+Six5QWLTgJquoZdSKJWBiw0vdWK13p4=
 github.com/webdevelop-pro/go-common/context v0.0.0-20240709181103-69f477bc3045/go.mod h1:sTPN4cFn9lkQqBr15rMVrSUbgiLGU0ygpVJw/KmanyU=
 github.com/webdevelop-pro/go-common/context v0.0.0-20240717170542-c0346e00472d h1:ZaXFHuJxRUPQdDjjTVneMWKZ7xkNB3fJ9w5PlTucjIM=
 github.com/webdevelop-pro/go-common/context v0.0.0-20240717170542-c0346e00472d/go.mod h1:qt8+lur7xkTiFpyq96I0lEyWg3RPutxMCNGil1mna5w=
+github.com/webdevelop-pro/go-common/context v0.0.0-20241024090359-27b7fce771f4/go.mod h1:qt8+lur7xkTiFpyq96I0lEyWg3RPutxMCNGil1mna5w=
 github.com/webdevelop-pro/go-common/logger v0.0.0-20240709181103-69f477bc3045 h1:gp7CxsCXX9un2vmVUdO7ffkYTVHnkO51vIE8NBSbfpU=
 github.com/webdevelop-pro/go-common/logger v0.0.0-20240709181103-69f477bc3045/go.mod h1:dXcfR9fuiwOY79G3GteXKsohxWrCor6iZ6cJwSX3zMA=
 github.com/webdevelop-pro/go-common/logger v0.0.0-20240717170837-2649392865da h1:lPS8yH++JvZrKzj+w982cUtcs9S1AU4DZeIoHTwwBZg=

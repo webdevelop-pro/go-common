@@ -10,13 +10,13 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.9.0
-	github.com/webdevelop-pro/go-common/configurator v0.0.0-20240928194423-e378b7eda3d5
-	github.com/webdevelop-pro/go-common/context v0.0.0-20240928194423-e378b7eda3d5
-	github.com/webdevelop-pro/go-common/httputils v0.0.0-20240720163630-b4ea9f10773c
-	github.com/webdevelop-pro/go-common/logger v0.0.0-20240928194423-e378b7eda3d5
-	github.com/webdevelop-pro/go-common/response v0.0.0-20240928194423-e378b7eda3d5
-	github.com/webdevelop-pro/go-common/validator v0.0.0-20240928194423-e378b7eda3d5
-	github.com/webdevelop-pro/go-common/verser v0.0.0-20240928194423-e378b7eda3d5
+	github.com/webdevelop-pro/go-common/configurator v0.0.0-20241024090359-27b7fce771f4
+	github.com/webdevelop-pro/go-common/context v0.0.0-20241024090359-27b7fce771f4
+	github.com/webdevelop-pro/go-common/httputils v0.0.0-20241024090359-27b7fce771f4
+	github.com/webdevelop-pro/go-common/logger v0.0.0-20241024090359-27b7fce771f4
+	github.com/webdevelop-pro/go-common/response v0.0.0-20241024090359-27b7fce771f4
+	github.com/webdevelop-pro/go-common/validator v0.0.0-20241024090359-27b7fce771f4
+	github.com/webdevelop-pro/go-common/verser v0.0.0-20241024090359-27b7fce771f4
 	go.uber.org/fx v1.22.1
 )
 
@@ -24,10 +24,10 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.4 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.6 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.22.0 // indirect
+	github.com/go-playground/validator/v10 v10.22.1 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
@@ -47,10 +47,10 @@ require (
 	go.uber.org/dig v1.17.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.25.0 // indirect
-	golang.org/x/net v0.27.0 // indirect
-	golang.org/x/sys v0.22.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/crypto v0.28.0 // indirect
+	golang.org/x/net v0.30.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
