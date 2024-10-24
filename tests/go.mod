@@ -9,8 +9,8 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/friendsofgo/errors v0.9.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/webdevelop-pro/go-common/context v0.0.0-20241024090359-27b7fce771f4 // indirect
+	github.com/webdevelop-pro/go-common/context v0.0.0-20241024225208-caf4b7f8afd9 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
