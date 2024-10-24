@@ -25,7 +25,13 @@ else
 fi
 
 SERVICE_NAME=$(lstrip $(basename $(pwd)) "i-")
-REPOSITORY=$COMPANY_NAME/i-$SERVICE_NAME
+REPOSITORY=$COMPANY_NAME/$SERVICE_NAME
+
+# FIX SED for macos
+SED=`which gsed` || true
+if [ -z "$SED" ]; then
+  SED=`which sed`
+fi
 
 init() {
   GO_FILES=$(find . -name '*.go' | grep -v _test.go)
@@ -76,26 +82,33 @@ install)
   ;;
 
 lint)
-  golangci-lint -c .golangci.yml run $2 $3
+  dirlist=`ls`
+  for ddir in $dirlist[@]
+  do
+    if [ -d $ddir ]
+    then
+      if [ -f "$ddir/go.mod" ]; then
+        cd $ddir
+        golangci-lint -c ../.golangci.yml run --fix $2 $3 || echo 'not ok'
+        cd ../
+      fi
+    fi
+  done
   ;;
 
 test)
-  case $2 in
-  unit)
-    init
-    go test -run=Unit -count=1 -v ${PKG_LIST} $3
-    ;;
-
-  integration)
-    init
-    go test -run=Integration -count=1 -p 1 -v ${PKG_LIST} $3
-    ;;
-  *)
-      init
-      go test -count=1 -p 1 -v ${PKG_LIST} $2 $3
-    ;;
-
-    esac
+  dirlist=`ls`
+  for ddir in $dirlist[@]
+  do
+    if [ -d $ddir ]
+    then
+      if [ -f "$ddir/go.mod" ]; then
+        cd $ddir
+        go test -count=1 -p 1 ./... $2 $3
+        cd ../
+      fi
+    fi
+  done
   ;;
 
 race)
@@ -167,6 +180,19 @@ deploy-dev)
   docker push cr.webdevelop.us/$COMPANY_NAME/$SERVICE_NAME:$GIT_COMMIT
   docker push cr.webdevelop.us/$COMPANY_NAME/$SERVICE_NAME:latest-dev
   kubectl -n $COMPANY_NAME-dev set image deployment/$SERVICE_NAME $SERVICE_NAME=cr.webdevelop.us/$COMPANY_NAME/$SERVICE_NAME:$GIT_COMMIT
+  ;;
+
+update-version)
+  find ./ -name "go.mod" -exec $SED -i "s/$2/$3/g" {} \;
+  dirlist=`ls`
+  for ddir in $dirlist[@]
+  do
+    if [ -d $ddir ]; then
+      if [ -f "$ddir/go.mod" ]; then
+        cd $ddir; rm go.sum; go mod tidy; cd ..;
+      fi
+    fi
+  done
   ;;
 
 help)

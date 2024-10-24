@@ -4,27 +4,10 @@ import (
 	"context"
 )
 
-const (
-	LogentryObject      = "logentry"
-	PermissionObject    = "permission"
-	GroupObject         = "group"
-	ContentTypeObject   = "contenttype"
-	SessionObject       = "session"
-	AccountObject       = "account"
-	FilerObject         = "filer"
-	OfferFilerObject    = "offerfiler"
-	OfferObject         = "offer"
-	ProfileObject       = "profile"
-	InvestmentObject    = "investment"
-	ApplogObject        = "applog"
-	EmailObject         = "email"
-	CommentObject       = "comment"
-	WalletObject        = "wallet"
-	FundingsourceObject = "fundingsource"
-	TransactionObject   = "transaction"
+type (
+	ContextKey rune
+	ContextStr string
 )
-
-type ContextKey rune
 
 const (
 	CtxTraceID ContextKey = iota
@@ -34,11 +17,18 @@ const (
 	IdentityID
 	LogInfo
 	RequestLogID
-	LogObjectType
-	LogObjectID
+
+	RequestIDStr ContextStr = "X-Request-Id"
+	IPAddressStr ContextStr = "IP-Address"
+
+	RequestTimeContextStr ContextStr = "Request-Created-At"
+
+	XOriginalForwardedFor = "X-Original-Forwarded-For"
+	XForwardedFor         = "X-Forwarded-For"
+	XRealIP               = "X-Real-IP"
 )
 
-func GetAsString(ctx context.Context, key ContextKey) string {
+func GetAsString(ctx context.Context, key any) string {
 	val, ok := ctx.Value(key).(string)
 	if ok {
 		return val
@@ -46,7 +36,7 @@ func GetAsString(ctx context.Context, key ContextKey) string {
 	return ""
 }
 
-func GetCtxValue(ctx context.Context, key ContextKey) any {
+func GetCtxValue(ctx context.Context, key any) any {
 	return ctx.Value(key)
 }
 

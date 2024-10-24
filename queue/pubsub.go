@@ -3,14 +3,14 @@ package queue
 import (
 	"context"
 
+	"github.com/webdevelop-pro/go-common/logger"
 	"github.com/webdevelop-pro/go-common/queue/pclient"
-	logger "github.com/webdevelop-pro/go-logger"
 )
 
 type PubSubListener struct {
 	log    logger.Logger
 	routes []PubSubRoute
-	client pclient.Client
+	client *pclient.Client
 }
 
 type PubSubRoute struct {
@@ -39,7 +39,7 @@ func New(routes []PubSubRoute) PubSubListener {
 
 	err = p.AddRoutes(routes)
 	if err != nil {
-		log.Fatal().Stack().Err(err).Msg("failed add routes")
+		log.Fatal().Stack().Err(err).Msg(ErrAddRoute.Error())
 	}
 
 	return p
@@ -55,25 +55,25 @@ func (p PubSubListener) Start() {
 			go func() {
 				for {
 					err := p.client.ListenWebhooks(ctx, br.Subscription, br.Topic, br.WebhooksListener)
-					p.log.Error().Err(err).Msg("ListenWebhooks error")
+					p.log.Error().Err(err).Msg(ErrListeningError.Error())
 				}
 			}()
 		case "events":
 			go func() {
 				for {
 					err := p.client.ListenEvents(ctx, br.Subscription, br.Topic, br.EventsListener)
-					p.log.Error().Err(err).Msg("ListenWebhooks error")
+					p.log.Error().Err(err).Msg(ErrListeningError.Error())
 				}
 			}()
 		case "messages":
 			go func() {
 				for {
 					err := p.client.ListenRawMsgs(ctx, br.Subscription, br.Topic, br.MsgsListener)
-					p.log.Error().Err(err).Msg("ListenWebhooks error")
+					p.log.Error().Err(err).Msg(ErrListeningError.Error())
 				}
 			}()
 		default:
-			p.log.Fatal().Stack().Msgf("topic name %s incorrect", br.Name)
+			p.log.Fatal().Stack().Msgf("%s %s", ErrNotCorrectTopic.Error(), br.Name)
 		}
 	}
 }

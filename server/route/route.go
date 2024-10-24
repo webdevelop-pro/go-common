@@ -9,7 +9,7 @@ import (
 type Route struct {
 	Method      string
 	Path        string
-	Handle      echo.HandlerFunc
+	Handler     echo.HandlerFunc
 	Middlewares []echo.MiddlewareFunc
 }
 
@@ -17,20 +17,8 @@ type Configurator interface {
 	GetRoutes() []Route
 }
 
-type ConfiguratorOut struct {
-	fx.Out
-
-	RG Configurator `group:"route_configurator"`
-}
-
 type ConfiguratorIn struct {
-	// fx.In
+	fx.In
 
 	Configurators []Configurator `group:"route_configurator"`
-}
-
-func NewConfigurator(rg Configurator) ConfiguratorOut {
-	return ConfiguratorOut{
-		RG: rg,
-	}
 }

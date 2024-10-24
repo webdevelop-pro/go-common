@@ -17,7 +17,7 @@ type Configuration struct {
 func NewConfiguration(conf interface{}, prefixes ...string) error {
 	prefix := ""
 
-	err := loadDotEnv()
+	err := LoadDotEnv()
 	if err != nil {
 		return err
 	}
@@ -35,12 +35,15 @@ func NewConfiguration(conf interface{}, prefixes ...string) error {
 	return nil
 }
 
-func loadDotEnv() error {
+func LoadDotEnv() error {
 	envPath := os.Getenv("ENV_FILE")
 
 	var err error
 	if envPath == "" {
-		_ = godotenv.Load(".env") // ignore error by default
+		// if .env exists
+		if _, err1 := os.Stat(".env"); err1 == nil {
+			err = godotenv.Load(".env")
+		}
 	} else {
 		err = godotenv.Load(envPath) // if path to env file defined, check error
 	}

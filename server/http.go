@@ -4,18 +4,21 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/labstack/echo-contrib/prometheus"
+	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
 	echoMW "github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/webdevelop-pro/go-common/configurator"
+	"github.com/webdevelop-pro/go-common/context/keys"
+	"github.com/webdevelop-pro/go-common/logger"
 	"github.com/webdevelop-pro/go-common/server/healthcheck"
 	"github.com/webdevelop-pro/go-common/server/middleware"
 	"github.com/webdevelop-pro/go-common/server/route"
-	"github.com/webdevelop-pro/go-common/server/validator"
-	logger "github.com/webdevelop-pro/go-logger"
+	"github.com/webdevelop-pro/go-common/validator"
 	"go.uber.org/fx"
 )
+
+const component = "http_server"
 
 type HTTPServer struct {
 	Echo   *echo.Echo
@@ -23,28 +26,45 @@ type HTTPServer struct {
 	config *Config
 }
 
-func InitAllRoutes(srv *HTTPServer, params route.ConfiguratorIn) {
-	for _, rg := range params.Configurators {
-		srv.InitRoutes(rg)
+func InitAndRun() fx.Option {
+	return fx.Module(component,
+		// Init http server
+		fx.Provide(NewServer),
+		fx.Invoke(
+			//
+			AddDefaultMiddlewares,
+			// Registration routes and handlers for http server
+			InitHandlerGroups,
+			// Run HTTP server
+			StartServer,
+		),
+	)
+}
+
+func (s *HTTPServer) InitRoutes(rg route.Configurator) {
+	for _, r := range rg.GetRoutes() {
+		//nolint:gosec,scopelint
+		s.AddRoute(&r)
 	}
 }
 
 // AddRoute adds route to the router.
-func (s *HTTPServer) AddRoute(rte *route.Route) {
-	handle := rte.Handle
-	rte.Middlewares = append(rte.Middlewares, middleware.SetLogger)
-	s.Echo.Add(rte.Method, rte.Path, handle, rte.Middlewares...)
+func (s *HTTPServer) AddRoute(route *route.Route) {
+	s.Echo.Add(route.Method, route.Path, route.Handler, route.Middlewares...)
 }
 
-func (s *HTTPServer) InitRoutes(rg route.Configurator) {
-	for _, rte := range rg.GetRoutes() {
-		//nolint:gosec,scopelint
-		s.AddRoute(&rte)
+// NewServer returns new API instance.
+func NewServer() *HTTPServer {
+	var (
+		cfg = &Config{}
+		l   = logger.NewComponentLogger(context.TODO(), component)
+	)
+
+	if err := configurator.NewConfiguration(cfg); err != nil {
+		l.Fatal().Err(err).Msg("failed to get configuration of server")
 	}
-}
 
-// NewHTTPServer returns new API instance.
-func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config) *HTTPServer {
+	e := echo.New()
 	// sets CORS headers if Origin is present
 	e.Use(
 		echoMW.CORSWithConfig(echoMW.CORSConfig{
@@ -61,29 +81,12 @@ func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config) *HTTPServer {
 	)
 
 	// Set context logger
-	e.Use(middleware.SetIPAddress)
-	e.Use(middleware.DefaultCTXValues)
-	e.Use(middleware.SetRequestTime)
 	e.Use(middleware.SetLogger)
-	e.Use(middleware.LogRequests)
-	// Trace ID middleware generates a unique id for a request.
-	e.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
-		RequestIDHandler: func(c echo.Context, requestID string) {
-			c.Set(echo.HeaderXRequestID, requestID)
-		},
-	}))
 	// Add the healthcheck endpoint
 	e.GET(`/healthcheck`, healthcheck.Healthcheck)
 
 	// get an instance of a validator
 	e.Validator = validator.New()
-
-	// Add prometheus metrics
-	p := prometheus.NewPrometheus("echo", nil)
-	p.Use(e)
-
-	// Set docs middleware
-	// setDocsMiddleware(e)
 
 	// avoid any native logging of echo, because we use custom library for logging
 	e.HideBanner = true        // don't log the banner on startup
@@ -97,15 +100,29 @@ func NewHTTPServer(e *echo.Echo, l logger.Logger, cfg *Config) *HTTPServer {
 	}
 }
 
-func New() *HTTPServer {
-	cfg := &Config{}
-	l := logger.NewComponentLogger(context.TODO(), "http_server")
+func AddPrometheus(srv *HTTPServer) {
+	srv.Echo.Use(echoprometheus.NewMiddleware(component))
+	srv.Echo.GET("/metrics", echoprometheus.NewHandler())
+}
 
-	if err := configurator.NewConfiguration(cfg); err != nil {
-		l.Fatal().Err(err).Msg("failed to get configuration of server")
-	}
+func AddDefaultMiddlewares(srv *HTTPServer) {
+	// srv.Echo.Use(echoMW.Recover())
+	srv.Echo.Use(echoMW.BodyLimit("20M"))
+	srv.Echo.Use(middleware.SetIPAddress)
+	srv.Echo.Use(middleware.SetRequestTime)
+	srv.Echo.Use(echoMW.BodyDumpWithConfig(echoMW.BodyDumpConfig{
+		Skipper: middleware.FileAndHealtchCheckSkipper,
+		Handler: middleware.BodyDumpHandler,
+	}))
+	// Trace ID middleware generates a unique id for a request.
+	srv.Echo.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
+		RequestIDHandler: func(c echo.Context, requestID string) {
+			c.Set(echo.HeaderXRequestID, requestID)
 
-	return NewHTTPServer(echo.New(), l, cfg)
+			ctx := context.WithValue(c.Request().Context(), keys.RequestID, requestID)
+			c.SetRequest(c.Request().WithContext(ctx))
+		},
+	}))
 }
 
 // StartServer is function that registers start of http server in lifecycle
@@ -114,7 +131,9 @@ func StartServer(lc fx.Lifecycle, srv *HTTPServer) {
 		fx.Hook{
 			OnStart: func(_ context.Context) error {
 				on := fmt.Sprintf("%s:%s", srv.config.Host, srv.config.Port)
+
 				srv.log.Info().Msgf("starting server on %s", on)
+
 				go func() {
 					err := srv.Echo.Start(on)
 					if err != nil {

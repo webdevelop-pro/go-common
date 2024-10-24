@@ -7,16 +7,16 @@ import (
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/tracelog"
-	comLogger "github.com/webdevelop-pro/go-logger"
+	"github.com/webdevelop-pro/go-common/logger"
 )
 
 // Logger is a struct that represent logger for DB
 type Logger struct {
-	log comLogger.Logger
+	log logger.Logger
 }
 
 // NewDBLogger is a constructor for Logger
-func NewDBLogger(log comLogger.Logger) *Logger {
+func NewDBLogger(log logger.Logger) *Logger {
 	return &Logger{log: log}
 }
 
@@ -50,17 +50,18 @@ func (l *Logger) Log(ctx context.Context, level tracelog.LogLevel, msg string, d
 	}
 }
 
+func CleanSQL(query string) string {
+	q := strings.ReplaceAll(query, "\t", " ")
+	q = strings.ReplaceAll(q, "\n", " ")
+	q = strings.ReplaceAll(q, "  ", " ")
+	q = strings.ReplaceAll(q, "  ", " ")
+	return q
+}
+
 // LogQuery custom method to log SQL, for future use in Log
 func (db *DB) LogQuery(ctx context.Context, query string, args interface{}) {
 	// ToDo
 	// Replace $1,$2 with values
-	q := strings.ReplaceAll(
-		strings.ReplaceAll(
-			strings.ReplaceAll(
-				strings.ReplaceAll(query, "\t", " "),
-				"  ", " "),
-			"  ", " "),
-		"\n", " ")
-
+	q := CleanSQL(query)
 	db.Log.Trace().Ctx(ctx).Msgf("query: %s, %v", q, args)
 }

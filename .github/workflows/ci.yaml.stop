@@ -1,0 +1,117 @@
+# This is a basic workflow to help you get started with Actions
+stop
+
+name: CICD
+on:
+  push:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+  
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: false
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: v1.59
+          args: -c .golangci.yml
+          only-new-issues: true
+  tests:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    services:
+      pubsub_emulator:
+        image: 3apag/pubsub-emulator
+        env:
+          PUBSUB_PROJECT_ID: webdevelop-live
+          PUBSUB_LISTEN_ADDRESS: 0.0.0.0:8232
+        ports:
+          - 8232:8232
+
+      # Label used to access the service container
+      postgres:
+        image: postgres
+        ports:
+          - 5439:5439
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: password
+          PGPORT: 5439
+          POSTGRES_PORT: 5439
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 1s
+          --health-timeout 1s
+          --health-retries 50
+
+    container:
+      image: cr.webdevelop.us/webdevelop-pro/go-common:latest-dev
+      credentials:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Run tests
+      run: source .env.example ./make.sh test
+      env:
+        TEST_APP_START: "true"
+
+  build:
+    runs-on: ubuntu-22.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - uses: benjlevesque/short-sha@v2.1
+        if: always()
+        id: short-sha
+        with:
+          length: 8
+
+      - name: Get branch name
+        if: always()
+        id: branch-name
+        uses: tj-actions/branch-names@v8
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          registry: cr.webdevelop.us
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          context: docker
+          file: docker/Dockerfile
+          tags: |
+            cr.webdevelop.us/webdevelop-pro/go-common:latest
+            cr.webdevelop.us/webdevelop-pro/go-common:latest-dev
+            cr.webdevelop.us/webdevelop-pro/go-common:${{ steps.short-sha.outputs.sha }}
