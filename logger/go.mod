@@ -3,7 +3,7 @@ module github.com/webdevelop-pro/go-common/logger
 go 1.22.2
 
 require (
-	github.com/friendsofgo/errors v0.9.1
+	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.33.0
 	github.com/webdevelop-pro/go-common/configurator v0.0.0-20241024225208-caf4b7f8afd9
 	github.com/webdevelop-pro/go-common/context v0.0.0-20241024225208-caf4b7f8afd9

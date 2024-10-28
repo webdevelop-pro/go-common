@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	backoff "github.com/cenkalti/backoff/v4"
-	"github.com/friendsofgo/errors"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/tracelog"
+	"github.com/pkg/errors"
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/logger"
 )

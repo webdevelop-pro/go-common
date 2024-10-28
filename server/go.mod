@@ -3,7 +3,7 @@ module github.com/webdevelop-pro/go-common/server
 go 1.22.2
 
 require (
-	github.com/friendsofgo/errors v0.9.1
+	github.com/pkg/errors v0.9.1
 	github.com/go-playground/assert/v2 v2.2.0
 	github.com/labstack/echo-contrib v0.17.1
 	github.com/labstack/echo/v4 v4.12.0

@@ -3,8 +3,9 @@ module github.com/webdevelop-pro/go-common/logger/example
 go 1.22.2
 
 require (
+	github.com/pkg/errors v0.9.1
 	github.com/labstack/echo/v4 v4.12.0
-	github.com/friendsofgo/errors v0.9.1
+	github.com/pkg/errors v0.9.1
 	github.com/webdevelop-pro/go-common/logger v0.0.0-20240928212352-31b4d43c8e72
 	github.com/webdevelop-pro/go-common/verser v0.0.0-20240928212352-31b4d43c8e72
 )
@@ -25,4 +26,5 @@ require (
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7 // indirect
 )

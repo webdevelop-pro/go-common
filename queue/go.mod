@@ -5,7 +5,7 @@ go 1.22.2
 require (
 	cloud.google.com/go/pubsub v1.45.0
 	github.com/cenkalti/backoff/v4 v4.3.0
-	github.com/friendsofgo/errors v0.9.1
+	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.9.0
 	github.com/webdevelop-pro/go-common/configurator v0.0.0-20241024225208-caf4b7f8afd9

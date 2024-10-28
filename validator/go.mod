@@ -3,7 +3,7 @@ module github.com/webdevelop-pro/go-common/validator
 go 1.22.2
 
 require (
-	github.com/friendsofgo/errors v0.9.1
+	github.com/pkg/errors v0.9.1
 	github.com/go-playground/validator/v10 v10.22.1
 	github.com/stretchr/testify v1.9.0
 	github.com/webdevelop-pro/go-common/response v0.0.0-20241024225208-caf4b7f8afd9

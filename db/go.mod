@@ -4,7 +4,7 @@ go 1.22.2
 
 require (
 	github.com/cenkalti/backoff/v4 v4.3.0
-	github.com/friendsofgo/errors v0.9.1
+	github.com/pkg/errors v0.9.1
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/stretchr/testify v1.9.0
 	github.com/webdevelop-pro/go-common/configurator v0.0.0-20241024225208-caf4b7f8afd9

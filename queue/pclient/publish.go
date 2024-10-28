@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/friendsofgo/errors"
+	"github.com/pkg/errors"
 	"github.com/webdevelop-pro/go-common/validator"
 )
 

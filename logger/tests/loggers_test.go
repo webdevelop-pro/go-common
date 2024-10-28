@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/friendsofgo/errors"
+	"github.com/pkg/errors"
 
 	"github.com/webdevelop-pro/go-common/context/keys"
 	"github.com/webdevelop-pro/go-common/logger"
