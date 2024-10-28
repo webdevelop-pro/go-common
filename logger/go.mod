@@ -24,7 +24,6 @@ require (
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/webdevelop-pro/go-common/httputils v0.0.0-20241024225208-caf4b7f8afd9 // indirect
 	go.uber.org/multierr v1.11.0 // indirect

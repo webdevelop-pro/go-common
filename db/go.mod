@@ -4,8 +4,8 @@ go 1.22.2
 
 require (
 	github.com/cenkalti/backoff/v4 v4.3.0
-	github.com/pkg/errors v0.9.1
 	github.com/jackc/pgx/v5 v5.7.1
+	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
 	github.com/webdevelop-pro/go-common/configurator v0.0.0-20241024225208-caf4b7f8afd9
 	github.com/webdevelop-pro/go-common/context v0.0.0-20241024225208-caf4b7f8afd9
@@ -24,7 +24,6 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/rs/zerolog v1.33.0 // indirect
