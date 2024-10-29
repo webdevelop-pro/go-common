@@ -8,6 +8,7 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
+
 	"github.com/webdevelop-pro/go-common/configurator"
 )
 
@@ -21,7 +22,7 @@ func (l Logger) Printf(s string, args ...interface{}) {
 }
 
 // NewLogger return logger instance
-func NewLogger(c context.Context, component string, logLevel string, output io.Writer) Logger {
+func NewLogger(ctx context.Context, component string, logLevel string, output io.Writer) Logger {
 	level, err := zerolog.ParseLevel(logLevel)
 	if err != nil {
 		level = zerolog.InfoLevel
@@ -38,8 +39,8 @@ func NewLogger(c context.Context, component string, logLevel string, output io.W
 	// l = l.Caller()
 	// }
 
-	if c != nil {
-		l = l.Ctx(c)
+	if ctx != nil {
+		l = l.Ctx(ctx)
 	}
 
 	if component != "" {
@@ -78,11 +79,30 @@ func NewComponentLogger(c context.Context, component string) Logger {
 	return NewLogger(c, component, cfg.LogLevel, output)
 }
 
-// NewComponentLogger return default logger instance with custom component
+// FromCtx return default logger instance with custom component
 func FromCtx(ctx context.Context, component string) *zerolog.Logger {
 	log := zerolog.Ctx(ctx)
 	log.UpdateContext(func(c zerolog.Context) zerolog.Context {
 		return c.Str("component", component)
 	})
 	return log
+}
+
+// NewDefaultLogger return default logger instance
+func NewDefaultLogger() Logger {
+	cfg := Config{}
+	err := configurator.NewConfiguration(&cfg, "log")
+	if err != nil {
+		panic(err)
+	}
+
+	var output io.Writer
+	// Beautiful output
+	if cfg.LogConsole {
+		output = zerolog.NewConsoleWriter()
+	} else {
+		output = os.Stdout
+	}
+
+	return NewLogger(context.Background(), "", cfg.LogLevel, output)
 }

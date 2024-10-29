@@ -3,8 +3,9 @@ package fxzerolog
 import (
 	"strings"
 
-	"github.com/webdevelop-pro/go-common/logger"
 	"go.uber.org/fx/fxevent"
+
+	"github.com/webdevelop-pro/go-common/logger"
 )
 
 type ZeroLogger struct {

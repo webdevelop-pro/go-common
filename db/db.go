@@ -5,6 +5,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/webdevelop-pro/go-common/logger"
 )
 
