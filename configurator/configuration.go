@@ -10,7 +10,7 @@ import (
 // Configuration  is a struct for storing configuration
 type Configuration struct {
 	Name   string
-	Config interface{}
+	Config any
 }
 
 // NewConfiguration sets conf from env
@@ -53,4 +53,9 @@ func LoadDotEnv() error {
 	}
 
 	return nil
+}
+
+func Parse[T any]() (T, error) {
+	var t T
+	return t, NewConfiguration(&t)
 }
