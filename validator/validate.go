@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
+
 	"github.com/webdevelop-pro/go-common/response"
 )
 
@@ -63,29 +64,30 @@ func beautifulMsg(fe validator.FieldError) string {
 	return fe.Error() // default error
 }
 
-// Validate check payloads and return error list
+// Verify checks payloads and returns error list
 func (va Validator) Verify(i interface{}, httpStatus int) error {
 	// call the `Struct` function passing in your payload
 	err := va.validator.Struct(i)
 	if err != nil {
-		fieldErrors := response.Error{
+		fieldErrors := &response.Error{
 			StatusCode: httpStatus,
 			Err:        errors.Wrapf(err, "validator error"),
 			Message:    make(map[string][]string),
 		}
+
 		var ve validator.ValidationErrors
+
 		strErr := "validator error:"
+
 		if errors.As(err, &ve) {
 			for _, fe := range ve {
 				fieldName := fe.Field()
-				_, ok := fieldErrors.Message[fieldName]
+
+				_, ok := fieldErrors.GetMessageFromMap(fieldName)
 				if ok {
-					fieldErrors.Message[fieldName] = append(
-						fieldErrors.Message[fieldName],
-						beautifulMsg(fe),
-					)
+					fieldErrors.AddMessageToMap(fieldName, beautifulMsg(fe))
 				} else {
-					fieldErrors.Message[fieldName] = []string{beautifulMsg(fe)}
+					fieldErrors.AddMessageToMap(fieldName, beautifulMsg(fe))
 					strErr = fmt.Sprintf("%s %s %s,", strErr, fieldName, beautifulMsg(fe))
 				}
 			}
@@ -95,12 +97,14 @@ func (va Validator) Verify(i interface{}, httpStatus int) error {
 		strErr = strErr[0 : len(strErr)-1]
 		// We change default validator error message cause it does not provide details we need
 		fieldErrors.Err = errors.Errorf(strErr)
+
 		return fieldErrors
 	}
+
 	return nil
 }
 
-// ValidateBadRequest execute Validate with default BadRequest response
+// Validate executes Verify with default BadRequest response
 func (va Validator) Validate(i interface{}) error {
 	return va.Verify(i, http.StatusBadRequest)
 }
