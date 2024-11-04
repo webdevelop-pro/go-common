@@ -55,7 +55,7 @@ func LoadDotEnv() error {
 	return nil
 }
 
-func Parse[T any]() (T, error) {
+func Parse[T any](prefixes ...string) (T, error) {
 	var t T
-	return t, NewConfiguration(&t)
+	return t, NewConfiguration(&t, prefixes...)
 }
