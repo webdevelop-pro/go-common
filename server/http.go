@@ -10,8 +10,9 @@ import (
 	echoMW "github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 	"github.com/webdevelop-pro/go-common/context/keys"
-	"github.com/webdevelop-pro/go-common/validator"
 	"go.uber.org/fx"
+
+	"github.com/webdevelop-pro/go-common/validator"
 
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/logger"
@@ -122,10 +123,10 @@ func AddDefaultMiddlewares(srv *HTTPServer) {
 	srv.Echo.Use(echoMW.BodyLimit(limit))
 	srv.Echo.Use(middleware.SetIPAddress)
 	srv.Echo.Use(middleware.SetRequestTime)
-	srv.Echo.Use(echoMW.BodyDumpWithConfig(echoMW.BodyDumpConfig{
-		Skipper: middleware.FileAndHealtchCheckSkipper,
-		Handler: middleware.BodyDumpHandler,
-	}))
+	//srv.Echo.Use(echoMW.BodyDumpWithConfig(echoMW.BodyDumpConfig{
+	//	Skipper: middleware.FileAndHealtchCheckSkipper,
+	//	Handler: middleware.BodyDumpHandler,
+	//}))
 	// Trace ID middleware generates a unique id for a request.
 	srv.Echo.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
 		RequestIDHandler: func(c echo.Context, requestID string) {
@@ -133,6 +134,19 @@ func AddDefaultMiddlewares(srv *HTTPServer) {
 
 			ctx := context.WithValue(c.Request().Context(), keys.RequestID, requestID)
 			c.SetRequest(c.Request().WithContext(ctx))
+		},
+	}))
+
+	srv.Echo.Use(echoMW.RequestLoggerWithConfig(echoMW.RequestLoggerConfig{
+		LogURI:    true,
+		LogStatus: true,
+		LogValuesFunc: func(c echo.Context, v echoMW.RequestLoggerValues) error {
+			srv.log.Info().
+				Str("URI", v.URI).
+				Int("status", v.Status).
+				Msg("request")
+
+			return nil
 		},
 	}))
 }

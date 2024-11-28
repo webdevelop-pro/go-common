@@ -50,12 +50,11 @@ func newPool(ctx context.Context, pgConfig *pgxpool.Config, logger logger.Logger
 }
 
 func GetConfigPool(logger logger.Logger) *pgxpool.Config {
-	cfg := Config{}
-
-	err := configurator.NewConfiguration(&cfg, pkgName)
+	cfg, err := configurator.Parse[Config](pkgName)
 	if err != nil {
 		logger.Fatal().Stack().Err(err).Msg("Cannot parse config")
 	}
+
 	pgConfig, err := pgxpool.ParseConfig(GetPoolConnString(&cfg))
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed to parse config")

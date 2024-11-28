@@ -2,22 +2,21 @@ package response
 
 import (
 	"fmt"
-	"net/http"
 )
 
 var (
 	DefaultErrBadRequest = NewError(
-		fmt.Errorf("bad request"), http.StatusBadRequest, MsgBadRequest,
+		fmt.Errorf("bad request"), StatusBadRequest, MsgBadRequest,
 	)
 	DefaultErrInternalError = NewError(
-		fmt.Errorf("internal error"), http.StatusInternalServerError, MsgInternalErr,
+		fmt.Errorf("internal error"), StatusInternalError, MsgInternalErr,
 	)
 )
 
 func ErrBadRequest(err error) *Error {
-	return NewError(err, http.StatusBadRequest, map[string][]string{"__error__": {err.Error()}})
+	return NewError(err, StatusBadRequest, map[string][]string{"__error__": {err.Error()}})
 }
 
 func ErrInternalError(err error) *Error {
-	return NewError(err, http.StatusInternalServerError, map[string][]string{"__error__": {err.Error()}})
+	return NewError(err, StatusInternalError, map[string][]string{"__error__": {err.Error()}})
 }
