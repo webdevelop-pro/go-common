@@ -31,11 +31,11 @@ type Validator struct {
 	validator *validator.Validate
 }
 
-func New() Validator {
+func New() *Validator {
 	v := validator.New()
 	v.RegisterTagNameFunc(ParamName)
 
-	return Validator{
+	return &Validator{
 		validator: v,
 	}
 }
