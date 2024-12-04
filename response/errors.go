@@ -11,6 +11,10 @@ var (
 	DefaultErrInternalError = NewError(
 		fmt.Errorf("internal error"), StatusInternalError, MsgInternalErr,
 	)
+
+	DefaultErrNotFound = NewError(
+		fmt.Errorf("not found"), StatusNotFound, MsgNotFound,
+	)
 )
 
 func ErrBadRequest(err error) *Error {
