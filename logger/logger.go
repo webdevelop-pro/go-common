@@ -17,7 +17,7 @@ func init() {
 }
 
 // Printf is implementation of fx.Printer
-func (l Logger) Printf(s string, args ...interface{}) {
+func (l *Logger) Printf(s string, args ...interface{}) {
 	l.Info().Msgf(s, args...)
 }
 
@@ -82,11 +82,6 @@ func NewComponentLogger(c context.Context, component string) Logger {
 // FromCtx return default logger instance with custom component
 func FromCtx(ctx context.Context, component string) *zerolog.Logger {
 	log := zerolog.Ctx(ctx)
-
-	if log.GetLevel() == zerolog.Disabled {
-		l := NewComponentLogger(ctx, component)
-		log = &l.Logger
-	}
 
 	log.UpdateContext(func(c zerolog.Context) zerolog.Context {
 		return c.Str("component", component)
