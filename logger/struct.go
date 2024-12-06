@@ -1,6 +1,8 @@
 package logger
 
 import (
+	"context"
+
 	"github.com/rs/zerolog"
 )
 
@@ -11,6 +13,10 @@ const (
 // Logger is wrapper struct around logger.Logger that adds some custom functionality
 type Logger struct {
 	zerolog.Logger
+}
+
+func (l *Logger) Ctx(ctx context.Context) *zerolog.Logger {
+	return zerolog.Ctx(ctx)
 }
 
 // ServiceContext contain info for all logs
