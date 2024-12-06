@@ -8,6 +8,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/tracelog"
+
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/logger"
 )
@@ -63,9 +64,7 @@ func newConn(ctx context.Context, pgConfig *pgx.ConnConfig, logger logger.Logger
 }
 
 func GetConfigConn(logger logger.Logger) *pgx.ConnConfig {
-	cfg := Config{}
-
-	err := configurator.NewConfiguration(&cfg, pkgName)
+	cfg, err := configurator.Parse[Config](pkgName)
 	if err != nil {
 		logger.Fatal().Stack().Err(err).Msg("Cannot parse config")
 	}
