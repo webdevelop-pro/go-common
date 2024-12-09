@@ -2,6 +2,7 @@ package tests
 
 import (
 	"context"
+	"net/http"
 	"testing"
 	"time"
 
@@ -21,8 +22,9 @@ type (
 )
 
 type ExpectedResponse struct {
-	Code int
-	Body []byte
+	Code    int
+	Body    []byte
+	Headers http.Header
 }
 
 func SendHTTPRequst(req httputils.Request, expected ExpectedResponse) SomeAction {
@@ -30,10 +32,13 @@ func SendHTTPRequst(req httputils.Request, expected ExpectedResponse) SomeAction
 		res, err := httputils.CreateDefaultRequest(t.Ctx, req)
 		assert.NoError(t.T, err)
 
-		result, code, err := httputils.SendRequest(res)
+		result, headers, code, err := httputils.SendRequest(res)
 		assert.NoError(t.T, err)
 
 		assert.Equal(t.T, expected.Code, code, "Invalid response code")
+		if expected.Headers != nil {
+			assert.EqualValuesf(t.T, headers, expected.Headers, "headers not equal")
+		}
 		if expected.Body != nil {
 			CompareJSONBody(t.T, result, expected.Body)
 		}
