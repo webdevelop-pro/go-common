@@ -7,7 +7,7 @@ import (
 )
 
 // BadRequest shortcut to return http.StatusBadRequest with custom error and msg
-func BadRequest(err error, msg string) Error {
+func BadRequest(err error, msg string) *Error {
 	if err == nil {
 		err = errors.New("")
 	}
@@ -15,7 +15,7 @@ func BadRequest(err error, msg string) Error {
 	if msg == "" {
 		finalMsg = MsgBadRequest
 	}
-	return New(
+	return NewError(
 		err,
 		http.StatusBadRequest,
 		finalMsg,
@@ -23,7 +23,7 @@ func BadRequest(err error, msg string) Error {
 }
 
 // NotFound shortcut to return http.StatusNotFound with custom error and msg
-func NotFound(err error, msg string) Error {
+func NotFound(err error, msg string) *Error {
 	if err == nil {
 		err = errors.New("")
 	}
@@ -31,7 +31,7 @@ func NotFound(err error, msg string) Error {
 	if msg == "" {
 		finalMsg = MsgNotFound
 	}
-	return New(
+	return NewError(
 		err,
 		http.StatusNotFound,
 		finalMsg,
@@ -39,7 +39,7 @@ func NotFound(err error, msg string) Error {
 }
 
 // InternalError shortcut to return http.StatusInternalServerError with custom error and msg
-func InternalError(err error, msg string) Error {
+func InternalError(err error, msg string) *Error {
 	if err == nil {
 		err = errors.New("")
 	}
@@ -47,7 +47,7 @@ func InternalError(err error, msg string) Error {
 	if msg == "" {
 		finalMsg = MsgInternalErr
 	}
-	return New(
+	return NewError(
 		err,
 		http.StatusInternalServerError,
 		finalMsg,

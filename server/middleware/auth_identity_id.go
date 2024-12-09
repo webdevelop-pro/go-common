@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
 	"github.com/webdevelop-pro/go-common/context/keys"
+
 	"github.com/webdevelop-pro/go-common/logger"
 )
 
@@ -23,6 +24,10 @@ func NewAuthIdentityHeaderMW() *AuthIdentityHeaderMiddleware {
 }
 
 func (m *AuthIdentityHeaderMiddleware) Validate(next echo.HandlerFunc) echo.HandlerFunc {
+	return CheckIdentityID(next)
+}
+
+func CheckIdentityID(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		identityID := c.Request().Header.Get("Authorization")
 
@@ -33,8 +38,7 @@ func (m *AuthIdentityHeaderMiddleware) Validate(next echo.HandlerFunc) echo.Hand
 			)
 		}
 
-		ctx := c.Request().Context()
-		ctx = context.WithValue(ctx, keys.IdentityID, identityID)
+		ctx := context.WithValue(c.Request().Context(), keys.IdentityID, identityID)
 		l := zerolog.Ctx(ctx).With().Str("user_id", identityID).Logger()
 		ctx = l.WithContext(ctx)
 		c.SetRequest(c.Request().WithContext(ctx))

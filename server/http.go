@@ -9,17 +9,20 @@ import (
 	"github.com/labstack/echo/v4"
 	echoMW "github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
-	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/context/keys"
+	"go.uber.org/fx"
+
+	"github.com/webdevelop-pro/go-common/validator"
+
+	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/logger"
+
 	"github.com/webdevelop-pro/go-common/server/healthcheck"
 	"github.com/webdevelop-pro/go-common/server/middleware"
 	"github.com/webdevelop-pro/go-common/server/route"
-	"github.com/webdevelop-pro/go-common/validator"
-	"go.uber.org/fx"
 )
 
-const component = "http_server"
+const pkgName = "http_server"
 
 type HTTPServer struct {
 	Echo   *echo.Echo
@@ -28,7 +31,7 @@ type HTTPServer struct {
 }
 
 func InitAndRun() fx.Option {
-	return fx.Module(component,
+	return fx.Module(pkgName,
 		// Init http server
 		fx.Provide(NewServer),
 		fx.Invoke(
@@ -58,7 +61,7 @@ func (s *HTTPServer) AddRoute(route *route.Route) {
 func NewServer() *HTTPServer {
 	var (
 		cfg = &Config{}
-		l   = logger.NewComponentLogger(context.TODO(), component)
+		l   = logger.NewComponentLogger(context.TODO(), pkgName)
 	)
 
 	if err := configurator.NewConfiguration(cfg); err != nil {
@@ -94,15 +97,20 @@ func NewServer() *HTTPServer {
 	e.HidePort = true          // hide log about port server started on
 	e.Logger.SetLevel(log.OFF) // disable echo#Logger
 
-	return &HTTPServer{
+	newSrv := &HTTPServer{
 		Echo:   e,
 		config: cfg,
 		log:    l,
 	}
+
+	// add HTTPErrorHandler
+	newSrv.Echo.HTTPErrorHandler = newSrv.httpErrorHandler
+
+	return newSrv
 }
 
 func AddPrometheus(srv *HTTPServer) {
-	srv.Echo.Use(echoprometheus.NewMiddleware(component))
+	srv.Echo.Use(echoprometheus.NewMiddleware(pkgName))
 	srv.Echo.GET("/metrics", echoprometheus.NewHandler())
 }
 
@@ -115,10 +123,10 @@ func AddDefaultMiddlewares(srv *HTTPServer) {
 	srv.Echo.Use(echoMW.BodyLimit(limit))
 	srv.Echo.Use(middleware.SetIPAddress)
 	srv.Echo.Use(middleware.SetRequestTime)
-	srv.Echo.Use(echoMW.BodyDumpWithConfig(echoMW.BodyDumpConfig{
-		Skipper: middleware.FileAndHealtchCheckSkipper,
-		Handler: middleware.BodyDumpHandler,
-	}))
+	//srv.Echo.Use(echoMW.BodyDumpWithConfig(echoMW.BodyDumpConfig{
+	//	Skipper: middleware.FileAndHealtchCheckSkipper,
+	//	Handler: middleware.BodyDumpHandler,
+	//}))
 	// Trace ID middleware generates a unique id for a request.
 	srv.Echo.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
 		RequestIDHandler: func(c echo.Context, requestID string) {
@@ -126,6 +134,19 @@ func AddDefaultMiddlewares(srv *HTTPServer) {
 
 			ctx := context.WithValue(c.Request().Context(), keys.RequestID, requestID)
 			c.SetRequest(c.Request().WithContext(ctx))
+		},
+	}))
+
+	srv.Echo.Use(echoMW.RequestLoggerWithConfig(echoMW.RequestLoggerConfig{
+		LogURI:    true,
+		LogStatus: true,
+		LogValuesFunc: func(c echo.Context, v echoMW.RequestLoggerValues) error {
+			srv.log.Info().
+				Str("URI", v.URI).
+				Int("status", v.Status).
+				Msg("request")
+
+			return nil
 		},
 	}))
 }

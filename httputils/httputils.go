@@ -132,18 +132,18 @@ func CreateRequestWithFiles(req Request, body map[string]any, files map[string]s
 	return res, nil
 }
 
-func SendRequest(req *http.Request) ([]byte, int, error) {
+func SendRequest(req *http.Request) ([]byte, *http.Header, int, error) {
 	httpClient := &http.Client{}
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		return nil, 0, err
+		return nil, nil, 0, err
 	}
 	defer resp.Body.Close()
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, resp.StatusCode, errors.Wrapf(err, "cannot read response body")
+		return nil, nil, resp.StatusCode, errors.Wrapf(err, "cannot read response body")
 	}
 
-	return bodyBytes, resp.StatusCode, nil
+	return bodyBytes, &resp.Header, resp.StatusCode, nil
 }
