@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+
 	"github.com/webdevelop-pro/go-common/logger"
 
 	"github.com/webdevelop-pro/go-common/response"
@@ -25,7 +26,7 @@ func ErrorResponse(e echo.Context, err error) error {
 		return e.JSON(respErr.StatusCode, respErr.Message)
 	}
 
-	// If we have not an response.Error but something else
+	// If we have not a response.Error but something else
 	log.Warn().Stack().Err(err).Msgf("app return invalid error type")
 
 	return e.JSON(
@@ -79,11 +80,7 @@ func (s *HTTPServer) httpErrorHandler(err error, c echo.Context) {
 
 	switch m := he.Message.(type) {
 	case string:
-		if s.config.Debug {
-			message = echo.Map{"message": m, "error": err.Error()}
-		} else {
-			message = echo.Map{"message": m}
-		}
+		message = echo.Map{"message": m}
 	case json.Marshaler:
 		// do nothing - this type knows how to format itself to JSON
 	case error:
