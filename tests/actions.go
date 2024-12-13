@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/webdevelop-pro/go-common/httputils"
 )
 
@@ -29,19 +30,26 @@ type ExpectedResponse struct {
 
 func SendHTTPRequst(req httputils.Request, expected ExpectedResponse) SomeAction {
 	return func(t TestContext) error {
-		res, err := httputils.CreateDefaultRequest(t.Ctx, req)
+		newReq, err := httputils.CreateDefaultRequest(t.Ctx, req)
 		assert.NoError(t.T, err)
 
-		result, headers, code, err := httputils.SendRequest(res)
+		doRequest := httputils.SendRequest
+		if req.HttpClient != nil {
+			doRequest = httputils.SendRequestWithClient(req.HttpClient)
+		}
+
+		result, headers, code, err := doRequest(newReq)
 		assert.NoError(t.T, err)
 
 		assert.Equal(t.T, expected.Code, code, "Invalid response code")
 		if expected.Headers != nil {
-			assert.EqualValuesf(t.T, headers, expected.Headers, "headers not equal")
+			assert.EqualValuesf(t.T, expected.Headers, *headers, "headers not equal")
 		}
+
 		if expected.Body != nil {
 			CompareJSONBody(t.T, result, expected.Body)
 		}
+
 		return nil
 	}
 }

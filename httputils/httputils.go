@@ -16,6 +16,7 @@ import (
 )
 
 type Request struct {
+	HttpClient         *http.Client
 	Host, Port, Scheme string
 	Method, Path       string
 	Body               []byte
@@ -132,8 +133,7 @@ func CreateRequestWithFiles(req Request, body map[string]any, files map[string]s
 	return res, nil
 }
 
-func SendRequest(req *http.Request) ([]byte, *http.Header, int, error) {
-	httpClient := &http.Client{}
+func request(httpClient *http.Client, req *http.Request) ([]byte, *http.Header, int, error) {
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, nil, 0, err
@@ -146,4 +146,16 @@ func SendRequest(req *http.Request) ([]byte, *http.Header, int, error) {
 	}
 
 	return bodyBytes, &resp.Header, resp.StatusCode, nil
+}
+
+func SendRequest(req *http.Request) ([]byte, *http.Header, int, error) {
+	httpClient := &http.Client{}
+
+	return request(httpClient, req)
+}
+
+func SendRequestWithClient(httpClient *http.Client) func(req *http.Request) ([]byte, *http.Header, int, error) {
+	return func(req *http.Request) ([]byte, *http.Header, int, error) {
+		return request(httpClient, req)
+	}
 }
