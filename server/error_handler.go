@@ -64,11 +64,20 @@ func (s *HTTPServer) httpErrorHandler(err error, c echo.Context) {
 	if c.Response().Committed {
 		return
 	}
+	var (
+		he      *response.Error
+		echoErr *echo.HTTPError
+	)
 
-	var he *response.Error
-	ok := errors.As(err, &he)
-
-	if !ok {
+	switch {
+	case errors.As(err, &echoErr):
+		he = &response.Error{
+			StatusCode: echoErr.Code,
+			Message:    echoErr.Message,
+		}
+	case errors.As(err, &he):
+		// do nothing
+	default:
 		he = &response.Error{
 			StatusCode: http.StatusInternalServerError,
 			Message:    http.StatusText(http.StatusInternalServerError),
@@ -93,6 +102,7 @@ func (s *HTTPServer) httpErrorHandler(err error, c echo.Context) {
 	} else {
 		err = c.JSON(code, message)
 	}
+
 	if err != nil {
 		s.log.Err(err).Msg("cannot send error response")
 	}
