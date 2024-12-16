@@ -8,13 +8,13 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.10.0
-	github.com/webdevelop-pro/go-common/configurator v0.0.0-20241119201513-73cbbd58c706
-	github.com/webdevelop-pro/go-common/context v0.0.0-20241119201513-73cbbd58c706
-	github.com/webdevelop-pro/go-common/httputils v0.0.0-20241119201513-73cbbd58c706
-	github.com/webdevelop-pro/go-common/logger v0.0.0-20241119201513-73cbbd58c706
-	github.com/webdevelop-pro/go-common/tests v0.0.0-20241119201513-73cbbd58c706
-	github.com/webdevelop-pro/go-common/validator v0.0.0-20241119201513-73cbbd58c706
-	github.com/webdevelop-pro/go-common/verser v0.0.0-20241119201513-73cbbd58c706
+	github.com/webdevelop-pro/go-common/configurator v1.0.4
+	github.com/webdevelop-pro/go-common/context v1.0.4
+	github.com/webdevelop-pro/go-common/httputils v1.0.4
+	github.com/webdevelop-pro/go-common/logger v1.0.4
+	github.com/webdevelop-pro/go-common/tests v1.0.4
+	github.com/webdevelop-pro/go-common/validator v1.0.4
+	github.com/webdevelop-pro/go-common/verser v1.0.4
 	google.golang.org/api v0.211.0
 )
 
@@ -39,13 +39,11 @@ require (
 	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/rogpeppe/go-internal v1.13.1 // indirect
-	github.com/webdevelop-pro/go-common/response v0.0.0-20241119201513-73cbbd58c706 // indirect
+	github.com/webdevelop-pro/go-common/response v1.0.4 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.57.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.57.0 // indirect
