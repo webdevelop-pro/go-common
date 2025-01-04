@@ -33,6 +33,22 @@ func GetPointer(str string) *string {
 }
 */
 
+func IsNil(v interface{}) bool {
+	if v == nil {
+		return true
+	}
+
+	val := reflect.ValueOf(v)
+
+	switch val.Kind() {
+	case reflect.Chan, reflect.Func, reflect.Map, reflect.Pointer,
+		reflect.UnsafePointer, reflect.Interface, reflect.Slice:
+		return val.IsNil()
+	}
+
+	return false
+}
+
 func RunTableTest(t *testing.T, ctx context.Context, fixtureMngrs []FixturesManager, tableTest TableTest) {
 	t.Helper()
 
@@ -64,7 +80,11 @@ func AllowDictAny(src, dst map[string]interface{}) map[string]interface{} {
 	for k, v := range dst {
 		switch val := v.(type) {
 		case string:
-			if val == "%any%" && src != nil && !reflect.ValueOf(src[k]).IsZero() {
+			if src == nil || src[k] == nil || IsNil(src[k]) {
+				continue
+			}
+
+			if val == "%any%" && !reflect.ValueOf(src[k]).IsZero() {
 				res[k] = src[k]
 			}
 		case int:
