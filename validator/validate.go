@@ -20,6 +20,7 @@ const (
 	MsgOneOf    = "must be one of: %s"
 	MsgEq       = "must be equal to: %s"
 	MsgSSN      = "is a valid social security number: %s"
+	MsgPath     = "invalid path: %s"
 )
 
 type FieldError struct {
@@ -34,6 +35,11 @@ type Validator struct {
 func New() *Validator {
 	v := validator.New()
 	v.RegisterTagNameFunc(ParamName)
+
+	err := v.RegisterValidation("path", isPath)
+	if err != nil {
+		panic(err)
+	}
 
 	return &Validator{
 		validator: v,
@@ -60,6 +66,8 @@ func beautifulMsg(fe validator.FieldError) string {
 		return fmt.Sprintf(MsgEq, fe.Param())
 	case "ssn":
 		return fmt.Sprintf(MsgSSN, fe.Value())
+	case "dirpath", "path":
+		return fmt.Sprintf(MsgPath, fe.Value())
 	}
 	return fe.Error() // default error
 }

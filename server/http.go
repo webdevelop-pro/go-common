@@ -138,12 +138,22 @@ func AddDefaultMiddlewares(srv *HTTPServer) {
 	}))
 
 	srv.Echo.Use(echoMW.RequestLoggerWithConfig(echoMW.RequestLoggerConfig{
-		LogURI:    true,
-		LogStatus: true,
+		LogURI:       true,
+		LogStatus:    true,
+		LogMethod:    true,
+		LogLatency:   true,
+		LogURIPath:   true,
+		LogError:     true,
+		LogRequestID: true,
+		HandleError:  true,
+
 		LogValuesFunc: func(c echo.Context, v echoMW.RequestLoggerValues) error {
 			srv.log.Info().
+				Str("method", v.Method).
 				Str("URI", v.URI).
 				Int("status", v.Status).
+				Str("request_id", v.RequestID).
+				Str("latency", v.Latency.String()).
 				Msg("request")
 
 			return nil

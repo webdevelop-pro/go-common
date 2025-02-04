@@ -3,6 +3,8 @@ package validator
 import (
 	"reflect"
 	"strings"
+
+	"github.com/go-playground/validator/v10"
 )
 
 func ParamName(fld reflect.StructField) string {
@@ -19,4 +21,8 @@ func ParamName(fld reflect.StructField) string {
 	}
 
 	return name
+}
+
+func isPath(fl validator.FieldLevel) bool {
+	return pathRegex.MatchString(fl.Field().String())
 }

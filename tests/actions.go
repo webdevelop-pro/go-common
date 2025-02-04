@@ -28,7 +28,12 @@ type ExpectedResponse struct {
 	Headers http.Header
 }
 
+// DEPRECATED: use SendHTTPRequest instead
 func SendHTTPRequst(req httputils.Request, expected ExpectedResponse) SomeAction {
+	return SendHTTPRequest(req, expected)
+}
+
+func SendHTTPRequest(req httputils.Request, expected ExpectedResponse) SomeAction {
 	return func(t TestContext) error {
 		newReq, err := httputils.CreateDefaultRequest(t.Ctx, req)
 		assert.NoError(t.T, err)
@@ -42,8 +47,20 @@ func SendHTTPRequst(req httputils.Request, expected ExpectedResponse) SomeAction
 		assert.NoError(t.T, err)
 
 		assert.Equal(t.T, expected.Code, code, "Invalid response code")
+
 		if expected.Headers != nil {
-			assert.EqualValuesf(t.T, expected.Headers, *headers, "headers not equal")
+			asserts := assert.New(t.T)
+
+			for key := range expected.Headers {
+				expectedValue := expected.Headers[key][0]
+				actualValue := headers.Get(key)
+
+				if expectedValue == "%any%" {
+					continue
+				}
+
+				asserts.Equal(expectedValue, actualValue, "Invalid header value for %s", key)
+			}
 		}
 
 		if expected.Body != nil {
