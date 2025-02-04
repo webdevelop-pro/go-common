@@ -7,7 +7,7 @@ if [ ! -d ".git" ]; then
   exit 1
 fi
 
-TAG_VERSION="v1.0.4"
+TAG_VERSION="v1.0.8"
 
 # get go.mod from dir in root
 MODULE_DIRS=$(find . -maxdepth 2 -name "go.mod" -exec dirname {} \;)
