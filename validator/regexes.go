@@ -3,5 +3,5 @@ package validator
 import "regexp"
 
 var (
-	pathRegex = regexp.MustCompile(`^[a-zA-Z0-9/]+$`)
+	pathRegex = regexp.MustCompile(`^[A-Za-z0-9/_-]+$`)
 )
