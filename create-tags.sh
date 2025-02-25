@@ -9,7 +9,7 @@ fi
 
 MODULE_DIRS=$(find . -maxdepth 2 -name "go.mod" -exec dirname {} \;)
 
-TAG_VERSION="v1.0.8"
+TAG_VERSION="v1.0.9"
 
 for DIR in $MODULE_DIRS; do
   # skip dir if it doesn't have go.mod file
@@ -23,7 +23,7 @@ for DIR in $MODULE_DIRS; do
 
   echo "Creating tag: $TAG_NAME for module $MODULE_NAME"
 
-   git tag "$TAG_NAME" || true
+   git tag -m $TAG_NAME"" "$TAG_NAME"  || true
 
 done
 
