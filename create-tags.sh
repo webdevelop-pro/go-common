@@ -9,7 +9,7 @@ fi
 
 MODULE_DIRS=$(find . -maxdepth 2 -name "go.mod" -exec dirname {} \;)
 
-TAG_VERSION="v1.0.9"
+TAG_VERSION="v1.0.10"
 
 for DIR in $MODULE_DIRS; do
   # skip dir if it doesn't have go.mod file
