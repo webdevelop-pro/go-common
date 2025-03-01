@@ -71,6 +71,44 @@ func SendHTTPRequest(req httputils.Request, expected ExpectedResponse) SomeActio
 	}
 }
 
+func SendHTTPRequestFiles(req httputils.Request, body map[string]any, files map[string]string, expected ExpectedResponse) SomeAction {
+	return func(t TestContext) error {
+		newReq, err := httputils.CreateRequestWithFiles(req, body, files)
+		assert.NoError(t.T, err)
+
+		doRequest := httputils.SendRequest
+		if req.HttpClient != nil {
+			doRequest = httputils.SendRequestWithClient(req.HttpClient)
+		}
+
+		result, headers, code, err := doRequest(newReq)
+		assert.NoError(t.T, err)
+
+		assert.Equal(t.T, expected.Code, code, "Invalid response code")
+
+		if expected.Headers != nil {
+			asserts := assert.New(t.T)
+
+			for key := range expected.Headers {
+				expectedValue := expected.Headers[key][0]
+				actualValue := headers.Get(key)
+
+				if expectedValue == "%any%" {
+					continue
+				}
+
+				asserts.Equal(expectedValue, actualValue, "Invalid header value for %s", key)
+			}
+		}
+
+		if expected.Body != nil {
+			CompareJSONBody(t.T, result, expected.Body)
+		}
+
+		return nil
+	}
+}
+
 func Sleep(d time.Duration) SomeAction {
 	return func(_ TestContext) error {
 		time.Sleep(d)
