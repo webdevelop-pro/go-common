@@ -61,6 +61,7 @@ func (f FixturesManager) CleanAndApply() error {
 }
 
 func (f FixturesManager) SetCTX(ctx context.Context) context.Context {
+	ctx = context.WithValue(ctx, "testm", "test test")
 	return context.WithValue(ctx, queueKey, f.queue)
 }
 

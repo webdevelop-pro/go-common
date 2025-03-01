@@ -58,7 +58,7 @@ func RunTableTest(t *testing.T, ctx context.Context, fixtureMngrs []FixturesMana
 		if err != nil {
 			panic(err)
 		}
-		tableTest.Context.Ctx = fixtures.SetCTX(tableTest.Context.Ctx)
+		ctx = fixtures.SetCTX(ctx)
 	}
 
 	// ToDo
