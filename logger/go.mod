@@ -5,9 +5,9 @@ go 1.23.4
 require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.33.0
-	github.com/webdevelop-pro/go-common/configurator v1.0.8
-	github.com/webdevelop-pro/go-common/context v1.0.8
-	github.com/webdevelop-pro/go-common/tests v1.0.8
+	github.com/webdevelop-pro/go-common/configurator v1.0.11
+	github.com/webdevelop-pro/go-common/context v1.0.11
+	github.com/webdevelop-pro/go-common/tests v1.0.11
 	go.uber.org/fx v1.23.0
 )
 
@@ -20,7 +20,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
-	github.com/webdevelop-pro/go-common/httputils v1.0.8 // indirect
+	github.com/webdevelop-pro/go-common/httputils v1.0.11 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect

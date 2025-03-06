@@ -7,6 +7,14 @@ type Error struct {
 	Err        error `json:"-"`
 }
 
+func New(err error, status int, msg map[string][]string) Error {
+	return Error{
+		StatusCode: status,
+		Err:        err,
+		Message:    msg,
+	}
+}
+
 func NewError(err error, args ...any) *Error {
 	newError := Error{
 		Err: err,
@@ -17,7 +25,7 @@ func NewError(err error, args ...any) *Error {
 		case int:
 			newError.StatusCode = v
 		case string:
-			newError.Message = v
+			newError.Message = map[string][]string{"__error__": {v}}
 		case map[string][]string:
 			newError.Message = v
 		}

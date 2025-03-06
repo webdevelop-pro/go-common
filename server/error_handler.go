@@ -15,7 +15,7 @@ import (
 func ErrorResponse(e echo.Context, err error) error {
 	log := logger.FromCtx(e.Request().Context(), pkgName)
 
-	respErr := response.Error{}
+	respErr := &response.Error{}
 	if errors.As(err, &respErr) {
 		if respErr.StatusCode >= http.StatusInternalServerError {
 			log.Error().Stack().Err(err).Msgf("system error happen")
@@ -42,7 +42,7 @@ func ErrorBadRequestResponse(e echo.Context, err error) error {
 	log.Debug().Err(err).Msgf("cannot decode request")
 
 	var resp any
-	respErr := response.Error{}
+	respErr := &response.Error{}
 
 	if errors.As(err, &respErr) {
 		resp = respErr.Message
