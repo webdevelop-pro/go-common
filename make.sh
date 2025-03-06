@@ -189,7 +189,7 @@ update-version)
   do
     if [ -d $ddir ]; then
       if [ -f "$ddir/go.mod" ]; then
-        cd $ddir; rm go.sum; cd ..;
+        cd $ddir; go mod tidy; cd ..;
       fi
     fi
   done
