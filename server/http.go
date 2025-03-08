@@ -115,11 +115,13 @@ func AddPrometheus(srv *HTTPServer) {
 }
 
 func AddDefaultMiddlewares(srv *HTTPServer) {
-	// srv.Echo.Use(echoMW.Recover())
+	srv.Echo.Use(echoMW.Recover())
+
 	limit := os.Getenv("HTTP_BODY_LIMIT")
 	if limit == "" {
 		limit = "20M"
 	}
+
 	srv.Echo.Use(echoMW.BodyLimit(limit))
 	srv.Echo.Use(middleware.SetIPAddress)
 	srv.Echo.Use(middleware.SetRequestTime)
