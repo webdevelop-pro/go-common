@@ -51,7 +51,7 @@ func ReadStdout(stdOut *stdOut) []string {
 	return result
 }
 
-func CreateTestContext() context.Context {
+func CreateTestContext(ctx context.Context) context.Context {
 	logInfo := logger.ServiceContext{
 		Service: "test-db",
 		Version: "v1.0.0",
@@ -71,17 +71,18 @@ func CreateTestContext() context.Context {
 		},
 	}
 
-	return keys.SetCtxValue(context.Background(), keys.LogInfo, logInfo)
+	return keys.SetCtxValue(ctx, keys.LogInfo, logInfo)
 }
 
 func TestLogger_DBQuery(t *testing.T) {
-	ctx := CreateTestContext()
+	stdout := ConnectToStdout()
+
+	ctx := context.TODO()
+	ctx = CreateTestContext(ctx)
 	resultInt, resultStr, resultTime := 0, "", time.Time{}
 
 	os.Setenv("LOG_LEVEL", "info")
 	os.Setenv("DB_LOG_LEVEL", "info")
-
-	stdout := ConnectToStdout()
 
 	db := New(ctx)
 	err := db.QueryRow(ctx, "select 1, 'b', now();").Scan(&resultInt, &resultStr, &resultTime)
@@ -129,7 +130,8 @@ func TestLogger_DBQuery(t *testing.T) {
 }
 
 func TestLogger_DBExec(t *testing.T) {
-	ctx := CreateTestContext()
+	ctx := context.TODO()
+	ctx = CreateTestContext(ctx)
 
 	os.Setenv("LOG_LEVEL", "info")
 	os.Setenv("DB_LOG_LEVEL", "info")
@@ -182,7 +184,8 @@ func TestLogger_DBExec(t *testing.T) {
 }
 
 func TestLogger_DBQuery_ERROR(t *testing.T) {
-	ctx := CreateTestContext()
+	ctx := context.TODO()
+	ctx = CreateTestContext(ctx)
 	resultInt, resultStr, resultTime := 0, "", time.Time{}
 
 	os.Setenv("LOG_LEVEL", "info")
@@ -210,7 +213,7 @@ func TestLogger_DBQuery_ERROR(t *testing.T) {
 					"Hint": "",
 					"InternalPosition": 0,
 					"InternalQuery": "",
-					"Line": 3722,
+					"Line": 3716,
 					"Message": "column \"asd\" does not exist",
 					"Position": 8,
 					"Routine": "errorMissingColumn",

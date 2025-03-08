@@ -1,4 +1,4 @@
-FROM golang:1.22.2-alpine3.19@sha256:cdc86d9f363e8786845bea2040312b4efa321b828acdeb26f393faa864d887b0
+FROM golang:1.24-alpine3.21
 
 ARG GIT_COMMIT=unspecified
 ARG BUILD_DATE=unspecified
@@ -21,4 +21,5 @@ ADD . /app
 WORKDIR /app
 
 COPY etc ./etc /app/etc/
+RUN go build main.go
 CMD ["/bin/sh"]

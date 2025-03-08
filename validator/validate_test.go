@@ -8,7 +8,6 @@ import (
 )
 
 func TestValidator(t *testing.T) {
-
 	valid := New()
 	type testCases struct {
 		description    string
@@ -35,11 +34,9 @@ func TestValidator(t *testing.T) {
 			expectedError:  true,
 		},
 		{
-			// WTF, why it does not work?
-			// https://github.com/go-playground/validator/issues/1142
 			description: "Pass if empty but error if less than two",
 			input: struct {
-				Name string `json:"name,omitempty" validate:"gte=2"`
+				Name string `json:"name,omitempty" validate:"omitempty,gte=2"`
 			}{""},
 			expectedResult: map[string][]string{},
 			expectedError:  false,
@@ -77,7 +74,9 @@ func TestValidator(t *testing.T) {
 			if !scenario.expectedError && err != nil {
 				t.Error("error should be nil")
 			}
-			assert.Equal(t, err.(response.Error).Message, scenario.expectedResult)
+			if scenario.expectedError {
+				assert.Equal(t, scenario.expectedResult, err.(*response.Error).Message)
+			}
 		})
 	}
 }

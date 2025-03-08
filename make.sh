@@ -98,12 +98,14 @@ lint)
 
 test)
   dirlist=`ls`
+  set -a
   for ddir in $dirlist[@]
   do
     if [ -d $ddir ]
     then
       if [ -f "$ddir/go.mod" ]; then
         cd $ddir
+        source .env
         go test -count=1 -p 1 ./... $2 $3
         cd ../
       fi

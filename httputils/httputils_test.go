@@ -17,13 +17,12 @@ func TestSendRequest(t *testing.T) {
 			Body:   []byte{},
 		},
 	)
-
 	if err != nil {
 		t.Errorf("cannot create default request: %s", err.Error())
 		t.FailNow()
 	}
 
-	_, code, err := SendRequest(req)
+	_, headers, code, err := SendRequest(req)
 	if err != nil {
 		t.Errorf("cannot send request: %s", err.Error())
 		t.FailNow()
@@ -31,6 +30,11 @@ func TestSendRequest(t *testing.T) {
 
 	if code != 200 {
 		t.Errorf("expected 200 code")
+		t.FailNow()
+	}
+
+	if headers.Get("Content-Type") != "text/html; charset=ISO-8859-1" {
+		t.Errorf("expected text/html; charset=ISO-8859-1 from google")
 		t.FailNow()
 	}
 }

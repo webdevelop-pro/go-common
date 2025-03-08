@@ -4,7 +4,7 @@ tmp_dir = "tmp"
 
 [build]
   args_bin = []
-  bin = "./http"
+  bin = "./http & ./worker"
   cmd = "./make.sh build"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "tests"]

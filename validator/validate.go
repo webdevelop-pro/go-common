@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-playground/validator/v10"
+	valid "github.com/go-playground/validator/v10"
 	"github.com/pkg/errors"
 
 	"github.com/webdevelop-pro/go-common/response"
@@ -29,11 +29,11 @@ type FieldError struct {
 }
 
 type Validator struct {
-	validator *validator.Validate
+	validator *valid.Validate
 }
 
 func New() *Validator {
-	v := validator.New()
+	v := valid.New()
 	v.RegisterTagNameFunc(ParamName)
 
 	err := v.RegisterValidation("path", isPath)
@@ -46,7 +46,7 @@ func New() *Validator {
 	}
 }
 
-func beautifulMsg(fe validator.FieldError) string {
+func beautifulMsg(fe valid.FieldError) string {
 	switch fe.Tag() {
 	case "required":
 		return MsgRequired
@@ -83,7 +83,7 @@ func (va Validator) Verify(i interface{}, httpStatus int) error {
 			Message:    make(map[string][]string),
 		}
 
-		var ve validator.ValidationErrors
+		var ve valid.ValidationErrors
 
 		strErr := "validator error:"
 
