@@ -14,7 +14,7 @@ require (
 	github.com/webdevelop-pro/go-common/logger v1.0.13
 	github.com/webdevelop-pro/go-common/tests v1.0.13
 	github.com/webdevelop-pro/go-common/validator v1.0.13
-	github.com/webdevelop-pro/go-common/verser v1.0.10
+	github.com/webdevelop-pro/go-common/verser v1.0.14
 	google.golang.org/api v0.211.0
 )
 

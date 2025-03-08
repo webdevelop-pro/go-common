@@ -2,8 +2,6 @@ module github.com/webdevelop-pro/go-common/validator
 
 go 1.23.4
 
-replace github.com/webdevelop-pro/go-common/response => /Users/vladsmac/projects/webdevelop-pro/go-common/response
-
 require (
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/pkg/errors v0.9.1

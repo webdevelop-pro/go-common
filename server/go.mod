@@ -16,7 +16,7 @@ require (
 	github.com/webdevelop-pro/go-common/logger v1.0.13
 	github.com/webdevelop-pro/go-common/response v1.0.13
 	github.com/webdevelop-pro/go-common/validator v1.0.13
-	github.com/webdevelop-pro/go-common/verser v1.0.10
+	github.com/webdevelop-pro/go-common/verser v1.0.14
 	go.uber.org/fx v1.23.0
 )
 

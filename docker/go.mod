@@ -45,7 +45,7 @@ require (
 	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/webdevelop-pro/go-common/configurator v1.0.13 // indirect
 	github.com/webdevelop-pro/go-common/httputils v1.0.13 // indirect
-	github.com/webdevelop-pro/go-common/response v1.0.8 // indirect
+	github.com/webdevelop-pro/go-common/response v1.0.13 // indirect
 	github.com/webdevelop-pro/go-common/tests v1.0.13 // indirect
 	github.com/webdevelop-pro/go-common/validator v1.0.10 // indirect
 	github.com/webdevelop-pro/go-common/verser v1.0.12 // indirect
