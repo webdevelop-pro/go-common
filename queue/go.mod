@@ -8,13 +8,13 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.10.0
-	github.com/webdevelop-pro/go-common/configurator v1.0.12
-	github.com/webdevelop-pro/go-common/context v1.0.12
-	github.com/webdevelop-pro/go-common/httputils v1.0.12
-	github.com/webdevelop-pro/go-common/logger v1.0.12
-	github.com/webdevelop-pro/go-common/tests v1.0.12
-	github.com/webdevelop-pro/go-common/validator v1.0.12
-	github.com/webdevelop-pro/go-common/verser v1.0.12
+	github.com/webdevelop-pro/go-common/configurator v1.0.13
+	github.com/webdevelop-pro/go-common/context v1.0.13
+	github.com/webdevelop-pro/go-common/httputils v1.0.13
+	github.com/webdevelop-pro/go-common/logger v1.0.13
+	github.com/webdevelop-pro/go-common/tests v1.0.13
+	github.com/webdevelop-pro/go-common/validator v1.0.13
+	github.com/webdevelop-pro/go-common/verser v1.0.10
 	google.golang.org/api v0.211.0
 )
 
@@ -43,7 +43,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/webdevelop-pro/go-common/response v1.0.12 // indirect
+	github.com/webdevelop-pro/go-common/response v1.0.13 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.57.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.57.0 // indirect

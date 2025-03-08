@@ -10,13 +10,13 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.33.0
 	github.com/stretchr/testify v1.10.0
-	github.com/webdevelop-pro/go-common/configurator v1.0.12
-	github.com/webdevelop-pro/go-common/context v1.0.12
-	github.com/webdevelop-pro/go-common/httputils v1.0.12
-	github.com/webdevelop-pro/go-common/logger v1.0.12
-	github.com/webdevelop-pro/go-common/response v1.0.12
-	github.com/webdevelop-pro/go-common/validator v1.0.12
-	github.com/webdevelop-pro/go-common/verser v1.0.12
+	github.com/webdevelop-pro/go-common/configurator v1.0.13
+	github.com/webdevelop-pro/go-common/context v1.0.13
+	github.com/webdevelop-pro/go-common/httputils v1.0.13
+	github.com/webdevelop-pro/go-common/logger v1.0.13
+	github.com/webdevelop-pro/go-common/response v1.0.13
+	github.com/webdevelop-pro/go-common/validator v1.0.13
+	github.com/webdevelop-pro/go-common/verser v1.0.10
 	go.uber.org/fx v1.23.0
 )
 
