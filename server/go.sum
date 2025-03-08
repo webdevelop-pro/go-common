@@ -83,8 +83,8 @@ github.com/webdevelop-pro/go-common/response v1.0.13 h1:Mnx2dNl5+7trtONSWTdGCjzh
 github.com/webdevelop-pro/go-common/response v1.0.13/go.mod h1:6ybP7y3KTbKOOm3vgE0dH3R2gwFvef2HBXJSzm5u1t0=
 github.com/webdevelop-pro/go-common/validator v1.0.13 h1:xjHpGlIRU+5WPdpkddysck+SPQnkb7wWSWjgXMF4kXE=
 github.com/webdevelop-pro/go-common/validator v1.0.13/go.mod h1:QzcdO3+p+/fVdLzWok9jOk2hjTKcYQ7ATJZakkk8YW0=
-github.com/webdevelop-pro/go-common/verser v1.0.10 h1:n3MQ3GtmBXop02qXoSbNPmTvXjcNckMVd3+2SGdSu+o=
-github.com/webdevelop-pro/go-common/verser v1.0.10/go.mod h1:j5LN7GvWAj91nQcvo+4wjtopHAhvSn6K4y+ObXP7dYU=
+github.com/webdevelop-pro/go-common/verser v1.0.14 h1:Z4X5vr0/5ueTRrmRaTIz5gDeDNU5/YDiXcU9C5S5hTg=
+github.com/webdevelop-pro/go-common/verser v1.0.14/go.mod h1:j5LN7GvWAj91nQcvo+4wjtopHAhvSn6K4y+ObXP7dYU=
 go.uber.org/dig v1.18.0 h1:imUL1UiY0Mg4bqbFfsRQO5G4CGRBec/ZujWTvSVp3pw=
 go.uber.org/dig v1.18.0/go.mod h1:Us0rSJiThwCv2GteUN0Q7OKvU7n5J4dxZ9JKUXozFdE=
 go.uber.org/fx v1.23.0 h1:lIr/gYWQGfTwGcSXWXu4vP5Ws6iqnNEIY+F/aFzCKTg=

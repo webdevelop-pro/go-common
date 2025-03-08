@@ -185,7 +185,7 @@ deploy-dev)
   ;;
 
 update-version)
-  find ./ -name "go.mod" -exec $SED -i "s/$2/$3/g" {} \;
+  find ./ -name "go.mod" -exec $SED -i "s/s/(go-common.*) $2/\1 $3/g" {} \;
   dirlist=`ls`
   for ddir in $dirlist[@]
   do
@@ -203,7 +203,7 @@ release-all-pkgs)
   do
     if [ -d $ddir ]; then
       if [ -f "$ddir/go.mod" ]; then
-        echo "$ddir/$2 $3 $4"
+        # echo "$ddir/$2 $3 $4"
         # version and comment
         git tag -a $ddir/$2 $3 "$4"
         git push origin $ddir/$2

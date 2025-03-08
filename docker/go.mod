@@ -3,10 +3,10 @@ module github.com/webdevelop-pro/go-common
 go 1.24.0
 
 require (
-	github.com/webdevelop-pro/go-common/context v1.0.13
-	github.com/webdevelop-pro/go-common/db v1.0.13
-	github.com/webdevelop-pro/go-common/logger v1.0.13
-	github.com/webdevelop-pro/go-common/queue v1.0.10
+	github.com/webdevelop-pro/go-common/context v1.0.15
+	github.com/webdevelop-pro/go-common/db v1.0.15
+	github.com/webdevelop-pro/go-common/logger v1.0.15
+	github.com/webdevelop-pro/go-common/queue v1.0.15
 )
 
 require (
@@ -19,12 +19,12 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.7 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.23.0 // indirect
+	github.com/go-playground/validator/v10 v10.25.0 // indirect
 	github.com/google/s2a-go v0.1.8 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
@@ -36,6 +36,7 @@ require (
 	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -43,23 +44,23 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rs/zerolog v1.33.0 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
-	github.com/webdevelop-pro/go-common/configurator v1.0.13 // indirect
-	github.com/webdevelop-pro/go-common/httputils v1.0.13 // indirect
-	github.com/webdevelop-pro/go-common/response v1.0.13 // indirect
-	github.com/webdevelop-pro/go-common/tests v1.0.13 // indirect
-	github.com/webdevelop-pro/go-common/validator v1.0.10 // indirect
-	github.com/webdevelop-pro/go-common/verser v1.0.12 // indirect
+	github.com/webdevelop-pro/go-common/configurator v1.0.15 // indirect
+	github.com/webdevelop-pro/go-common/httputils v1.0.15 // indirect
+	github.com/webdevelop-pro/go-common/response v1.0.15 // indirect
+	github.com/webdevelop-pro/go-common/tests v1.0.14 // indirect
+	github.com/webdevelop-pro/go-common/validator v1.0.15 // indirect
+	github.com/webdevelop-pro/go-common/verser v1.0.15 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.57.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.57.0 // indirect
 	go.opentelemetry.io/otel v1.32.0 // indirect
 	go.opentelemetry.io/otel/metric v1.32.0 // indirect
 	go.opentelemetry.io/otel/trace v1.32.0 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/net v0.32.0 // indirect
+	golang.org/x/crypto v0.32.0 // indirect
+	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
 	google.golang.org/api v0.211.0 // indirect
