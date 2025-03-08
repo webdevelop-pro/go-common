@@ -198,19 +198,23 @@ update-version)
   ;;
 
 release-all-pkgs)
-  find ./ -name "go.mod" -exec $SED -i "s/$2/$3/g" {} \;
-  dirlist=`ls`
+  dirlist=`ls .`
   for ddir in $dirlist[@]
   do
     if [ -d $ddir ]; then
       if [ -f "$ddir/go.mod" ]; then
-        # echo "$ddir/$2 $3 $4"
+        echo "$ddir/$2 $3 $4"
         # version and comment
         git tag -a $ddir/$2 $3 "$4"
         git push origin $ddir/$2
       fi
     fi
   done
+  # FOR SOME REASON verser dir left behind
+  ddir="verser"
+  cd $ddir
+  git tag -a $ddir/$2 $3 "$4"
+  git push origin $ddir/$2
   ;;
 
 help)
