@@ -189,7 +189,23 @@ update-version)
   do
     if [ -d $ddir ]; then
       if [ -f "$ddir/go.mod" ]; then
-        cd $ddir; go mod tidy; cd ..;
+        cd $ddir; rm go.sum; go mod tidy; cd ..;
+      fi
+    fi
+  done
+  ;;
+
+release-all-pkgs)
+  find ./ -name "go.mod" -exec $SED -i "s/$2/$3/g" {} \;
+  dirlist=`ls`
+  for ddir in $dirlist[@]
+  do
+    if [ -d $ddir ]; then
+      if [ -f "$ddir/go.mod" ]; then
+        # echo "$ddir/$2 $3 $4"
+        # version and comment
+        git tag $ddir/$2 $3 "$4"
+        git push origin $ddir/$2
       fi
     fi
   done
