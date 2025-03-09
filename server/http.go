@@ -115,8 +115,7 @@ func AddPrometheus(srv *HTTPServer) {
 }
 
 func AddDefaultMiddlewares(srv *HTTPServer) {
-	srv.Echo.Use(echoMW.Recover())
-
+	//srv.Echo.Use(echoMW.Recover())
 	limit := os.Getenv("HTTP_BODY_LIMIT")
 	if limit == "" {
 		limit = "20M"
@@ -159,6 +158,16 @@ func AddDefaultMiddlewares(srv *HTTPServer) {
 				Msg("request")
 
 			return nil
+		},
+	}))
+
+	srv.Echo.Use(echoMW.RecoverWithConfig(echoMW.RecoverConfig{
+		StackSize: 10 << 10, // 10 KB
+		LogLevel:  log.ERROR,
+		LogErrorFunc: func(c echo.Context, err error, stack []byte) error {
+			srv.log.Error().Err(err).Bytes("stacktrace", stack).Msg("panic recover")
+
+			return err
 		},
 	}))
 }
