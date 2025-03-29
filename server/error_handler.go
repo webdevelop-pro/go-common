@@ -89,11 +89,11 @@ func (s *HTTPServer) httpErrorHandler(err error, c echo.Context) {
 
 	switch m := he.Message.(type) {
 	case string:
-		message = echo.Map{"message": m}
+		message = echo.Map{"__error__": []string{m}}
 	case json.Marshaler:
 		// do nothing - this type knows how to format itself to JSON
 	case error:
-		message = echo.Map{"message": m.Error()}
+		message = echo.Map{"__error__": []string{m.Error()}}
 	}
 
 	// Send response

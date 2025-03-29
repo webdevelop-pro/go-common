@@ -34,12 +34,13 @@ func CheckIdentityID(next echo.HandlerFunc) echo.HandlerFunc {
 		if identityID == "" {
 			return c.JSON(http.StatusUnauthorized, map[string][]string{
 				"__error__": {"empty identity_id"},
-			},
-			)
+			})
 		}
 
 		ctx := context.WithValue(c.Request().Context(), keys.IdentityID, identityID)
-		l := zerolog.Ctx(ctx).With().Str("user_id", identityID).Logger()
+		// Q
+		// Should we name it identity_id?
+		l := zerolog.Ctx(ctx).With().Str("identity_id", identityID).Logger()
 		ctx = l.WithContext(ctx)
 		c.SetRequest(c.Request().WithContext(ctx))
 
