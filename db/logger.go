@@ -65,3 +65,7 @@ func (db *DB) LogQuery(ctx context.Context, query string, args interface{}) {
 	q := CleanSQL(query)
 	db.Log.Trace().Ctx(ctx).Msgf("query: %s, %v", q, args)
 }
+
+func (db *DB) Lg() logger.Logger {
+	return db.Log
+}
