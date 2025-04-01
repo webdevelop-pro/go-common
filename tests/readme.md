@@ -1,4 +1,5 @@
 # ToDo
+- [ ] add partial %any% for example "access_token": "plaid-access-token-%any%'
 - [ ] add ability to check response only using assertify library
 - [ ] Create setUp() and tearDown() methods that will allow you to define instructions that will be executed before and after each test method. 
 - [ ] Add stack trace with a start a function which trigger test. As for example when error code does not match we have this response
