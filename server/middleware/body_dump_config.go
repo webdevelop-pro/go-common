@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"bytes"
+
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
 )
@@ -24,12 +26,14 @@ func FileAndHealtchCheckSkipper(c echo.Context) bool {
 // Writes down every request to the log file
 // Useful for debagging
 func BodyDumpHandler(c echo.Context, incoming []byte, outcoming []byte) {
+	outcoming = bytes.ReplaceAll([]byte("\t"), []byte(""), outcoming)
+	outcoming = bytes.ReplaceAll([]byte("\n"), []byte(""), outcoming)
 	log := zerolog.Ctx(c.Request().Context())
 	log.Trace().Str("path", c.Request().RequestURI).
 		Interface("headers", c.Request().Header).
 		Interface("body", string(incoming)).Msg("incoming request")
 	// ToDo
 	// headers = Fix error marshaling error: json: unsupported type: func() http.Header
-	log.Trace().Interface("headers", c.Response().Header).
+	log.Trace().Interface("headers", c.Response().Header()).
 		Interface("body", string(outcoming)).Msg("outcoming request")
 }
