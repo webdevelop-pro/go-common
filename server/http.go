@@ -124,10 +124,10 @@ func AddDefaultMiddlewares(srv *HTTPServer) {
 	srv.Echo.Use(echoMW.BodyLimit(limit))
 	srv.Echo.Use(middleware.SetIPAddress)
 	srv.Echo.Use(middleware.SetRequestTime)
-	//srv.Echo.Use(echoMW.BodyDumpWithConfig(echoMW.BodyDumpConfig{
-	//	Skipper: middleware.FileAndHealtchCheckSkipper,
-	//	Handler: middleware.BodyDumpHandler,
-	//}))
+	srv.Echo.Use(echoMW.BodyDumpWithConfig(echoMW.BodyDumpConfig{
+		Skipper: middleware.FileAndHealtchCheckSkipper,
+		Handler: middleware.BodyDumpHandler,
+	}))
 	// Trace ID middleware generates a unique id for a request.
 	srv.Echo.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
 		RequestIDHandler: func(c echo.Context, requestID string) {
