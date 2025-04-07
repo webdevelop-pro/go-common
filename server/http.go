@@ -86,8 +86,11 @@ func NewServer() *HTTPServer {
 
 	// Set context logger
 	e.Use(middleware.SetLogger)
-	// Add the healthcheck endpoint
-	e.GET(`/healthcheck`, healthcheck.Healthcheck)
+
+	if os.Getenv("HTTP_HEALTHCHECK") != "false" {
+		// Add the healthcheck endpoint
+		e.GET(`/healthcheck`, healthcheck.Healthcheck)
+	}
 
 	// get an instance of a validator
 	e.Validator = validator.New()
@@ -109,13 +112,7 @@ func NewServer() *HTTPServer {
 	return newSrv
 }
 
-func AddPrometheus(srv *HTTPServer) {
-	srv.Echo.Use(echoprometheus.NewMiddleware(pkgName))
-	srv.Echo.GET("/metrics", echoprometheus.NewHandler())
-}
-
 func AddDefaultMiddlewares(srv *HTTPServer) {
-	//srv.Echo.Use(echoMW.Recover())
 	limit := os.Getenv("HTTP_BODY_LIMIT")
 	if limit == "" {
 		limit = "20M"
@@ -124,10 +121,7 @@ func AddDefaultMiddlewares(srv *HTTPServer) {
 	srv.Echo.Use(echoMW.BodyLimit(limit))
 	srv.Echo.Use(middleware.SetIPAddress)
 	srv.Echo.Use(middleware.SetRequestTime)
-	srv.Echo.Use(echoMW.BodyDumpWithConfig(echoMW.BodyDumpConfig{
-		Skipper: middleware.FileAndHealtchCheckSkipper,
-		Handler: middleware.BodyDumpHandler,
-	}))
+
 	// Trace ID middleware generates a unique id for a request.
 	srv.Echo.Use(echoMW.RequestIDWithConfig(echoMW.RequestIDConfig{
 		RequestIDHandler: func(c echo.Context, requestID string) {
@@ -138,38 +132,55 @@ func AddDefaultMiddlewares(srv *HTTPServer) {
 		},
 	}))
 
-	srv.Echo.Use(echoMW.RequestLoggerWithConfig(echoMW.RequestLoggerConfig{
-		LogURI:       true,
-		LogStatus:    true,
-		LogMethod:    true,
-		LogLatency:   true,
-		LogURIPath:   true,
-		LogError:     true,
-		LogRequestID: true,
-		HandleError:  true,
+	if os.Getenv("HTTP_PROMETHEUS") != "false" {
+		srv.Echo.Use(echoprometheus.NewMiddleware(pkgName))
+		srv.Echo.GET("/metrics", echoprometheus.NewHandler())
+	}
 
-		LogValuesFunc: func(c echo.Context, v echoMW.RequestLoggerValues) error {
-			srv.log.Info().
-				Str("method", v.Method).
-				Str("URI", v.URI).
-				Int("status", v.Status).
-				Str("request_id", v.RequestID).
-				Str("latency", v.Latency.String()).
-				Msg("request")
+	if os.Getenv("HTTP_BODY_DUMP") != "false" {
+		srv.Echo.Use(echoMW.BodyDumpWithConfig(echoMW.BodyDumpConfig{
+			Skipper: middleware.FileAndHealtchCheckSkipper,
+			Handler: middleware.BodyDumpHandler,
+		}))
+	}
 
-			return nil
-		},
-	}))
+	if os.Getenv("HTTP_REQUEST_LOGGER") != "false" {
+		srv.Echo.Use(echoMW.RequestLoggerWithConfig(echoMW.RequestLoggerConfig{
+			LogURI:       true,
+			LogStatus:    true,
+			LogMethod:    true,
+			LogLatency:   true,
+			LogURIPath:   true,
+			LogError:     true,
+			LogRequestID: true,
+			HandleError:  true,
 
-	srv.Echo.Use(echoMW.RecoverWithConfig(echoMW.RecoverConfig{
-		StackSize: 10 << 10, // 10 KB
-		LogLevel:  log.ERROR,
-		LogErrorFunc: func(c echo.Context, err error, stack []byte) error {
-			srv.log.Error().Err(err).Bytes("stacktrace", stack).Msg("panic recover")
+			Skipper: middleware.FileAndHealtchCheckSkipper,
+			LogValuesFunc: func(c echo.Context, v echoMW.RequestLoggerValues) error {
+				srv.log.Info().
+					Str("method", v.Method).
+					Str("URI", v.URI).
+					Int("status", v.Status).
+					Str("request_id", v.RequestID).
+					Str("latency", v.Latency.String()).
+					Msg("request")
 
-			return err
-		},
-	}))
+				return nil
+			},
+		}))
+	}
+
+	if os.Getenv("HTTP_REQUEST_RECOVER") != "false" {
+		srv.Echo.Use(echoMW.RecoverWithConfig(echoMW.RecoverConfig{
+			StackSize: 10 << 10, // 10 KB
+			LogLevel:  log.ERROR,
+			LogErrorFunc: func(c echo.Context, err error, stack []byte) error {
+				srv.log.Error().Err(err).Bytes("stacktrace", stack).Msg("panic recover")
+
+				return err
+			},
+		}))
+	}
 }
 
 // StartServer is function that registers start of http server in lifecycle
