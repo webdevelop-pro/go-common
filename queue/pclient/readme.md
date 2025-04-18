@@ -8,4 +8,5 @@
 - dont forget to create topic using by using [CreateTopic](./client.go) client method
 
 ## ToDo
+- [ ] pclient.Publish do NOT return messageID all the time - in some case it just an empty string
 - [ ] Do not parse config file all the time use configurator

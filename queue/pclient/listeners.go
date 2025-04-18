@@ -108,12 +108,8 @@ func (b *Client) listenRawGoroutine(
 			Data:        msg.Data,
 			PublishTime: msg.PublishTime,
 			Attempt:     msg.DeliveryAttempt,
+			Attributes:  msg.Attributes,
 		}
-		attrs := map[string]any{}
-		for k, v := range msg.Attributes {
-			attrs[k] = v
-		}
-		m.Attributes = attrs
 
 		ctx = keys.SetCtxValue(ctx, keys.MSGID, msg.ID)
 		b.log.Trace().Str("msg", string(m.Data)).Msgf("received message")

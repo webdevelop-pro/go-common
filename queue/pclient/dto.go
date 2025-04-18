@@ -2,7 +2,6 @@ package pclient
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 )
 
@@ -18,14 +17,15 @@ const (
 )
 
 type Message struct {
-	Attributes  map[string]any
+	Headers     map[string][]string
+	Attributes  map[string]string
 	PublishTime time.Time
 	Data        []byte
 	Attempt     *int   `json:"attempt"`
 	ID          string `json:"message_id"`
 }
 
-func NewMessage(data any, attributes map[string]any) (*Message, error) {
+func NewMessage(data any, attributes map[string]string) (*Message, error) {
 	// Returns the message object
 	b, err := json.Marshal(&data)
 	if err != nil {
@@ -37,25 +37,25 @@ func NewMessage(data any, attributes map[string]any) (*Message, error) {
 	}, nil
 }
 
-func (msg *Message) PubSubAttributes() map[string]string {
-	pubsubAttrs := map[string]string{}
-	for k, v := range msg.Attributes {
-		switch val := v.(type) {
-		case string:
-			pubsubAttrs[k] = val
-		case int:
-			pubsubAttrs[k] = fmt.Sprintf("%d", val)
-		case bool:
-			pubsubAttrs[k] = fmt.Sprintf("%x", val)
-		case float64:
-			pubsubAttrs[k] = fmt.Sprintf("%.2f", val)
-		default:
-			bData, _ := json.Marshal(val)
-			pubsubAttrs[k] = string(bData)
-		}
-	}
-	return pubsubAttrs
-}
+// func (msg *Message) PubSubAttributes() map[string]string {
+// 	pubsubAttrs := map[string]string{}
+// 	for k, v := range msg.Attributes {
+// 		switch val := v.(type) {
+// 		case string:
+// 			pubsubAttrs[k] = val
+// 		case int:
+// 			pubsubAttrs[k] = fmt.Sprintf("%d", val)
+// 		case bool:
+// 			pubsubAttrs[k] = fmt.Sprintf("%x", val)
+// 		case float64:
+// 			pubsubAttrs[k] = fmt.Sprintf("%.2f", val)
+// 		default:
+// 			bData, _ := json.Marshal(val)
+// 			pubsubAttrs[k] = string(bData)
+// 		}
+// 	}
+// 	return pubsubAttrs
+//}
 
 type Event struct {
 	ID         string         `json:"id"`

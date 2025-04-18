@@ -17,7 +17,7 @@ func (b *Client) PublishEvent(
 	if err := valid.Verify(event, http.StatusPreconditionFailed); err != nil {
 		return nil, err
 	}
-	attr := map[string]any{}
+	attr := map[string]string{}
 	return b.PublishToTopic(ctx, topic, event, attr)
 }
 
@@ -28,18 +28,18 @@ func (b *Client) PublishWebhook(
 	if err := valid.Verify(webhook, http.StatusPreconditionFailed); err != nil {
 		return nil, err
 	}
-	attr := map[string]any{}
+	attr := map[string]string{}
 	return b.PublishToTopic(ctx, topic, webhook, attr)
 }
 
 func (b *Client) Publish(
-	ctx context.Context, topic string, data any, attr map[string]any,
+	ctx context.Context, topic string, data any, attr map[string]string,
 ) (*Message, error) {
 	return b.PublishToTopic(ctx, topic, data, attr)
 }
 
 func (b *Client) PublishToTopic(
-	ctx context.Context, topicID string, data any, attr map[string]any,
+	ctx context.Context, topicID string, data any, attr map[string]string,
 ) (*Message, error) {
 	var (
 		wg    sync.WaitGroup
@@ -50,20 +50,20 @@ func (b *Client) PublishToTopic(
 	t := b.client.Topic(topicID)
 	ok, err := t.Exists(ctx)
 	if !ok {
-		b.log.Error().Err(err).Interface("topic", topicID).Msgf(ErrTopicNotExists.Error())
+		b.log.Error().Err(err).Stack().Interface("topic", topicID).Msgf(ErrTopicNotExists.Error())
 		return nil, errors.Wrapf(ErrTopicNotExists, ": %s", topicID)
 	}
 
 	msg, err := NewMessage(data, attr)
 	if err != nil {
-		b.log.Error().Err(err).Interface("data", data).Interface("attr", attr).Msgf(ErrUnmarshalPubSub.Error())
+		b.log.Error().Err(err).Stack().Interface("data", data).Interface("attr", attr).Msgf(ErrUnmarshalPubSub.Error())
 		return nil, err
 	}
 
 	wg.Add(1)
 	result := t.Publish(ctx, &pubsub.Message{
 		Data:       msg.Data,
-		Attributes: msg.PubSubAttributes(),
+		Attributes: msg.Attributes,
 	})
 
 	go func(res *pubsub.PublishResult) {
