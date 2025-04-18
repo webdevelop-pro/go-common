@@ -103,11 +103,17 @@ func (b *Client) listenRawGoroutine(
 		verifyDeliveryAttempt(msg)
 
 		// Unmarshal the message data into a struct
-		m := Message{}
-		m.Data = msg.Data
-		m.Attributes = msg.Attributes
-		m.ID = msg.ID
-		m.Attempt = msg.DeliveryAttempt
+		m := Message{
+			ID:          msg.ID,
+			Data:        msg.Data,
+			PublishTime: msg.PublishTime,
+			Attempt:     msg.DeliveryAttempt,
+		}
+		attrs := map[string]any{}
+		for k, v := range msg.Attributes {
+			attrs[k] = v
+		}
+		m.Attributes = attrs
 
 		ctx = keys.SetCtxValue(ctx, keys.MSGID, msg.ID)
 		b.log.Trace().Str("msg", string(m.Data)).Msgf("received message")

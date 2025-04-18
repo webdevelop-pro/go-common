@@ -17,7 +17,7 @@ func (b *Client) PublishEvent(
 	if err := valid.Verify(event, http.StatusPreconditionFailed); err != nil {
 		return nil, err
 	}
-	attr := map[string]string{}
+	attr := map[string]any{}
 	return b.PublishToTopic(ctx, topic, event, attr)
 }
 
@@ -28,18 +28,18 @@ func (b *Client) PublishWebhook(
 	if err := valid.Verify(webhook, http.StatusPreconditionFailed); err != nil {
 		return nil, err
 	}
-	attr := map[string]string{}
+	attr := map[string]any{}
 	return b.PublishToTopic(ctx, topic, webhook, attr)
 }
 
 func (b *Client) Publish(
-	ctx context.Context, topic string, data any, attr map[string]string,
+	ctx context.Context, topic string, data any, attr map[string]any,
 ) (*Message, error) {
 	return b.PublishToTopic(ctx, topic, data, attr)
 }
 
 func (b *Client) PublishToTopic(
-	ctx context.Context, topicID string, data any, attr map[string]string,
+	ctx context.Context, topicID string, data any, attr map[string]any,
 ) (*Message, error) {
 	var (
 		wg    sync.WaitGroup
@@ -63,7 +63,7 @@ func (b *Client) PublishToTopic(
 	wg.Add(1)
 	result := t.Publish(ctx, &pubsub.Message{
 		Data:       msg.Data,
-		Attributes: msg.Attributes,
+		Attributes: msg.PubSubAttributes(),
 	})
 
 	go func(res *pubsub.PublishResult) {

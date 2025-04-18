@@ -16,7 +16,7 @@ func getClient(t tests.TestContext) *Client {
 	return t.Ctx.Value(pkgName).(*Client)
 }
 
-func SendPubSubEvent(topic string, body any, attr map[string]string) tests.SomeAction {
+func SendPubSubEvent(topic string, body any, attr map[string]any) tests.SomeAction {
 	return func(t tests.TestContext) error {
 		_, err := getClient(t).PublishToTopic(t.Ctx, topic, body, attr)
 		return err
