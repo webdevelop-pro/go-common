@@ -26,8 +26,12 @@ func FileAndHealtchCheckSkipper(c echo.Context) bool {
 // Writes down every request to the log file
 // Useful for debagging
 func BodyDumpHandler(c echo.Context, incoming []byte, outcoming []byte) {
-	outcoming = bytes.ReplaceAll([]byte("\t"), []byte(""), outcoming)
-	outcoming = bytes.ReplaceAll([]byte("\n"), []byte(""), outcoming)
+	// Remove \t and \n from the dump
+	incoming = bytes.ReplaceAll(incoming, []byte("\t"), []byte(""))
+	incoming = bytes.ReplaceAll(incoming, []byte("\n"), []byte(""))
+	outcoming = bytes.ReplaceAll(outcoming, []byte("\t"), []byte(""))
+	outcoming = bytes.ReplaceAll(outcoming, []byte("\n"), []byte(""))
+
 	log := zerolog.Ctx(c.Request().Context())
 	log.Trace().Str("path", c.Request().RequestURI).
 		Interface("headers", c.Request().Header).
