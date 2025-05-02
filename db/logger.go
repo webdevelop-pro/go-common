@@ -42,7 +42,9 @@ func (l *Logger) Log(ctx context.Context, level tracelog.LogLevel, msg string, d
 	case tracelog.LogLevelDebug:
 		l.log.Debug().Ctx(ctx).Interface("data", data).Msg(msg)
 	case tracelog.LogLevelInfo:
-		l.log.Info().Ctx(ctx).Interface("data", data).Msg(msg)
+		if len(msg) > 4 && msg[0:5] == "Query" {
+			l.log.Info().Ctx(ctx).Interface("data", data).Msg(msg)
+		}
 	case tracelog.LogLevelWarn:
 		l.log.Warn().Ctx(ctx).Interface("data", data).Msg(msg)
 	case tracelog.LogLevelError:
