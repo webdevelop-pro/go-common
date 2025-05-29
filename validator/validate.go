@@ -17,6 +17,7 @@ const (
 	MsgMax      = "longer than maximum length %s"
 	MsgGte      = "greater than or equal to %s"
 	MsgGt       = "greater than %s"
+	MsgLen      = "must be one %s size"
 	MsgOneOf    = "must be one of: %s"
 	MsgEq       = "must be equal to: %s"
 	MsgSSN      = "is a valid social security number: %s"
@@ -52,6 +53,8 @@ func beautifulMsg(fe valid.FieldError) string {
 		return MsgRequired
 	case "email":
 		return MsgEmail
+	case "len":
+		return fmt.Sprintf(MsgLen, fe.Param())
 	case "min":
 		return fmt.Sprintf(MsgMin, fe.Param())
 	case "max":
