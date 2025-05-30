@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"sync"
+	"time"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/pkg/errors"
@@ -82,6 +83,7 @@ func (b *Client) PublishToTopic(
 
 	wg.Wait()
 	msg.ID = msgID
+	msg.PublishTime = time.Now()
 
 	return msg, nil
 }
