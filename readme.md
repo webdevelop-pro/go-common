@@ -1,20 +1,36 @@
+# Go lang common image
+
+Pre-build docker image for go 1.23.0
+- Improve docker build up for 10x times
+- Make sure base image is secure with snyk vulnerability scanner
+- Universal make.sh file to help have similar pipelines on different go based repos
+
+## Installation
+
+1. Set up credentials for cr.webdevelop.pro and docker.io/webdevelop-pro
+2. Set up credentials for [snyk](https://snyk.io/) to verify image security vulnerabilities
+
+## Deploy
+1. build and deploy using `./build-deploy.sh` script
+
+## Structure
+- build all heavy dependencies (gcc, fx.uber, modern-go/concurrent, modern-go/reflect2)
+- `etc/golangci.yml` - actuall rules for golang linter
+- `etc/make.sh` - bash utility with usefull commands
+- `etc/pre-commit` - git pre-commit rules
+- `etc/air.toml` - autorestart service on changes
+
+
+## Usage example
+```Dockerfile
+FROM cr.webdevelop.us/webdevelop-pro/go-common:latest-dev AS builder
+
+# RUN apk add --no-cache make gcc musl-dev linux-headers git gettext - no longer needed
+# fast build cause of pre-build requirements
+RUN ./make.sh build 
+```
+
 # ToDo
-
-- [ ] update `docker/` image and go-common image
-- [ ] fix docker build, add tests from all repos to include all requirements
-- [ ] eliminate go-echo-swagger, upload swagger files to apidocs.<domain>.com/service. Go-echo-swagger adds a lot of dependencies and slows down every request
-- [ ] [server/middleware/ip_address.go#L18](use echo.RealIP()) instead of our custom code
-- [ ] Set up proper middleware to get user ip address correctly, https://echo.labstack.com/docs/ip-address
-- [ ] refactor middleware to have config same as [echo ones](https://github.com/labstack/echo/blob/master/middleware/body_dump.go#L18)
-- [ ] replace `configurator.NewConfiguration` with `configurator.NewConfigurator` and run `configurator.NewConfiguration` only at start
-
-
-## Guidelines
-### How to update ALL go.mod files?
-
-1. add replace to go.mod file to work locally, example `replace github.com/webdevelop-pro/go-common/queue => /home/go-common/queue`
-2. once you finish run tests to verify go-common is working properly
-3. if tests are passed commit and push
-4. one pushed open queue (or any other package) and update requirements with latest push go get github.com/webdevelop-pro/go-common/context@<hash>
-5. look on the new version hash in queue/go.mod and update dependencies everywhere ` ./make.sh update-version <old-version> <new-version>`
-6. For example `./make.sh update-version v0.0.0-20210101163630-b4ea9f10773c v0.0.0-20240928194423-e378b7eda3d5`
+- [ ] `./make.sh coverage` to generate badger for test coverage
+- [ ] `./make.sh run-debug-dev` add ability to run in debug mode
+- [ ] create go image with pubsub and without pubsub (pubsub takes about 1G of space)

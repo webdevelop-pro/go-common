@@ -33,10 +33,19 @@ func New(ctx context.Context) (*Client, error) {
 		return &Client{}, err
 	}
 
-	bclient, err := gpubsub.NewClient(ctx, cfg.ProjectID, option.WithCredentialsFile(cfg.ServiceAccountCredentials))
-	if err != nil {
-		log.Fatal().Stack().Err(err).Msg(err.Error())
-		return &Client{}, err
+	var bclient *gpubsub.Client
+	if cfg.ServiceAccountCredentials != "" {
+		bclient, err = gpubsub.NewClient(ctx, cfg.ProjectID, option.WithCredentialsFile(cfg.ServiceAccountCredentials))
+		if err != nil {
+			log.Fatal().Stack().Err(err).Msg(err.Error())
+			return &Client{}, err
+		}
+	} else {
+		bclient, err = gpubsub.NewClient(ctx, cfg.ProjectID)
+		if err != nil {
+			log.Fatal().Stack().Err(err).Msg(err.Error())
+			return &Client{}, err
+		}
 	}
 
 	b := &Client{

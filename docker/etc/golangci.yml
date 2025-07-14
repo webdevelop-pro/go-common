@@ -6,8 +6,7 @@ run:
   tests: false
 
 skip-dirs:
-  - api
-  - pkg/lib
+  - tests
 skip-files:
   - api/docs.go
 
