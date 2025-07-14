@@ -22,7 +22,7 @@ WORKDIR /app
 
 RUN go mod download
 RUN go build main.go
-RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.61.0
+RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.63.0
 
 RUN go install github.com/securego/gosec/v2/cmd/gosec@latest
 RUN go install github.com/daixiang0/gci@latest
