@@ -7,13 +7,13 @@ toolchain go1.24.0
 require (
 	github.com/webdevelop-pro/go-common/configurator v1.0.18
 	github.com/webdevelop-pro/go-common/context v1.0.18
-	github.com/webdevelop-pro/go-common/db v1.0.8
+	github.com/webdevelop-pro/go-common/db v1.0.22
 	github.com/webdevelop-pro/go-common/httputils v1.0.19
 	github.com/webdevelop-pro/go-common/logger v1.0.19
-	github.com/webdevelop-pro/go-common/queue v1.0.23
+	github.com/webdevelop-pro/go-common/queue v1.0.25
 	github.com/webdevelop-pro/go-common/response v1.0.19
 	github.com/webdevelop-pro/go-common/tests v1.0.19
-	github.com/webdevelop-pro/go-common/validator v1.0.20
+	github.com/webdevelop-pro/go-common/validator v1.0.21
 	github.com/webdevelop-pro/go-common/verser v1.0.19
 	go.uber.org/fx v1.23.0
 
@@ -29,19 +29,19 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.26.0 // indirect
+	github.com/go-playground/validator/v10 v10.27.0 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.7.2 // indirect
+	github.com/jackc/pgx/v5 v5.7.5 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
