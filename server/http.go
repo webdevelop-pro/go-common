@@ -144,7 +144,7 @@ func AddDefaultMiddlewares(srv *HTTPServer) {
 		}))
 	}
 
-	if os.Getenv("HTTP_REQUEST_LOGGER") != "true" {
+	if os.Getenv("HTTP_REQUEST_LOGGER") == "true" {
 		srv.Echo.Use(echoMW.RequestLoggerWithConfig(echoMW.RequestLoggerConfig{
 			LogURI:       true,
 			LogStatus:    true,
