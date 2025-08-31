@@ -81,7 +81,7 @@ jobs:
           submodules: true
           fetch-depth: 0
 
-      - uses: benjlevesque/short-sha@v3
+      - uses: benjlevesque/short-sha@v3.0
         if: always()
         id: short-sha
         with:
@@ -106,7 +106,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           push: true
           context: docker
