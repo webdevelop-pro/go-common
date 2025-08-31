@@ -34,3 +34,4 @@ RUN ./make.sh build
 - [ ] `./make.sh coverage` to generate badger for test coverage
 - [ ] `./make.sh run-debug-dev` add ability to run in debug mode
 
+
