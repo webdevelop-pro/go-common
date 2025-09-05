@@ -105,6 +105,15 @@ func AllowAny(src, dst interface{}) interface{} {
 	res := dst
 
 	switch val := dst.(type) {
+	case map[string]any:
+		if src != nil && !reflect.ValueOf(src).IsZero() {
+			for key, value := range src.(map[string]any) {
+				expValue, ok := res.(map[string]any)[key]
+				if ok {
+					res.(map[string]any)[key] = AllowAny(expValue, value)
+				}
+			}
+		}
 	case string:
 		if val == "%any%" && src != nil && !reflect.ValueOf(src).IsZero() {
 			res = src
