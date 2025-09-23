@@ -4,12 +4,12 @@ go 1.24
 
 require (
 	github.com/labstack/echo-contrib v0.17.1
-	github.com/labstack/echo/v4 v4.13.2
+	github.com/labstack/echo/v4 v4.13.3
 	github.com/labstack/gommon v0.4.2
 	github.com/pkg/errors v0.9.1
-	github.com/rs/zerolog v1.33.0
+	github.com/rs/zerolog v1.34.0
 	github.com/stretchr/testify v1.10.0
-	github.com/webdevelop-pro/go-common/configurator v1.0.18
+	github.com/webdevelop-pro/go-common/configurator v1.0.19
 	github.com/webdevelop-pro/go-common/context v1.0.18
 	github.com/webdevelop-pro/go-common/httputils v1.0.19
 	github.com/webdevelop-pro/go-common/logger v1.0.19
