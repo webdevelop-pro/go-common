@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/labstack/echo-contrib/echoprometheus"
@@ -72,7 +73,15 @@ func NewServer() *HTTPServer {
 	// sets CORS headers if Origin is present
 	e.Use(
 		echoMW.CORSWithConfig(echoMW.CORSConfig{
-			Skipper: func(_ echo.Context) bool {
+			Skipper: func(ctx echo.Context) bool {
+				// skip OPTIONS request if we already defined them in application
+				for _, route := range ctx.Echo().Router().Routes() {
+					// FixMe
+					// Route might have dynamic attributes like :id
+					if route.Method == http.MethodOptions && route.Path == ctx.Path() {
+						return true
+					}
+				}
 				return false
 			},
 			AllowOriginFunc: func(_ string) (bool, error) {
