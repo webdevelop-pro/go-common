@@ -16,7 +16,7 @@ require (
 	github.com/webdevelop-pro/go-common/response v1.0.19
 	github.com/webdevelop-pro/go-common/validator v1.0.21
 	github.com/webdevelop-pro/go-common/verser v1.0.19
-	go.uber.org/fx v1.23.0
+	go.uber.org/fx v1.24.0
 )
 
 require (
@@ -40,7 +40,7 @@ require (
 	github.com/prometheus/procfs v0.13.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	go.uber.org/dig v1.18.0 // indirect
+	go.uber.org/dig v1.19.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/crypto v0.38.0 // indirect
