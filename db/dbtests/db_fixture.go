@@ -80,9 +80,9 @@ func (f FixturesManager) SetCTX(ctx context.Context) context.Context {
 
 func (f FixturesManager) Clean(table string) error {
 	query := fmt.Sprintf(
-		`DELETE FROM %s; select setval('%s_id_seq',(select max(id)+1 from %s));
+		`DELETE FROM %s; select setval('%s_id_seq', 1);
 		ALTER SEQUENCE %s_id_seq RESTART WITH 1`,
-		table, table, table, table,
+		table, table, table,
 	)
 
 	_, err := f.db.Exec(context.TODO(), query)
