@@ -74,11 +74,13 @@ func NewServer() *HTTPServer {
 	e.Use(
 		echoMW.CORSWithConfig(echoMW.CORSConfig{
 			Skipper: func(ctx echo.Context) bool {
+				// Get the query parameter value
+				schemaData := ctx.QueryParam("schema")
 				// skip OPTIONS request if we already defined them in application
 				for _, route := range ctx.Echo().Router().Routes() {
 					// FixMe
 					// Route might have dynamic attributes like :id
-					if route.Method == http.MethodOptions && route.Path == ctx.Path() {
+					if route.Method == http.MethodOptions && schemaData != "" {
 						return true
 					}
 				}
