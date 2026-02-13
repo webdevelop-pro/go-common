@@ -1,6 +1,6 @@
 module github.com/webdevelop-pro/go-common/logger/example
 
-go 1.24
+go 1.24.0
 
 require (
 	github.com/labstack/echo/v4 v4.15.0
@@ -20,8 +20,8 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/webdevelop-pro/go-common/configurator v1.0.19 // indirect
-	golang.org/x/crypto v0.38.0 // indirect
-	golang.org/x/net v0.40.0 // indirect
+	golang.org/x/crypto v0.46.0 // indirect
+	golang.org/x/net v0.48.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/text v0.33.0 // indirect
 )
