@@ -133,29 +133,34 @@ func CreateRequestWithFiles(req Request, body map[string]any, files map[string]s
 	return res, nil
 }
 
-func request(httpClient *http.Client, req *http.Request) ([]byte, http.Header, int, error) {
+func request(httpClient *http.Client, req *http.Request) ([]byte, *http.Response, error) {
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		return nil, nil, 0, err
+		return nil, nil, err
 	}
 	defer resp.Body.Close()
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, nil, resp.StatusCode, errors.Wrapf(err, "cannot read response body")
+		return nil, nil, errors.Wrapf(err, "cannot read response body")
 	}
 
-	return bodyBytes, resp.Header, resp.StatusCode, nil
+	return bodyBytes, resp, nil
 }
 
-func SendRequest(req *http.Request) ([]byte, http.Header, int, error) {
+func SendRequest(req *http.Request) ([]byte, *http.Response, error) {
 	httpClient := &http.Client{}
 
-	return request(httpClient, req)
+	body, resp, err := request(httpClient, req)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return body, resp, nil
 }
 
-func SendRequestWithClient(httpClient *http.Client) func(req *http.Request) ([]byte, http.Header, int, error) {
-	return func(req *http.Request) ([]byte, http.Header, int, error) {
+func SendRequestWithClient(httpClient *http.Client) func(req *http.Request) ([]byte, *http.Response, error) {
+	return func(req *http.Request) ([]byte, *http.Response, error) {
 		return request(httpClient, req)
 	}
 }

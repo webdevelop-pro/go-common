@@ -43,17 +43,17 @@ func SendHTTPRequest(req httputils.Request, expected ExpectedResponse) SomeActio
 			doRequest = httputils.SendRequestWithClient(req.HttpClient)
 		}
 
-		result, headers, code, err := doRequest(newReq)
+		result, resp, err := doRequest(newReq)
 		assert.NoError(t.T, err)
 
-		assert.Equal(t.T, expected.Code, code, "Invalid response code")
+		assert.Equal(t.T, expected.Code, resp.StatusCode, "Invalid response code")
 
 		if expected.Headers != nil {
 			asserts := assert.New(t.T)
 
 			for key := range expected.Headers {
 				expectedValue := expected.Headers[key][0]
-				actualValue := headers.Get(key)
+				actualValue := resp.Header.Get(key)
 
 				if expectedValue == "%any%" {
 					continue
@@ -81,17 +81,17 @@ func SendHTTPRequestFiles(req httputils.Request, body map[string]any, files map[
 			doRequest = httputils.SendRequestWithClient(req.HttpClient)
 		}
 
-		result, headers, code, err := doRequest(newReq)
+		result, resp, err := doRequest(newReq)
 		assert.NoError(t.T, err)
 
-		assert.Equal(t.T, expected.Code, code, "Invalid response code")
+		assert.Equal(t.T, expected.Code, resp.StatusCode, "Invalid response code")
 
 		if expected.Headers != nil {
 			asserts := assert.New(t.T)
 
 			for key := range expected.Headers {
 				expectedValue := expected.Headers[key][0]
-				actualValue := headers.Get(key)
+				actualValue := resp.Header.Get(key)
 
 				if expectedValue == "%any%" {
 					continue
