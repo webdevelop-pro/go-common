@@ -12,7 +12,7 @@ require (
 	github.com/webdevelop-pro/go-common/configurator v1.0.19
 	github.com/webdevelop-pro/go-common/context v1.0.18
 	github.com/webdevelop-pro/go-common/httputils v1.0.20
-	github.com/webdevelop-pro/go-common/logger v1.0.20
+	github.com/webdevelop-pro/go-common/logger v1.0.21
 	github.com/webdevelop-pro/go-common/response v1.0.19
 	github.com/webdevelop-pro/go-common/validator v1.0.21
 	github.com/webdevelop-pro/go-common/verser v1.0.19
