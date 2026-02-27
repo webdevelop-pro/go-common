@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	backoff "github.com/cenkalti/backoff/v4"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/tracelog"
 	"github.com/pkg/errors"
@@ -25,27 +26,38 @@ func NewPoolFromConfig(ctx context.Context, pgConfig *pgxpool.Config, logger log
 }
 
 func newPool(ctx context.Context, pgConfig *pgxpool.Config, logger logger.Logger) *pgxpool.Pool {
-	var pg *pgxpool.Pool
-	var err error
+	pgConfig.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+		conn.Exec(ctx, "SET TIME ZONE 'UTC'")
+		return nil
+	}
 
-	pg, err = backoff.RetryWithData(
+	pg, err := backoff.RetryWithData(
 		func() (*pgxpool.Pool, error) {
-			logger.Debug().Msgf("Connecting to db ")
-			return pgxpool.NewWithConfig(ctx, pgConfig)
+			logger.Debug().Msg("Attempting to connect to db...")
+
+			p, err := pgxpool.NewWithConfig(ctx, pgConfig)
+			if err != nil {
+				return nil, err // Fails immediately if the config itself is malformed
+			}
+
+			// FIX 1: Explicitly ping the DB to verify it's actually up and reachable.
+			if err := p.Ping(ctx); err != nil {
+				p.Close() // Prevent memory/goroutine leaks from the unused pool
+				return nil, err
+			}
+
+			return p, nil
 		},
 		backoff.WithContext(
 			backoff.WithMaxRetries(backoff.NewExponentialBackOff(), uint64(maxRetries)),
 			ctx,
 		),
 	)
+
 	if err != nil {
-		logger.Fatal().Err(err).Msg("Unable to create connection pool")
+		logger.Fatal().Err(err).Msg("Unable to create connection pool after retries")
 	}
 
-	_, err = pg.Exec(ctx, "SET TIME ZONE 'UTC';")
-	if err != nil {
-		logger.Error().Err(err).Msg("Unable change timezone")
-	}
 	return pg
 }
 

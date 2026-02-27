@@ -89,7 +89,7 @@ func GetConfigConn(logger logger.Logger) *pgx.ConnConfig {
 
 func GetConnString(cfg *Config) string {
 	return fmt.Sprintf(
-		"%s://%s:%s@%s:%d/%s?application_name=%s",
+		"%s://%s:%s@%s:%d/%s?application_name=%s&sslmode=%s",
 		cfg.Type,
 		cfg.User,
 		cfg.Password,
@@ -97,5 +97,6 @@ func GetConnString(cfg *Config) string {
 		cfg.Port,
 		cfg.Database,
 		cfg.AppName,
+		cfg.SSLMode,
 	)
 }
