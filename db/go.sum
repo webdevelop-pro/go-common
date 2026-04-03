@@ -10,8 +10,8 @@ github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsI
 github.com/jackc/pgpassfile v1.0.0/go.mod h1:CEx0iS5ambNFdcRtxPj5JhEz+xB6uRky5eyVu/W2HEg=
 github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 h1:iCEnooe7UlwOQYpKFhBabPMi4aNAfoODPEFNiAnClxo=
 github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761/go.mod h1:5TJZWKEWniPve33vlWYSoGYefn3gLQRzjfDlhSJ9ZKM=
-github.com/jackc/pgx/v5 v5.8.0 h1:TYPDoleBBme0xGSAX3/+NujXXtpZn9HBONkQC7IEZSo=
-github.com/jackc/pgx/v5 v5.8.0/go.mod h1:QVeDInX2m9VyzvNeiCJVjCkNFqzsNb43204HshNSZKw=
+github.com/jackc/pgx/v5 v5.9.1 h1:uwrxJXBnx76nyISkhr33kQLlUqjv7et7b9FjCen/tdc=
+github.com/jackc/pgx/v5 v5.9.1/go.mod h1:mal1tBGAFfLHvZzaYh77YS/eC6IX9OWbRV1QIIM0Jn4=
 github.com/jackc/puddle/v2 v2.2.2 h1:PR8nw+E/1w0GLuRFSmiioY6UooMp6KJv0/61nB7icHo=
 github.com/jackc/puddle/v2 v2.2.2/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
 github.com/jinzhu/copier v0.4.0 h1:w3ciUoD19shMCRargcpm0cm91ytaBhDvuRpz1ODO/U8=
@@ -53,8 +53,8 @@ github.com/webdevelop-pro/go-common/httputils v1.0.20 h1:jTGqmw1220V2vNkS3ZcWWYL
 github.com/webdevelop-pro/go-common/httputils v1.0.20/go.mod h1:4m2m900gqDrnuZLK6YDNL0iGLGg/+2Y70nGg6NPbSnQ=
 github.com/webdevelop-pro/go-common/logger v1.0.21 h1:nL8CqgfhqfXOS5b00KJ06JFQc/h4UVGwH9JzWXyVIJc=
 github.com/webdevelop-pro/go-common/logger v1.0.21/go.mod h1:Qju81xjMziywEktOxXF9BhwpTLXpxhePmrPE3UiLpFk=
-github.com/webdevelop-pro/go-common/tests v1.0.21 h1:NPZEWGGmoOEoi6NjEG+ym2LBLvXNZvI0NqNuQ3vwdUs=
-github.com/webdevelop-pro/go-common/tests v1.0.21/go.mod h1:rpN2Xtno/aS0e2UIwu9fPpi/uxcOKAOAN9BuoIG0m28=
+github.com/webdevelop-pro/go-common/tests v1.0.22 h1:XGC8hN55MwuAsDpTZST9vE0GJBVlt1ClnUad4pcBe1s=
+github.com/webdevelop-pro/go-common/tests v1.0.22/go.mod h1:uNxdLENKHvI2LcZk8oIjxfdVOS60iVeONLrk8tSUGfk=
 golang.org/x/sync v0.20.0 h1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=
 golang.org/x/sync v0.20.0/go.mod h1:9xrNwdLfx4jkKbNva9FpL6vEN7evnE43NNNJQ2LF3+0=
 golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=

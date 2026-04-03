@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/golang:1.25-alpine3.22
+FROM public.ecr.aws/docker/library/golang:1.25-alpine3.23
 
 ARG GIT_COMMIT=unspecified
 ARG BUILD_DATE=unspecified
