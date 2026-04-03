@@ -42,9 +42,9 @@ func NewFixturesManager(ctx context.Context, fixtures ...Fixture) FixturesManage
 		panic(err)
 	}
 
-	db := db.New(ctx)
+	dbInstance := db.New(ctx)
 	return FixturesManager{
-		db:       db,
+		db:       dbInstance,
 		cfg:      cfg,
 		fixtures: fixtures,
 	}

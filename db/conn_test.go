@@ -6,12 +6,13 @@ import (
 )
 
 func TestNewConn(t *testing.T) {
-	// ToDo
-	// NewConn should return an error
 	ctx := context.Background()
-	conn := NewConn(ctx)
+	conn, err := NewConn(ctx)
+	if err != nil {
+		t.Fatalf("Failed to create connection: %v", err)
+	}
 	var name string
-	err := conn.QueryRow(ctx, "select 'test'").Scan(&name)
+	err = conn.QueryRow(ctx, "select 'test'").Scan(&name)
 	if err != nil {
 		t.Fatalf("Failed to make request: %v", err)
 	}

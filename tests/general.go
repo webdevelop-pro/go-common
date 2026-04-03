@@ -75,56 +75,58 @@ func RunTableTest(t *testing.T, ctx context.Context, fixtureMngrs []FixturesMana
 }
 
 func AllowDictAny(src, dst map[string]interface{}) map[string]interface{} {
-	res := dst
-
-	for k, v := range dst {
-		switch val := v.(type) {
-		case string:
-			if src == nil || src[k] == nil || IsNil(src[k]) {
-				continue
-			}
-
-			if val == "%any%" && !reflect.ValueOf(src[k]).IsZero() {
-				res[k] = src[k]
-			}
-		case int:
-			if val == math.MinInt {
-				dst[k] = src[k]
-			}
-		case map[string]any:
-			if srck, ok := src[k].(map[string]any); ok {
-				res[k] = AllowDictAny(srck, val)
-			}
-		}
+	if src == nil {
+		return dst
 	}
-
+	res, ok := AllowAny(src, dst).(map[string]interface{})
+	if !ok {
+		return dst
+	}
 	return res
 }
 
 func AllowAny(src, dst interface{}) interface{} {
-	res := dst
-
-	switch val := dst.(type) {
+	switch expected := dst.(type) {
 	case map[string]any:
-		if src != nil && !reflect.ValueOf(src).IsZero() {
-			for key, value := range src.(map[string]any) {
-				expValue, ok := res.(map[string]any)[key]
-				if ok {
-					res.(map[string]any)[key] = AllowAny(expValue, value)
-				}
-			}
+		actualMap, ok := src.(map[string]any)
+		if !ok {
+			return dst
 		}
+		res := make(map[string]any, len(expected))
+		for key, expectedValue := range expected {
+			actualValue, ok := actualMap[key]
+			if ok {
+				res[key] = AllowAny(actualValue, expectedValue)
+				continue
+			}
+			res[key] = expectedValue
+		}
+		return res
+	case []any:
+		actualSlice, ok := src.([]any)
+		if !ok {
+			return dst
+		}
+		res := make([]any, len(expected))
+		for idx, expectedValue := range expected {
+			if idx < len(actualSlice) {
+				res[idx] = AllowAny(actualSlice[idx], expectedValue)
+				continue
+			}
+			res[idx] = expectedValue
+		}
+		return res
 	case string:
-		if val == "%any%" && src != nil && !reflect.ValueOf(src).IsZero() {
-			res = src
+		if expected == "%any%" && src != nil && !reflect.ValueOf(src).IsZero() {
+			return src
 		}
 	case int:
-		if val == math.MinInt {
-			res = src
+		if expected == math.MinInt {
+			return src
 		}
 	}
 
-	return res
+	return dst
 }
 
 // ToDo

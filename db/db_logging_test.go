@@ -84,8 +84,9 @@ func TestLogger_DBQuery(t *testing.T) {
 	os.Setenv("LOG_LEVEL", "info")
 	os.Setenv("DB_LOG_LEVEL", "info")
 
-	db := New(ctx)
-	err := db.QueryRow(ctx, "select 1, 'b', now();").Scan(&resultInt, &resultStr, &resultTime)
+	db, err := New(ctx)
+	assert.Nil(t, err)
+	err = db.QueryRow(ctx, "select 1, 'b', now();").Scan(&resultInt, &resultStr, &resultTime)
 	assert.Nil(t, err)
 
 	actualLogs := ReadStdout(stdout)
@@ -138,8 +139,9 @@ func TestLogger_DBExec(t *testing.T) {
 
 	stdout := ConnectToStdout()
 
-	db := New(ctx)
-	_, err := db.Exec(ctx, "SET TIME ZONE 'UTC';")
+	db, err := New(ctx)
+	assert.Nil(t, err)
+	_, err = db.Exec(ctx, "SET TIME ZONE 'UTC';")
 	assert.Nil(t, err)
 
 	actualLogs := ReadStdout(stdout)
@@ -193,8 +195,9 @@ func TestLogger_DBQuery_ERROR(t *testing.T) {
 
 	stdout := ConnectToStdout()
 
-	db := New(ctx)
-	err := db.QueryRow(ctx, "select asd;").Scan(&resultInt, &resultStr, &resultTime)
+	db, err := New(ctx)
+	assert.Nil(t, err)
+	err = db.QueryRow(ctx, "select asd;").Scan(&resultInt, &resultStr, &resultTime)
 	assert.NotNil(t, err)
 
 	actualLogs := ReadStdout(stdout)

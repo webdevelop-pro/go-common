@@ -3,100 +3,90 @@ package db
 import (
 	"context"
 	"fmt"
-	"strings"
-	"time"
+	"net/url"
 
+	backoff "github.com/cenkalti/backoff/v4"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/tracelog"
 
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/logger"
 )
 
 // NewConn is constructor for *pgx.Conn
-func NewConn(ctx context.Context) *pgx.Conn {
-	logger := logger.NewComponentLogger(ctx, pkgName)
+func NewConn(ctx context.Context) (*pgx.Conn, error) {
+	log := logger.NewComponentLogger(ctx, pkgName)
 
-	return newConn(ctx, GetConfigConn(logger), logger)
+	pgConfig, err := GetConfigConn(log)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewConnFromConfig(ctx, pgConfig, log)
 }
 
 // NewConnFromConfig is constructor for *pgx.Conn
-func NewConnFromConfig(ctx context.Context, pgConfig *pgx.ConnConfig) *pgx.Conn {
-	//nolint:contextcheck
-	logger := logger.NewComponentLogger(context.TODO(), pkgName)
+func NewConnFromConfig(ctx context.Context, pgConfig *pgx.ConnConfig, log logger.Logger) (*pgx.Conn, error) {
+	if pgConfig == nil {
+		return nil, fmt.Errorf("pgx connection config is nil")
+	}
 
-	return newConn(ctx, pgConfig, logger)
+	return newConn(ctx, pgConfig.Copy(), log)
 }
 
-func newConn(ctx context.Context, pgConfig *pgx.ConnConfig, logger logger.Logger) *pgx.Conn {
-	// ToDo
-	// Accept context as parameter
-	var (
-		pg  *pgx.Conn
-		err error
-	)
-
-	i := 0
-	ticker := time.NewTicker(time.Second)
-
-	for ; ; <-ticker.C {
-		i++
-		// ToDo
-		// use exponentional backoff connection
-		logger.Info().Msgf("Connecting to db attempt %d", i)
-		pg, err = pgx.ConnectConfig(ctx, pgConfig)
-		if err == nil || i > maxRetries {
-			_, err = pg.Exec(ctx, "SET TIME ZONE 'UTC';")
-			if err != nil {
-				logger.Error().Err(err).Msg("Unable change timezone")
+func newConn(ctx context.Context, pgConfig *pgx.ConnConfig, log logger.Logger) (*pgx.Conn, error) {
+	pg, err := backoff.RetryWithData(
+		func() (*pgx.Conn, error) {
+			log.Debug().Msg("Connecting to db")
+			conn, connectErr := pgx.ConnectConfig(ctx, pgConfig)
+			if connectErr != nil {
+				log.Error().Err(connectErr).Msg("Failed to connect to db")
+				return nil, connectErr
 			}
-			break
-		}
-		logger.Error().Err(err).Msgf("failed to connect, attempt %d", i)
-	}
 
+			if setErr := setSessionTimeZone(ctx, conn); setErr != nil {
+				_ = conn.Close(ctx)
+				return nil, setErr
+			}
+
+			return conn, nil
+		},
+		backoff.WithContext(
+			backoff.WithMaxRetries(backoff.NewExponentialBackOff(), uint64(maxRetries)),
+			ctx,
+		),
+	)
 	if err != nil {
-		logger.Fatal().Err(err).Msg("Unable to create connection pool")
+		return nil, fmt.Errorf("connect to db: %w", err)
 	}
 
-	ticker.Stop()
-	return pg
+	return pg, nil
 }
 
-func GetConfigConn(logger logger.Logger) *pgx.ConnConfig {
+func GetConfigConn(log logger.Logger) (*pgx.ConnConfig, error) {
 	cfg, err := configurator.Parse[Config](pkgName)
 	if err != nil {
-		logger.Fatal().Stack().Err(err).Msg("Cannot parse config")
+		return nil, fmt.Errorf("parse db config: %w", err)
 	}
 
 	pgConfig, err := pgx.ParseConfig(GetConnString(&cfg))
 	if err != nil {
-		logger.Fatal().Err(err).Msg("failed to parse config")
+		return nil, fmt.Errorf("parse pgx connection config: %w", err)
 	}
 
-	pgxLogLevel, err := tracelog.LogLevelFromString(strings.ToLower(cfg.LogLevel))
-	if err != nil {
-		pgxLogLevel = tracelog.LogLevelError
-	}
+	configureConnTracing(pgConfig, cfg.LogLevel, log)
 
-	pgConfig.Tracer = &tracelog.TraceLog{
-		Logger:   NewDBLogger(logger),
-		LogLevel: pgxLogLevel,
-	}
-
-	return pgConfig
+	return pgConfig, nil
 }
 
 func GetConnString(cfg *Config) string {
-	return fmt.Sprintf(
-		"%s://%s:%s@%s:%d/%s?application_name=%s&sslmode=%s",
-		cfg.Type,
-		cfg.User,
-		cfg.Password,
-		cfg.Host,
-		cfg.Port,
-		cfg.Database,
-		cfg.AppName,
-		cfg.SSLMode,
-	)
+	query := url.Values{}
+	query.Set("application_name", cfg.AppName)
+
+	return (&url.URL{
+		Scheme:   string(cfg.Type),
+		User:     url.UserPassword(cfg.User, cfg.Password),
+		Host:     fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
+		Path:     cfg.Database,
+		RawQuery: query.Encode(),
+	}).String()
 }

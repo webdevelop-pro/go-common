@@ -10,3 +10,11 @@ func TestAny(t *testing.T) {
 		[]byte(`{"nc_issuer_id":"%any%", "nc_issuer_status":"Pending"}`),
 	)
 }
+
+func TestAnyInsideArray(t *testing.T) {
+	CompareJSONBody(
+		t,
+		[]byte(`{"items":[{"id":21,"created_at":"2026-03-30 11:30:00 +0200 CEST","nested":["keep","dynamic"]}]}`),
+		[]byte(`{"items":[{"id":"%any%","created_at":"%any%","nested":["keep","%any%"]}]}`),
+	)
+}

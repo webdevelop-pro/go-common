@@ -7,9 +7,12 @@ import (
 
 func TestNewPool(t *testing.T) {
 	ctx := context.Background()
-	conn := NewPool(ctx)
+	conn, err := NewPool(ctx)
+	if err != nil {
+		t.Fatalf("Failed to create pool: %v", err)
+	}
 	var name string
-	err := conn.QueryRow(ctx, "select 'test'").Scan(&name)
+	err = conn.QueryRow(ctx, "select 'test'").Scan(&name)
 	if err != nil {
 		t.Fatalf("Failed to make request: %v", err)
 	}

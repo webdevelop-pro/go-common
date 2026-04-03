@@ -1,8 +1,10 @@
 package db
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/jackc/pgx/v5"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -11,7 +13,7 @@ const (
 )
 
 var (
-	ErrNotFound   = errors.Wrapf(pgx.ErrNoRows, "") // so we have stack trace and error message from pgx for errors.Is
+	ErrNotFound   = fmt.Errorf("db: %w", pgx.ErrNoRows)
 	ErrNotUpdated = errors.New("object is not updated")
 	ErrSQLQuery   = errors.New("sql query builder error")
 	ErrSQLRequest = errors.New("sql request error")

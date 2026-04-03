@@ -3,96 +3,130 @@ package db
 import (
 	"context"
 	"fmt"
+	"strings"
+	"time"
 
 	backoff "github.com/cenkalti/backoff/v4"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/tracelog"
-	"github.com/pkg/errors"
 
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/logger"
 )
 
 // NewPool is constructor for pgxpool.Pool
-func NewPool(ctx context.Context) *pgxpool.Pool {
-	logger := logger.NewComponentLogger(ctx, pkgName)
-	return newPool(ctx, GetConfigPool(logger), logger)
+func NewPool(ctx context.Context) (*pgxpool.Pool, error) {
+	log := logger.NewComponentLogger(ctx, pkgName)
+	pgConfig, err := GetConfigPool(log)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewPoolFromConfig(ctx, pgConfig, log)
 }
 
 // NewPoolFromConfig is constructor for pgxpool.Pool
-func NewPoolFromConfig(ctx context.Context, pgConfig *pgxpool.Config, logger logger.Logger) *pgxpool.Pool {
-	return newPool(ctx, pgConfig, logger)
-}
-
-func newPool(ctx context.Context, pgConfig *pgxpool.Config, logger logger.Logger) *pgxpool.Pool {
-	pgConfig.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
-		conn.Exec(ctx, "SET TIME ZONE 'UTC'")
-		return nil
+func NewPoolFromConfig(ctx context.Context, pgConfig *pgxpool.Config, log logger.Logger) (*pgxpool.Pool, error) {
+	if pgConfig == nil {
+		return nil, fmt.Errorf("pgx pool config is nil")
 	}
 
+	cfg := pgConfig.Copy()
+	cfg.AfterConnect = wrapAfterConnect(cfg.AfterConnect)
+
+	return newPool(ctx, cfg, log)
+}
+
+func newPool(ctx context.Context, pgConfig *pgxpool.Config, log logger.Logger) (*pgxpool.Pool, error) {
 	pg, err := backoff.RetryWithData(
 		func() (*pgxpool.Pool, error) {
-			logger.Debug().Msg("Attempting to connect to db...")
-
-			p, err := pgxpool.NewWithConfig(ctx, pgConfig)
-			if err != nil {
-				return nil, err // Fails immediately if the config itself is malformed
+			log.Debug().Msg("Connecting to db")
+			pool, poolErr := pgxpool.NewWithConfig(ctx, pgConfig)
+			if poolErr != nil {
+				log.Error().Err(poolErr).Msg("Failed to create connection pool")
+				return nil, poolErr
 			}
 
-			// FIX 1: Explicitly ping the DB to verify it's actually up and reachable.
-			if err := p.Ping(ctx); err != nil {
-				p.Close() // Prevent memory/goroutine leaks from the unused pool
-				return nil, err
+			if pingErr := pool.Ping(ctx); pingErr != nil {
+				pool.Close()
+				log.Error().Err(pingErr).Msg("Failed to ping db")
+				return nil, pingErr
 			}
 
-			return p, nil
+			return pool, nil
 		},
 		backoff.WithContext(
 			backoff.WithMaxRetries(backoff.NewExponentialBackOff(), uint64(maxRetries)),
 			ctx,
 		),
 	)
-
 	if err != nil {
-		logger.Fatal().Err(err).Msg("Unable to create connection pool after retries")
+		return nil, fmt.Errorf("create db pool: %w", err)
 	}
 
-	return pg
+	return pg, nil
 }
 
-func GetConfigPool(logger logger.Logger) *pgxpool.Config {
+func GetConfigPool(log logger.Logger) (*pgxpool.Config, error) {
 	cfg, err := configurator.Parse[Config](pkgName)
 	if err != nil {
-		logger.Fatal().Stack().Err(err).Msg("Cannot parse config")
+		return nil, fmt.Errorf("parse db config: %w", err)
 	}
 
 	pgConfig, err := pgxpool.ParseConfig(GetPoolConnString(&cfg))
 	if err != nil {
-		logger.Fatal().Err(err).Msg("failed to parse config")
+		return nil, fmt.Errorf("parse pgx pool config: %w", err)
 	}
 
-	pgxLogLevel, err := tracelog.LogLevelFromString(cfg.LogLevel)
+	configureConnTracing(pgConfig.ConnConfig, cfg.LogLevel, log)
+	pgConfig.MaxConns = int32(cfg.MaxConnections)
+	pgConfig.MinConns = int32(cfg.MinConnections)
+	pgConfig.MaxConnLifetime = fmtDurationSeconds(cfg.MaxConnLifetime)
+
+	return pgConfig, nil
+}
+
+func configureConnTracing(pgConfig *pgx.ConnConfig, logLevel string, log logger.Logger) {
+	pgxLogLevel, err := tracelog.LogLevelFromString(strings.ToLower(logLevel))
 	if err != nil {
-		logger.Warn().Err(errors.Wrapf(err, "wrong level: %s", cfg.LogLevel)).Msgf("cannot parse pgxLogLevel")
+		log.Warn().Err(fmt.Errorf("wrong level %q: %w", logLevel, err)).Msg("cannot parse pgx log level")
 		pgxLogLevel = tracelog.LogLevelNone
 	}
 
-	pgConfig.ConnConfig.Tracer = &tracelog.TraceLog{
-		Logger:   NewDBLogger(logger),
+	pgConfig.Tracer = &tracelog.TraceLog{
+		Logger:   NewDBLogger(log),
 		LogLevel: pgxLogLevel,
 	}
-
-	return pgConfig
 }
 
 func GetPoolConnString(cfg *Config) string {
-	query := GetConnString(cfg)
-	return fmt.Sprintf(
-		"%s&pool_max_conns=%d&pool_min_conns=%d&pool_max_conn_lifetime=%ds",
-		query,
-		cfg.MaxConnections,
-		cfg.MinConnections,
-		cfg.MaxConnLifetime,
-	)
+	return GetConnString(cfg)
+}
+
+func wrapAfterConnect(next func(context.Context, *pgx.Conn) error) func(context.Context, *pgx.Conn) error {
+	return func(ctx context.Context, conn *pgx.Conn) error {
+		if next != nil {
+			if err := next(ctx, conn); err != nil {
+				return err
+			}
+		}
+
+		return setSessionTimeZone(ctx, conn)
+	}
+}
+
+func setSessionTimeZone(ctx context.Context, conn interface {
+	Exec(context.Context, string, ...any) (pgconn.CommandTag, error)
+}) error {
+	if _, err := conn.Exec(ctx, "SET TIME ZONE 'UTC'"); err != nil {
+		return fmt.Errorf("set db session time zone: %w", err)
+	}
+
+	return nil
+}
+
+func fmtDurationSeconds(seconds int) time.Duration {
+	return time.Duration(seconds) * time.Second
 }

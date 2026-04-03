@@ -1,4 +1,3 @@
-//nolint:gochecknoglobals
 package db
 
 // Type represent storage engine type
@@ -6,10 +5,11 @@ type (
 	Type string
 )
 
-var (
+const (
 	Postgres Type = "postgres"
 	MySQL    Type = "mysql"
-	SQLLite  Type = "sqllite"
+	SQLite   Type = "sqlite"
+	SQLLite  Type = SQLite
 )
 
 // Config is a struct to configure postgresql
@@ -21,7 +21,6 @@ type Config struct {
 	Password        string `required:"true" split_words:"true"`
 	Database        string `required:"true" split_words:"true"`
 	AppName         string `required:"true" split_words:"true"`
-	SSLMode         string `required:"false" split_words:"true"`
 	MinConnections  int    `default:"4" split_words:"true"`
 	MaxConnections  int    `default:"16" split_words:"true"`
 	MaxConnLifetime int    `default:"3600" split_words:"true"`

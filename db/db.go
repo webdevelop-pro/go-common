@@ -32,9 +32,13 @@ type Repository interface {
 
 // New returns new DB instance.
 func New(ctx context.Context) *DB {
-	logger := logger.NewComponentLogger(ctx, pkgName)
+	log := logger.NewComponentLogger(ctx, pkgName)
+	pool, err := NewPool(ctx)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to connect to DB")
+	}
 
-	return NewDB(NewPool(ctx), logger)
+	return NewDB(pool, log)
 }
 
 // NewDB returns new DB instance.
@@ -54,7 +58,8 @@ func (db *DB) Subscribe(ctx context.Context, topicName string) (<-chan *[]byte, 
 		return nil, err
 	}
 
-	if _, err := conn.Exec(ctx, "listen "+topicName); err != nil {
+	if _, err := conn.Exec(ctx, "listen "+pgx.Identifier{topicName}.Sanitize()); err != nil {
+		conn.Release()
 		return nil, err
 	}
 
