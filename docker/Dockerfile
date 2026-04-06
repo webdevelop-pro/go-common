@@ -14,6 +14,7 @@ LABEL REPOSITORY=$REPOSITORY
 ENV GOPATH=/go
 ENV VERSION=${VERSION:-unknown}
 
+RUN apk update && apk upgrade --no-cache
 RUN apk add --no-cache make gcc musl-dev linux-headers git gettext ca-certificates curl
 
 ADD . /app
@@ -22,7 +23,7 @@ WORKDIR /app
 
 RUN go mod download
 RUN go build main.go
-RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.64.0
+RUN wget -O - https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.63.0
 
 RUN go install github.com/securego/gosec/v2/cmd/gosec@latest
 RUN go install github.com/daixiang0/gci@latest
