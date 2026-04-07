@@ -1,41 +1,55 @@
+version: "2"
 run:
-  # default concurrency is a available CPU number
   concurrency: 4
-  # timeout for analysis, e.g. 30s, 5m, default is 1m
-  timeout: 10m
   tests: false
-
-skip-dirs:
-  - tests
-skip-files:
-  - api/docs.go
-
 linters:
-  enable-all: true
+  default: all
   disable:
-    - nlreturn
-    - wrapcheck
-    - tagliatelle
-    - exhaustivestruct
     - depguard
-    - godot
     - exhaustruct
-    - wsl
+    - godot
+    - nlreturn
     - tagalign
+    - tagliatelle
     - varnamelen
-
-linters-settings:
-  cyclop:
-    # the maximal code complexity to report
-    max-complexity: 20
-  nestif:
-    min-complexity: 10
-
-  stylecheck:
-    checks: [ "all", "-ST1003" ]
-
-  gosec:
-    # To select a subset of rules to run.
-    # Available rules: https://github.com/securego/gosec#available-rules
-    excludes:
-      - G107
+    - wrapcheck
+    - wsl
+  settings:
+    cyclop:
+      max-complexity: 20
+    gosec:
+      excludes:
+        - G107
+    nestif:
+      min-complexity: 10
+    staticcheck:
+      checks:
+        - all
+        - -ST1003
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - ^tests/
+      - ^api/docs\.go$
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - ^tests/
+      - ^api/docs\.go$
+      - third_party$
+      - builtin$
+      - examples$

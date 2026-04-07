@@ -18,6 +18,7 @@ lstrip() {
 
 WORK_DIR=$(pwd)
 cd $WORK_DIR
+GOLANGCI_LINT_VERSION=v2.11.4
 
 # if company name not set - try to get it from the path$
 if [ -z "${COMPANY_NAME}" ]; then
@@ -73,7 +74,7 @@ case $1 in
 
 install)
   echo "golang global dependencies"
-  curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.61.0
+  curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin $GOLANGCI_LINT_VERSION
   go install github.com/go-swagger/go-swagger/cmd/swagger@latest
   go install github.com/securego/gosec/v2/cmd/gosec@latest
   go install github.com/cosmtrek/air@latest
