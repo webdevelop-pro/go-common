@@ -30,10 +30,10 @@ func NewConnFromConfig(ctx context.Context, pgConfig *pgx.ConnConfig, log logger
 		return nil, fmt.Errorf("pgx connection config is nil")
 	}
 
-	return newConn(ctx, pgConfig.Copy(), log)
+	return newConn(ctx, pgConfig.Copy(), log, retriesFromEnv())
 }
 
-func newConn(ctx context.Context, pgConfig *pgx.ConnConfig, log logger.Logger) (*pgx.Conn, error) {
+func newConn(ctx context.Context, pgConfig *pgx.ConnConfig, log logger.Logger, retries int) (*pgx.Conn, error) {
 	pg, err := backoff.RetryWithData(
 		func() (*pgx.Conn, error) {
 			log.Debug().Msg("Connecting to db")
@@ -43,15 +43,17 @@ func newConn(ctx context.Context, pgConfig *pgx.ConnConfig, log logger.Logger) (
 				return nil, connectErr
 			}
 
-			if setErr := setSessionTimeZone(ctx, conn); setErr != nil {
-				_ = conn.Close(ctx)
-				return nil, setErr
+			if !skipSessionInitFromEnv() {
+				if setErr := setSessionTimeZone(ctx, conn); setErr != nil {
+					_ = conn.Close(ctx)
+					return nil, setErr
+				}
 			}
 
 			return conn, nil
 		},
 		backoff.WithContext(
-			backoff.WithMaxRetries(backoff.NewExponentialBackOff(), uint64(maxRetries)),
+			backoff.WithMaxRetries(backoff.NewExponentialBackOff(), uint64(retries)),
 			ctx,
 		),
 	)
@@ -60,6 +62,24 @@ func newConn(ctx context.Context, pgConfig *pgx.ConnConfig, log logger.Logger) (
 	}
 
 	return pg, nil
+}
+
+// retriesFromEnv pulls Config.MaxRetries; falls back to the package-level default
+// if config parsing fails (rare — same parse already succeeded earlier).
+func retriesFromEnv() int {
+	cfg, err := configurator.Parse[Config](pkgName)
+	if err != nil || cfg.MaxRetries <= 0 {
+		return maxRetries
+	}
+	return cfg.MaxRetries
+}
+
+func skipSessionInitFromEnv() bool {
+	cfg, err := configurator.Parse[Config](pkgName)
+	if err != nil {
+		return false
+	}
+	return cfg.SkipSessionInit
 }
 
 func GetConfigConn(log logger.Logger) (*pgx.ConnConfig, error) {
@@ -81,6 +101,9 @@ func GetConfigConn(log logger.Logger) (*pgx.ConnConfig, error) {
 func GetConnString(cfg *Config) string {
 	query := url.Values{}
 	query.Set("application_name", cfg.AppName)
+	if cfg.SslMode != "" {
+		query.Set("sslmode", cfg.SslMode)
+	}
 
 	return (&url.URL{
 		Scheme:   string(cfg.Type),

@@ -4,14 +4,13 @@ go 1.25.0
 
 require (
 	github.com/cenkalti/backoff/v4 v4.3.0
-	github.com/jackc/pgx/v5 v5.9.1
+	github.com/jackc/pgx/v5 v5.9.2
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.11.1
 	github.com/webdevelop-pro/go-common/configurator v1.0.19
 	github.com/webdevelop-pro/go-common/context v1.0.18
 	github.com/webdevelop-pro/go-common/logger v1.0.21
 	github.com/webdevelop-pro/go-common/tests v1.0.22
-	golang.org/x/sync v0.20.0
 )
 
 require (
@@ -31,6 +30,6 @@ require (
 	github.com/webdevelop-pro/go-common/httputils v1.0.20 // indirect
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.42.0 // indirect
-	golang.org/x/text v0.35.0 // indirect
+	golang.org/x/text v0.36.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

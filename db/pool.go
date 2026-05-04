@@ -36,10 +36,10 @@ func NewPoolFromConfig(ctx context.Context, pgConfig *pgxpool.Config, log logger
 	cfg := pgConfig.Copy()
 	cfg.AfterConnect = wrapAfterConnect(cfg.AfterConnect)
 
-	return newPool(ctx, cfg, log)
+	return newPool(ctx, cfg, log, retriesFromEnv())
 }
 
-func newPool(ctx context.Context, pgConfig *pgxpool.Config, log logger.Logger) (*pgxpool.Pool, error) {
+func newPool(ctx context.Context, pgConfig *pgxpool.Config, log logger.Logger, retries int) (*pgxpool.Pool, error) {
 	pg, err := backoff.RetryWithData(
 		func() (*pgxpool.Pool, error) {
 			log.Debug().Msg("Connecting to db")
@@ -58,7 +58,7 @@ func newPool(ctx context.Context, pgConfig *pgxpool.Config, log logger.Logger) (
 			return pool, nil
 		},
 		backoff.WithContext(
-			backoff.WithMaxRetries(backoff.NewExponentialBackOff(), uint64(maxRetries)),
+			backoff.WithMaxRetries(backoff.NewExponentialBackOff(), uint64(retries)),
 			ctx,
 		),
 	)
@@ -113,6 +113,9 @@ func wrapAfterConnect(next func(context.Context, *pgx.Conn) error) func(context.
 			}
 		}
 
+		if skipSessionInitFromEnv() {
+			return nil
+		}
 		return setSessionTimeZone(ctx, conn)
 	}
 }

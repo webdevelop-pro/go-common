@@ -12,8 +12,10 @@ import (
 )
 
 var (
-	pkgName    = "db"
-	maxRetries = 100
+	pkgName = "db"
+	// maxRetries is the fallback ceiling on initial-connection retries.
+	// Per-call retries also honor cfg.MaxRetries (env DB_MAX_RETRIES).
+	maxRetries = 5
 )
 
 // DB is a layer to simplify interact with DB
