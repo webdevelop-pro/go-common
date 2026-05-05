@@ -9,24 +9,9 @@ import (
 
 	"github.com/webdevelop-pro/go-common/httputils"
 	"github.com/webdevelop-pro/go-common/queue/pclient"
+	"github.com/webdevelop-pro/go-common/queue/pubsubpush"
 	"github.com/webdevelop-pro/go-common/tests"
 )
-
-// PushRequest is the envelope Google Pub/Sub sends to push subscribers.
-// See https://cloud.google.com/pubsub/docs/push#receive_push.
-type PushRequest struct {
-	Message      PushMessage `json:"message"`
-	Subscription string      `json:"subscription"`
-}
-
-type PushMessage struct {
-	Attributes      map[string]string `json:"attributes"`
-	Data            []byte            `json:"data"`
-	MessageID       string            `json:"messageId"`
-	PublishTime     time.Time         `json:"publishTime"`
-	OrderingKey     string            `json:"orderingKey,omitempty"`
-	DeliveryAttempt *int              `json:"deliveryAttempt,omitempty"`
-}
 
 // SendPushWebhook emulates a Pub/Sub push delivery of a Webhook to the service
 // under test by POSTing a push envelope to its HTTP endpoint.
@@ -56,8 +41,8 @@ func SendPushTo(host, port, path string, msg any, attrs map[string]string) tests
 		if err != nil {
 			return fmt.Errorf("marshal push payload: %w", err)
 		}
-		envelope := PushRequest{
-			Message: PushMessage{
+		envelope := pubsubpush.PushRequest{
+			Message: pubsubpush.PushMessage{
 				MessageID:   fmt.Sprintf("test-%d", time.Now().UnixNano()),
 				PublishTime: time.Now().UTC(),
 				Attributes:  attrs,

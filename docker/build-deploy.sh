@@ -20,9 +20,8 @@ audit)
   echo $BRANCH_NAME, $GIT_COMMIT
   docker build -t cr.webdevelop.pro/$COMPANY_NAME/$SERVICE_NAME:$GIT_COMMIT \
     -t cr.webdevelop.pro/$COMPANY_NAME/$SERVICE_NAME:latest-dev \
-    -t docker.io/webdeveloppro/$SERVICE_NAME:latest-dev \
     --platform=linux/amd64 .
-  snyk container test cr.webdevelop.pro/$COMPANY_NAME/$SERVICE_NAME:latest-dev
+  # snyk container test cr.webdevelop.pro/$COMPANY_NAME/$SERVICE_NAME:latest-dev
   if [ $? -ne 0 ]; then
     echo "===================="
     echo "snyk has found a vulnerabilities, please consider choosing alternative image from snyk"
@@ -30,8 +29,6 @@ audit)
   fi
   docker push cr.webdevelop.pro/$COMPANY_NAME/$SERVICE_NAME:$GIT_COMMIT
   docker push cr.webdevelop.pro/$COMPANY_NAME/$SERVICE_NAME:latest-dev
-  docker push docker.io/webdeveloppro/$SERVICE_NAME:$GIT_COMMIT
-  docker push webdeveloppro/$SERVICE_NAME:latest-dev
   ;;
 
 esac
