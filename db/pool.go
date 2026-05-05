@@ -75,6 +75,8 @@ func GetConfigPool(log logger.Logger) (*pgxpool.Config, error) {
 		return nil, fmt.Errorf("parse db config: %w", err)
 	}
 
+	normalizeSslMode(&cfg, log)
+
 	pgConfig, err := pgxpool.ParseConfig(GetPoolConnString(&cfg))
 	if err != nil {
 		return nil, fmt.Errorf("parse pgx pool config: %w", err)
