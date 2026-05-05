@@ -115,9 +115,6 @@ func wrapAfterConnect(next func(context.Context, *pgx.Conn) error) func(context.
 			}
 		}
 
-		if skipSessionInitFromEnv() {
-			return nil
-		}
 		return setSessionTimeZone(ctx, conn)
 	}
 }

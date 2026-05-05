@@ -43,11 +43,9 @@ func newConn(ctx context.Context, pgConfig *pgx.ConnConfig, log logger.Logger, r
 				return nil, connectErr
 			}
 
-			if !skipSessionInitFromEnv() {
-				if setErr := setSessionTimeZone(ctx, conn); setErr != nil {
-					_ = conn.Close(ctx)
-					return nil, setErr
-				}
+			if setErr := setSessionTimeZone(ctx, conn); setErr != nil {
+				_ = conn.Close(ctx)
+				return nil, setErr
 			}
 
 			return conn, nil
@@ -72,14 +70,6 @@ func retriesFromEnv() int {
 		return maxRetries
 	}
 	return cfg.MaxRetries
-}
-
-func skipSessionInitFromEnv() bool {
-	cfg, err := configurator.Parse[Config](pkgName)
-	if err != nil {
-		return false
-	}
-	return cfg.SkipSessionInit
 }
 
 func GetConfigConn(log logger.Logger) (*pgx.ConnConfig, error) {
@@ -126,8 +116,7 @@ var validSslModes = map[string]struct{}{
 	"verify-full": {},
 }
 
-// normalizeSslMode coerces an unrecognized SslMode to "disable" and warns.
-// An empty value is left as-is — GetConnString omits it and pgx applies its default.
+// normalizeSslMode coerces an empty or unrecognized SslMode to "disable" and warns.
 func normalizeSslMode(cfg *Config, log logger.Logger) {
 	if cfg.SslMode == "" {
 		cfg.SslMode = "disable"
@@ -137,4 +126,5 @@ func normalizeSslMode(cfg *Config, log logger.Logger) {
 		return
 	}
 	log.Warn().Str("sslmode", cfg.SslMode).Msg("invalid DB_SSL_MODE, falling back to disable")
+	cfg.SslMode = "disable"
 }

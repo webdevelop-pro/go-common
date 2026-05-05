@@ -24,8 +24,7 @@ type Config struct {
 	SslMode         string `default:"disable" split_words:"true"` // disable | allow | prefer | require | verify-ca | verify-full
 	MinConnections  int    `default:"4" split_words:"true"`
 	MaxConnections  int    `default:"16" split_words:"true"`
-	MaxConnLifetime int    `default:"3600" split_words:"true"`  // seconds
-	MaxRetries      int    `default:"5" split_words:"true"`     // initial-connection retry ceiling
-	SkipSessionInit bool   `default:"false" split_words:"true"` // skip SET TIME ZONE on each new conn
+	MaxConnLifetime int    `default:"3600" split_words:"true"` // seconds
+	MaxRetries      int    `default:"5" split_words:"true"`    // initial-connection retry ceiling
 	LogLevel        string `default:"error" split_words:"true"`
 }

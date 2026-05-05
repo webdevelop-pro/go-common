@@ -4,12 +4,18 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"flag"
 	"math"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+// -name filters scenarios by Description (case-insensitive substring match).
+// Usage: go test -run TestX -name "Successfull case"
+var scenarioNameFilter = flag.String("name", "", "filter scenarios by Description (case-insensitive substring)")
 
 type TestScenario struct {
 	Description string
@@ -53,6 +59,13 @@ func RunTableTest(t *testing.T, ctx context.Context, fixtureMngrs []FixturesMana
 	t.Helper()
 
 	tableTest.SetContext(t, ctx)
+
+	scenarios := filterScenarios(tableTest.Scenarios, *scenarioNameFilter)
+	if len(scenarios) == 0 {
+		t.Skipf("no scenarios match -name=%q", *scenarioNameFilter)
+		return
+	}
+
 	for _, fixtures := range fixtureMngrs {
 		err := fixtures.CleanAndApply()
 		if err != nil {
@@ -63,7 +76,7 @@ func RunTableTest(t *testing.T, ctx context.Context, fixtureMngrs []FixturesMana
 
 	// ToDo
 	// Run in parallel
-	for _, s := range tableTest.Scenarios {
+	for _, s := range scenarios {
 		scenario := s
 		t.Run(tableTest.Description+": "+scenario.Description, func(t *testing.T) {
 			for _, action := range scenario.TestActions {
@@ -72,6 +85,20 @@ func RunTableTest(t *testing.T, ctx context.Context, fixtureMngrs []FixturesMana
 			}
 		})
 	}
+}
+
+func filterScenarios(scenarios []TestScenario, name string) []TestScenario {
+	if name == "" {
+		return scenarios
+	}
+	needle := strings.ToLower(name)
+	out := make([]TestScenario, 0, len(scenarios))
+	for _, s := range scenarios {
+		if strings.Contains(strings.ToLower(s.Description), needle) {
+			out = append(out, s)
+		}
+	}
+	return out
 }
 
 func AllowDictAny(src, dst map[string]interface{}) map[string]interface{} {
