@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	_ "github.com/labstack/echo/v4"
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/context/keys"
 	_ "github.com/webdevelop-pro/go-common/db"
