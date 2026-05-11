@@ -118,10 +118,6 @@ func NewServer() *HTTPServer {
 	e.Use(
 		echoMW.CORSWithConfig(echoMW.CORSConfig{
 			Skipper: func(ctx echo.Context) bool {
-				// Only apply CORS to `/internal/` routes.
-				if !isInternalPath(ctx) {
-					return true
-				}
 				// Get the query parameter value
 				schemaData := ctx.QueryParam("schema")
 				// skip OPTIONS request if we already defined them in application
