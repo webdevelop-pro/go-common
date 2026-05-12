@@ -135,7 +135,7 @@ func NewServer() *HTTPServer {
 			},
 			AllowCredentials: true,
 			AllowMethods:     []string{"GET, POST, PUT, OPTIONS, DELETE, PATCH"},
-			AllowHeaders:     []string{"Authorization, X-PINGOTHER, Content-Type, X-Requested-With, X-Request-ID, Vary"},
+			AllowHeaders:     []string{"Authorization, X-PINGOTHER, Content-Type, X-Requested-With, X-Request-ID, Vary, Access-Control-Request-Private-Network"},
 		}),
 	)
 
