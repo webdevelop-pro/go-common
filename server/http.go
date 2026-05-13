@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"regexp"
 
 	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
@@ -25,46 +24,6 @@ import (
 )
 
 const pkgName = "http_server"
-
-// Private Network Access (PNA) preflight header names.
-// See: https://wicg.github.io/private-network-access/
-const (
-	headerAccessControlRequestPrivateNetwork = "Access-Control-Request-Private-Network"
-	headerAccessControlAllowPrivateNetwork   = "Access-Control-Allow-Private-Network"
-)
-
-// internalPathRe matches paths where `internal` is the segment immediately
-// after the version prefix, e.g. `/v1.0/internal/...` or `/v2/internal`.
-var internalPathRe = regexp.MustCompile(`^/v[0-9]+(?:\.[0-9]+)*/internal(?:/|$)`)
-
-// isInternalPath reports whether the request targets an `/<version>/internal/...` route.
-// CORS and Private Network Access handling are scoped to those routes only.
-func isInternalPath(c echo.Context) bool {
-	return internalPathRe.MatchString(c.Request().URL.Path)
-}
-
-// privateNetworkAccess answers a Private Network Access preflight by mirroring
-// `Access-Control-Request-Private-Network: true` back as `Access-Control-Allow-Private-Network: true`,
-// but only when the CORS middleware has approved the origin (Access-Control-Allow-Origin is set).
-// Must be registered before echo's CORS middleware so the Before hook is in place
-// when CORS terminates the preflight with NoContent.
-// Scoped to `/internal/` routes — matches the CORS skipper.
-func privateNetworkAccess(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		req := c.Request()
-		if isInternalPath(c) &&
-			req.Method == http.MethodOptions &&
-			req.Header.Get(headerAccessControlRequestPrivateNetwork) == "true" {
-			res := c.Response()
-			res.Before(func() {
-				if res.Header().Get(echo.HeaderAccessControlAllowOrigin) != "" {
-					res.Header().Set(headerAccessControlAllowPrivateNetwork, "true")
-				}
-			})
-		}
-		return next(c)
-	}
-}
 
 type HTTPServer struct {
 	Echo   *echo.Echo
@@ -111,10 +70,10 @@ func NewServer() *HTTPServer {
 	}
 
 	e := echo.New()
-	// Private Network Access preflight support — must run before CORS so the
-	// Before hook is registered before echo's CORS terminates the preflight.
-	e.Use(privateNetworkAccess)
-	// sets CORS headers if Origin is present
+	// sets CORS headers if Origin is present.
+	// Private Network Access (PNA) preflight is handled at the nginx layer:
+	// nginx adds `Access-Control-Allow-Private-Network: true` for any vhost
+	// on a *.webdevelop.internal / *.webdevelop.ll domain.
 	e.Use(
 		echoMW.CORSWithConfig(echoMW.CORSConfig{
 			Skipper: func(ctx echo.Context) bool {
@@ -135,7 +94,7 @@ func NewServer() *HTTPServer {
 			},
 			AllowCredentials: true,
 			AllowMethods:     []string{"GET, POST, PUT, OPTIONS, DELETE, PATCH"},
-			AllowHeaders:     []string{"Authorization, X-PINGOTHER, Content-Type, X-Requested-With, X-Request-ID, Vary, Access-Control-Request-Private-Network"},
+			AllowHeaders:     []string{"Authorization, X-PINGOTHER, Content-Type, X-Requested-With, X-Request-ID, Vary"},
 		}),
 	)
 
