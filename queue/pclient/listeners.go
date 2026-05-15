@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	gpubsub "cloud.google.com/go/pubsub"
 	backoff "github.com/cenkalti/backoff/v4"
@@ -13,6 +14,12 @@ import (
 const (
 	maxRetries         = 100
 	maxDeliveryAttempt = 10
+	// SubscriptionRetryTimeout bounds how long getSubscriptionRetry keeps
+	// trying to (re)connect to a subscription before giving up. A deleted
+	// subscription that is recreated within this window reconnects
+	// transparently; one that stays gone surfaces an error to the caller
+	// (instead of busy-looping for ~15 minutes on the default backoff).
+	SubscriptionRetryTimeout = 60 * time.Second
 )
 
 func verifyDeliveryAttempt(msg *gpubsub.Message) {
@@ -27,13 +34,15 @@ func verifyDeliveryAttempt(msg *gpubsub.Message) {
 }
 
 func (b *Client) getSubscriptionRetry(ctx context.Context, subscription, topic string) (*gpubsub.Subscription, error) {
+	expo := backoff.NewExponentialBackOff()
+	expo.MaxElapsedTime = SubscriptionRetryTimeout
 	sub, err := backoff.RetryWithData(
 		func() (*gpubsub.Subscription, error) {
 			b.log.Info().Msgf("Connecting to subscription %s/%s", topic, subscription)
 			return b.getSubscription(ctx, subscription, topic)
 		},
 		backoff.WithContext(
-			backoff.WithMaxRetries(backoff.NewExponentialBackOff(), maxRetries),
+			backoff.WithMaxRetries(expo, maxRetries),
 			ctx,
 		),
 	)
