@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	_ "github.com/ethereum/go-ethereum"
+	_ "github.com/ethereum/go-ethereum/crypto"
 	_ "github.com/labstack/echo/v4"
 	"github.com/webdevelop-pro/go-common/configurator"
 	"github.com/webdevelop-pro/go-common/context/keys"
