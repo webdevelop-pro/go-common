@@ -3,34 +3,15 @@ package pclient
 import (
 	"context"
 	"fmt"
-
-	"github.com/webdevelop-pro/go-common/tests"
 )
 
 type contextKey string
 
 const ctxKey contextKey = "db"
 
-func getClient(t tests.TestContext) *Client {
-	//nolint:forcetypeassert
-	return t.Ctx.Value(pkgName).(*Client)
-}
-
-func SendPubSubEvent(topic string, body any, attr map[string]string) tests.SomeAction {
-	return func(t tests.TestContext) error {
-		_, err := getClient(t).PublishToTopic(t.Ctx, topic, body, attr)
-		return err
-	}
-}
-
-/*
-func CheckIfMsgRead(topic string, body any) tests.SomeAction {
-	return func(t tests.TestContext) error {
-		// _, err := getClient(t).PublishToTopic(context.Background(), topic, body, attr)
-		return nil
-	}
-}
-*/
+// NOTE: the integration-test harness lives in go-common/queue/qtests
+// (pubsub) + go-common/db/dbtests (DB) + go-common/tests.RunTableTest.
+// The legacy pubsub Fixture/FixturesManager below is kept for back-compat.
 
 type Fixture struct {
 	topic        string
