@@ -58,3 +58,37 @@ func TestRequiredEnvs(t *testing.T) {
 		t.Errorf("no env set, should return an error")
 	}
 }
+
+func TestRequiredString(t *testing.T) {
+	t.Setenv("CFG_REQUIRED", "  value  ")
+	t.Setenv("CFG_OPTIONAL", "")
+
+	type Config struct {
+		Required RequiredString `required:"true"`
+		Optional string         `required:"true"`
+	}
+
+	cfg := &Config{}
+	if err := NewConfiguration(cfg, "CFG"); err != nil {
+		t.Fatalf("cannot process config: %v", err)
+	}
+	if cfg.Required.String() != "value" {
+		t.Fatalf("expected trimmed required string, got %q", cfg.Required.String())
+	}
+	if cfg.Optional != "" {
+		t.Fatalf("expected regular string to keep empty value, got %q", cfg.Optional)
+	}
+}
+
+func TestRequiredStringRejectsBlankValue(t *testing.T) {
+	t.Setenv("CFG_REQUIRED", "   ")
+
+	type Config struct {
+		Required RequiredString `required:"true"`
+	}
+
+	cfg := &Config{}
+	if err := NewConfiguration(cfg, "CFG"); err == nil {
+		t.Fatal("expected blank required string to fail")
+	}
+}
