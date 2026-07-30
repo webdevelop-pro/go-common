@@ -111,14 +111,7 @@ func (b *Client) listenRawGoroutine(
 			return
 		}
 
-		// Unmarshal the message data into a struct
-		m := Message{
-			ID:          msg.ID,
-			Data:        msg.Data,
-			PublishTime: msg.PublishTime,
-			Attempt:     msg.DeliveryAttempt,
-			Attributes:  msg.Attributes,
-		}
+		m := receivedMessage(msg)
 
 		ctx = keys.SetCtxValue(ctx, keys.MSGID, msg.ID)
 		b.log.Trace().Str("msg", string(m.Data)).Msgf("received message")
@@ -134,6 +127,17 @@ func (b *Client) listenRawGoroutine(
 		b.log.Error().Stack().Err(err).Msg(ErrReceiveSubscription.Error())
 	}
 	return err
+}
+
+func receivedMessage(msg *gpubsub.Message) Message {
+	return Message{
+		ID:          msg.ID,
+		Data:        msg.Data,
+		PublishTime: msg.PublishTime,
+		Attempt:     msg.DeliveryAttempt,
+		Attributes:  msg.Attributes,
+		OrderingKey: msg.OrderingKey,
+	}
 }
 
 func (b *Client) ListenWebhooks(
