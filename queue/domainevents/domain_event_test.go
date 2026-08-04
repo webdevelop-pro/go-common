@@ -175,6 +175,9 @@ func TestDecodeV1OfferSharesRequireCanonicalDecimalStrings(t *testing.T) {
 	}{
 		{name: "zero", value: "0"},
 		{name: "integer", value: "150"},
+		{name: "single decimal place", value: "0.1"},
+		{name: "quarter share", value: "0.25"},
+		{name: "fractional sentinel", value: "0.96000008"},
 		{name: "fractional", value: "150.25"},
 		{name: "minimum fraction", value: "0.000000000000000001"},
 		{name: "numeric 38 18 maximum", value: "99999999999999999999.999999999999999999"},
@@ -185,6 +188,7 @@ func TestDecodeV1OfferSharesRequireCanonicalDecimalStrings(t *testing.T) {
 		{name: "leading zero", value: "01", wantError: true},
 		{name: "trailing fractional zero", value: "1.0", wantError: true},
 		{name: "negative", value: "-1", wantError: true},
+		{name: "explicit positive sign", value: "+1", wantError: true},
 		{name: "integer overflow", value: "100000000000000000000", wantError: true},
 		{name: "scale overflow", value: "0.0000000000000000001", wantError: true},
 	}
