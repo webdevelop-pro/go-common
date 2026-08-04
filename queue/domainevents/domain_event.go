@@ -22,6 +22,10 @@ const (
 	VersionV1 = 1
 	// SourcePostgresOutbox identifies events produced by the PostgreSQL outbox trigger.
 	SourcePostgresOutbox = "postgres-outbox"
+	// CreatedField identifies lifecycle events whose Data contains only the created row identity.
+	CreatedField = "created"
+	// DeletedField identifies lifecycle events whose Data contains the immutable deletion snapshot.
+	DeletedField = "deleted"
 	// ModeOff validates deliveries without evaluating service actions.
 	ModeOff Mode = "off"
 	// ModeShadow evaluates and logs service actions without performing them.
@@ -43,11 +47,16 @@ var (
 
 	objectPattern = regexp.MustCompile(`^[a-z][a-z0-9-]*$`)
 	fieldPattern  = regexp.MustCompile(`^[a-z][a-z0-9_]*$`)
+	sharePattern  = regexp.MustCompile(`^(0|[1-9][0-9]{0,19})(\.[0-9]{0,17}[1-9])?$`)
 )
 
 // DomainEventV1 is the canonical payload emitted by the PostgreSQL outbox.
-// Data contains exactly one key: Field. Its RawMessage value intentionally
-// preserves JSON strings, numbers, booleans, objects, and null transitions.
+// Field-change events contain exactly one Data key matching Field. Created
+// events use Field "created" and contain only data.id. Deleted events use Field
+// "deleted" and contain data.id plus any explicitly allowlisted immutable
+// identifiers required after the source row is gone. RawMessage values
+// preserve JSON strings, numbers, booleans, objects, and nulls without
+// coercion.
 type DomainEventV1 struct {
 	ID       string                     `json:"id"`
 	Type     string                     `json:"type"`
@@ -85,8 +94,7 @@ func EnvironmentMode() (Mode, error) {
 
 // SuppressLegacyFieldEvent reports whether an old field-change delivery is
 // owned by the transactional outbox after this worker moves to active mode.
-// Insert/delete and unmonitored-field events intentionally remain on the
-// legacy path during the incremental migration.
+// Unmonitored field events remain outside the outbox contract.
 func SuppressLegacyFieldEvent(objectName, action string, data map[string]any) (bool, error) {
 	mode, err := EnvironmentMode()
 	if err != nil {
@@ -125,6 +133,10 @@ func SuppressLegacyFieldEvent(objectName, action string, data map[string]any) (b
 // is returned as ("", false, nil), allowing consumers to ignore nullable
 // transitions without conflating them with malformed scalar values.
 func (event DomainEventV1) StringValue() (string, bool, error) {
+	if event.IsCreated() || event.IsDeleted() {
+		return "", false, malformed("StringValue is not valid for lifecycle events")
+	}
+
 	raw, ok := event.Data[event.Field]
 	if !ok {
 		return "", false, malformed("data must contain field %q", event.Field)
@@ -144,7 +156,22 @@ func (event DomainEventV1) StringValue() (string, bool, error) {
 	return value, true, nil
 }
 
-// PositiveIntObjectID parses the numeric primary keys used by the current six
+// IsCreated reports whether the event represents creation of a row.
+func (event DomainEventV1) IsCreated() bool {
+	return event.Field == CreatedField && event.Type == event.Object+".created.v1"
+}
+
+// IsDeleted reports whether the event represents deletion of a row.
+func (event DomainEventV1) IsDeleted() bool {
+	return event.Field == DeletedField && event.Type == event.Object+".deleted.v1"
+}
+
+// IsLifecycle reports whether the event represents row creation or deletion.
+func (event DomainEventV1) IsLifecycle() bool {
+	return event.Field == CreatedField || event.Field == DeletedField
+}
+
+// PositiveIntObjectID parses the numeric primary keys used by the current
 // workers. It returns a contract error for zero and negative IDs as well as
 // non-numeric values, so known events cannot be silently acknowledged.
 func (event DomainEventV1) PositiveIntObjectID() (int, error) {
@@ -302,29 +329,18 @@ func (event DomainEventV1) Validate() error {
 		return malformed("field %q is not a lower-case SQL field name", event.Field)
 	}
 
-	expectedType := event.Object + "." + strings.ReplaceAll(event.Field, "_", "-") + ".changed.v1"
-	if event.Type != expectedType {
-		return malformed("type is %q, want %q", event.Type, expectedType)
-	}
-
-	if len(event.Data) != 1 {
-		return malformed("data must contain exactly one field")
-	}
-
-	value, ok := event.Data[event.Field]
-	if !ok {
-		return malformed("data must contain field %q", event.Field)
-	}
-
-	if len(value) == 0 || !json.Valid(value) {
-		return malformed("data.%s must contain a JSON value", event.Field)
-	}
-
 	if event.Time.IsZero() {
 		return malformed("time is required")
 	}
 
-	return nil
+	switch event.Field {
+	case CreatedField:
+		return event.validateCreated()
+	case DeletedField:
+		return event.validateDeleted()
+	default:
+		return event.validateFieldChange()
+	}
 }
 
 // ValidateDelivery checks the Pub/Sub attributes and ordering key copied from
@@ -349,6 +365,129 @@ func (event DomainEventV1) ValidateDelivery(attributes map[string]string, orderi
 	}
 
 	return nil
+}
+
+func (event DomainEventV1) validateFieldChange() error {
+	expectedType := event.Object + "." + strings.ReplaceAll(event.Field, "_", "-") + ".changed.v1"
+	if event.Type != expectedType {
+		return malformed("type is %q, want %q", event.Type, expectedType)
+	}
+
+	if len(event.Data) != 1 {
+		return malformed("data must contain exactly one field")
+	}
+
+	value, ok := event.Data[event.Field]
+	if !ok {
+		return malformed("data must contain field %q", event.Field)
+	}
+
+	if len(value) == 0 || !json.Valid(value) {
+		return malformed("data.%s must contain a JSON value", event.Field)
+	}
+
+	if event.Object == "offer" &&
+		(event.Field == "subscribed_shares" || event.Field == "confirmed_shares") {
+		var shares string
+
+		err := json.Unmarshal(value, &shares)
+		if err != nil || !sharePattern.MatchString(shares) {
+			return malformed(
+				"data.%s must be a canonical decimal JSON string with at most 20 integer and 18 fractional digits",
+				event.Field,
+			)
+		}
+	}
+
+	return nil
+}
+
+func (event DomainEventV1) validateCreated() error {
+	expectedType := event.Object + ".created.v1"
+	if event.Type != expectedType {
+		return malformed("type is %q, want %q", event.Type, expectedType)
+	}
+
+	if len(event.Data) != 1 {
+		return malformed("created event data must contain exactly id")
+	}
+
+	return event.validateLifecycleID()
+}
+
+func (event DomainEventV1) validateDeleted() error {
+	expectedType := event.Object + ".deleted.v1"
+	if event.Type != expectedType {
+		return malformed("type is %q, want %q", event.Type, expectedType)
+	}
+
+	if event.Object != "funding-source" {
+		return malformed("deleted lifecycle events are not defined for object %q", event.Object)
+	}
+
+	requiredFields := map[string]struct{}{
+		"id":        {},
+		"wallet_id": {},
+		"user_id":   {},
+	}
+	if len(event.Data) != len(requiredFields) {
+		return malformed("funding-source deleted event data must contain exactly id, wallet_id, and user_id")
+	}
+
+	for field, value := range event.Data {
+		if _, allowed := requiredFields[field]; !allowed {
+			return malformed("data field %q is not allowed for funding-source deletion", field)
+		}
+
+		if len(value) == 0 || !json.Valid(value) {
+			return malformed("data.%s must contain a JSON value", field)
+		}
+	}
+
+	return event.validateLifecycleID()
+}
+
+func (event DomainEventV1) validateLifecycleID() error {
+	rawID, ok := event.Data["id"]
+	if !ok {
+		return malformed("%s event data must contain id", event.Field)
+	}
+
+	rowID, err := lifecycleRowID(rawID)
+	if err != nil {
+		return err
+	}
+
+	if rowID != event.ObjectID {
+		return malformed("data.id is %q, want object_id %q", rowID, event.ObjectID)
+	}
+
+	return nil
+}
+
+func lifecycleRowID(raw json.RawMessage) (string, error) {
+	decoder := json.NewDecoder(bytes.NewReader(raw))
+	decoder.UseNumber()
+
+	var value any
+
+	err := decoder.Decode(&value)
+	if err != nil {
+		return "", malformed("data.id must be a JSON string or number")
+	}
+
+	switch typed := value.(type) {
+	case string:
+		if strings.TrimSpace(typed) == "" {
+			return "", malformed("data.id must not be empty")
+		}
+
+		return typed, nil
+	case json.Number:
+		return typed.String(), nil
+	default:
+		return "", malformed("data.id must be a JSON string or number")
+	}
 }
 
 func ensureJSONEOF(decoder *json.Decoder) error {

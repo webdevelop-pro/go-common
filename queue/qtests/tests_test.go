@@ -73,7 +73,7 @@ func TestExample(t *testing.T) {
 	requirePubsubIntegration(t)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
+	t.Cleanup(cancel)
 
 	topic := uniquePubsubName(t, os.Getenv("PUBSUB_TOPIC_WEBHOOK"), "test_webhooks")
 	subscription := uniquePubsubName(t, os.Getenv("PUBSUB_SUBSCRIPTION_WEBHOOK"), topic+"_sub")

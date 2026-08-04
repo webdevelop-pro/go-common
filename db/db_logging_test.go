@@ -15,17 +15,20 @@ import (
 )
 
 type stdOut struct {
-	r *os.File
-	w *os.File
+	r        *os.File
+	w        *os.File
+	original *os.File
 }
 
 func ConnectToStdout() *stdOut {
+	original := os.Stdout
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
 	return &stdOut{
-		r: r,
-		w: w,
+		r:        r,
+		w:        w,
+		original: original,
 	}
 }
 
@@ -45,10 +48,21 @@ func ReadStdout(stdOut *stdOut) []string {
 		done <- struct{}{}
 	}()
 
-	stdOut.w.Close()
+	_ = stdOut.w.Close()
 	<-done
+	os.Stdout = stdOut.original
+	_ = stdOut.r.Close()
 
 	return result
+}
+
+func configureDBLoggingTest(t *testing.T) {
+	t.Helper()
+
+	t.Setenv("LOG_LEVEL", "info")
+	t.Setenv("DB_LOG_LEVEL", "info")
+	t.Setenv("DB_MIN_CONNECTIONS", "0")
+	t.Setenv("DB_MAX_CONNECTIONS", "1")
 }
 
 func CreateTestContext(ctx context.Context) context.Context {
@@ -81,13 +95,13 @@ func TestLogger_DBQuery(t *testing.T) {
 	ctx = CreateTestContext(ctx)
 	resultInt, resultStr, resultTime := 0, "", time.Time{}
 
-	os.Setenv("LOG_LEVEL", "info")
-	os.Setenv("DB_LOG_LEVEL", "info")
+	configureDBLoggingTest(t)
 
 	db, err := New(ctx)
 	assert.Nil(t, err)
 	err = db.QueryRow(ctx, "select 1, 'b', now();").Scan(&resultInt, &resultStr, &resultTime)
 	assert.Nil(t, err)
+	db.Close()
 
 	actualLogs := ReadStdout(stdout)
 	expected := `
@@ -134,8 +148,7 @@ func TestLogger_DBExec(t *testing.T) {
 	ctx := context.TODO()
 	ctx = CreateTestContext(ctx)
 
-	os.Setenv("LOG_LEVEL", "info")
-	os.Setenv("DB_LOG_LEVEL", "info")
+	configureDBLoggingTest(t)
 
 	stdout := ConnectToStdout()
 
@@ -143,6 +156,7 @@ func TestLogger_DBExec(t *testing.T) {
 	assert.Nil(t, err)
 	_, err = db.Exec(ctx, "SET TIME ZONE 'UTC';")
 	assert.Nil(t, err)
+	db.Close()
 
 	actualLogs := ReadStdout(stdout)
 	expected := `
@@ -190,8 +204,7 @@ func TestLogger_DBQuery_ERROR(t *testing.T) {
 	ctx = CreateTestContext(ctx)
 	resultInt, resultStr, resultTime := 0, "", time.Time{}
 
-	os.Setenv("LOG_LEVEL", "info")
-	os.Setenv("DB_LOG_LEVEL", "info")
+	configureDBLoggingTest(t)
 
 	stdout := ConnectToStdout()
 
@@ -199,6 +212,7 @@ func TestLogger_DBQuery_ERROR(t *testing.T) {
 	assert.Nil(t, err)
 	err = db.QueryRow(ctx, "select asd;").Scan(&resultInt, &resultStr, &resultTime)
 	assert.NotNil(t, err)
+	db.Close()
 
 	actualLogs := ReadStdout(stdout)
 	expected := `
