@@ -9,14 +9,8 @@ ARG GOLANGCI_LINT_VERSION=v2.11.4
 ARG GOSEC_VERSION=v2.22.10
 ARG GCI_VERSION=v0.13.7
 
-LABEL GIT_COMMIT=$GIT_COMMIT
-LABEL BUILD_DATE=$BUILD_DATE
-LABEL SERVICE_NAME=$SERVICE_NAME
-LABEL REPOSITORY=$REPOSITORY
-
 ENV GOPATH=/go
 ENV GOCACHE=/go/build-cache
-ENV VERSION=${VERSION:-unknown}
 
 RUN apk add --no-cache make gcc musl-dev linux-headers git gettext ca-certificates binutils binutils-gold
 
@@ -26,7 +20,8 @@ COPY docker/evm-api-cache/evm-api.mod /tmp/evm-api-cache/go.mod
 COPY docker/evm-api-cache/evm-api.sum /tmp/evm-api-cache/go.sum
 COPY docker/evm-api-cache/dependencies.go /tmp/evm-api-cache/dependencies.go
 RUN cd /tmp/evm-api-cache \
-    && GOWORK=off GOMODCACHE=/go/pkg/mod go mod download \
+    && GOWORK=off GOMODCACHE=/go/pkg/mod go mod download
+RUN cd /tmp/evm-api-cache \
     && GOWORK=off GOMODCACHE=/go/pkg/mod go test -mod=readonly -tags=evmapi_cache -run '^$' . \
     && rm -rf /tmp/evm-api-cache
 
@@ -76,5 +71,10 @@ RUN ln -s /usr/local/go/bin/go /usr/local/bin/go
 WORKDIR /app
 COPY docker/etc ./etc
 RUN addgroup -S app && adduser -S -G app app
+ENV VERSION=${VERSION:-unknown}
+LABEL GIT_COMMIT=$GIT_COMMIT
+LABEL BUILD_DATE=$BUILD_DATE
+LABEL SERVICE_NAME=$SERVICE_NAME
+LABEL REPOSITORY=$REPOSITORY
 USER app
 CMD ["/bin/sh"]
