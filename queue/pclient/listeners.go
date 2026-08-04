@@ -118,6 +118,7 @@ func (b *Client) listenRawGoroutine(
 			PublishTime: msg.PublishTime,
 			Attempt:     msg.DeliveryAttempt,
 			Attributes:  msg.Attributes,
+			OrderingKey: msg.OrderingKey,
 		}
 
 		ctx = keys.SetCtxValue(ctx, keys.MSGID, msg.ID)

@@ -19,6 +19,7 @@ const (
 type Message struct {
 	Headers     map[string][]string
 	Attributes  map[string]string
+	OrderingKey string
 	PublishTime time.Time
 	Data        []byte
 	Attempt     *int   `json:"attempt"`
