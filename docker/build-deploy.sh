@@ -6,7 +6,7 @@ COMPANY_NAME="${COMPANY_NAME:-global-torque}"
 SERVICE_NAME="${SERVICE_NAME:-go-common}"
 REGISTRY="${REGISTRY:-cr.webdevelop.pro}"
 CONTAINER_ENGINE="${CONTAINER_ENGINE:-docker}"
-PLATFORMS="linux/amd64,linux/arm64"
+PLATFORMS="${PLATFORMS:-linux/amd64,linux/arm64}"
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 REPOSITORY_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)

@@ -11,6 +11,21 @@ This repository is a multi-module Go library for shared Global Torque service pl
 - Import by each module path, for example `github.com/global-torque/go-common/db/v2`, not a root `go-common` package.
 - Many modules depend on published sibling versions in `go.mod`; when editing across modules, check `go.work` and local replaces before assuming dependency behavior.
 
+## Publishing Modules
+
+- Release only modules whose directory tree changed since their latest tag.
+  The tag format is `<module>/v<major>.<minor>.<patch>`, for example
+  `queue/v2.0.10`.
+- Inspect tag ancestry before publishing. Module tags may live on focused
+  branches that have not yet merged into `master`; never place a numerically
+  newer tag on a commit that drops behavior from the previous release.
+- Validate the exact release commit with `go vet ./...`, focused
+  `golangci-lint run --new-from-rev <previous-tag>`, `go test -count=1 ./...`,
+  and `go test -race -count=1 ./...` from the module directory.
+- Use an annotated tag and push that exact ref. Confirm it with
+  `GOWORK=off go mod download -json <module>@<version>` before updating
+  consumers.
+
 ## Package Map
 
 - `github.com/global-torque/go-common/configurator/v2`: env and `.env` loading through `envconfig`.
@@ -314,9 +329,9 @@ This repository is a multi-module Go library for shared Global Torque service pl
 - Do not use for: application package imports.
 - Key APIs: `docker/Dockerfile`, `docker/etc/make.sh`, `docker/etc/golangci.yml`, `docker/etc/air.toml`, `docker/build-deploy.sh`.
 - Configuration: Docker build args include `GIT_COMMIT`, `BUILD_DATE`, `SERVICE_NAME`, `REPOSITORY`, `VERSION`; root CI builds Go 1.25.8 image variants.
-- Wiring pattern: dependent Dockerfiles can use `FROM cr.webdevelop.us/global-torque/go-common:latest-dev AS builder` and run `./make.sh build`.
+- Wiring pattern: dependent Dockerfiles can use `FROM cr.webdevelop.pro/global-torque/go-common:latest-dev AS builder` and run `./make.sh build`.
 - Testing helpers: root `.github/workflows/ci.yaml` runs module vet/tests with PostgreSQL and Pub/Sub emulator services before image build.
-- Gotchas: this directory is a build seed with blank imports to pre-download heavy dependencies; its module path is not a go-common package path.
+- Gotchas: this directory is a build seed with blank imports to pre-download heavy dependencies; its module path is not a go-common package path. The image also seeds `/go/pkg/mod` and `/go/build-cache` from `docker/evm-api-cache`; `evm-api` uses those exact paths in both its Dockerfile and Compose stack. The snapshot is named `evm-api.mod`/`evm-api.sum` so root module discovery does not treat it as another workspace module; refresh it when `evm-api/go.mod` or its direct external imports change.
 
 ## Cross-Cutting Patterns
 

@@ -68,6 +68,9 @@ msg, err := client.PublishWebhook(ctx, topic, pclient.Webhook{
 ```
 
 Listeners ack when the callback returns nil and nack when it returns an error.
+Raw-message callbacks receive the Pub/Sub ordering key in
+`Message.OrderingKey`, alongside attributes, publish time, and delivery
+attempt.
 
 ## Testing
 
@@ -85,4 +88,6 @@ The package tests skip when the emulator is not configured or reachable.
 - `CreateSubscription` enables exactly-once delivery and a 5 to 10 minute retry
   policy.
 - Messages with delivery attempt greater than 10 are acked and skipped.
+- `Message.OrderingKey` is populated for pull deliveries as of
+  `queue/v2.0.10`.
 - `SetDefaultWebhookCtx` reads request ID and IP from webhook headers.
