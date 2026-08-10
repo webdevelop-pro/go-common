@@ -108,6 +108,7 @@ func NewServer() (*HTTPServer, error) {
 			AllowHeaders: []string{
 				echo.HeaderAuthorization,
 				echo.HeaderContentType,
+				"X-API-Key",
 				echo.HeaderXRequestedWith,
 				echo.HeaderXRequestID,
 				echo.HeaderVary,
